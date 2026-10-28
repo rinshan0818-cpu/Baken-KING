@@ -2,9 +2,6 @@ name: JRA result payout values check (anonymous totals only)
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/jra-result-probe.yml'
 
 permissions:
   contents: write
