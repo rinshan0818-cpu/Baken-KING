@@ -8,6 +8,8 @@ on:
       - 'tests/race-data.test.cjs'
       - 'jra-adapter.js'
       - 'race-bundle.js'
+      - 'race-settlement.js'
+      - 'tests/race-settlement.test.cjs'
       - 'tests/race-bundle.test.cjs'
       - 'scripts/inspect-private-race.cjs'
       - 'tests/private-race-cli.test.cjs'
@@ -29,3 +31,4 @@ jobs:
           node tests/jra-adapter.test.cjs
           node tests/race-bundle.test.cjs
           node tests/private-race-cli.test.cjs
+          node tests/race-settlement.test.cjs
