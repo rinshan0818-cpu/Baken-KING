@@ -317,3 +317,11 @@
 - **利用者はiPhoneのみ**。このCLIは開発環境／将来の非公開Linux環境向けで、現時点でiPhone上から実行できる機能ではない。実JRAデータ取得やサービス連携が可能になったわけではない。
 - GitHub Actionsの通常push実行履歴は現在利用可能な接続では確認できない。ワークフロー作成済み＝テスト実行成功とは扱わない。Actions：https://github.com/rinshan0818-cpu/Baken-KING/actions
 - 実JRA取得・個人利用条件・第三者ソースのコードライセンスは引き続き未解決。アプリUIはv2.5のまま。
+
+## 2026-10-29：iPhone本人専用データ連携の実装方式を整理
+
+- [GitHub Actionsの実行状況バッジ](https://github.com/rinshan0818-cpu/Baken-KING/actions)をREADME冒頭に追加（共通データテスト、jra-scr、MITのkeiba-scraping）。
+- **[本人専用データ連携の設計・完了条件](docs/iphone-private-data-architecture.md)**を追加。
+- 重要な結論：**GitHub ActionsだけではiPhoneに実データを配信できない**。本人だけが読める非公開データ保存先と認証APIが別途必要。GitHub Pagesに個人アクセストークンを埋め込まない。
+- GitHub Actionsの成功・失敗そのものは接続上の制約で未確認。表示バッジはユーザーがGitHub側の状態を直接確認できるようにするためのもの。
+- データソース・コードの権利未確定、実データ取得未実施。**画面はv2.5のまま**。
