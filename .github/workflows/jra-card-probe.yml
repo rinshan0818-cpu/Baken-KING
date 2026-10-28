@@ -1,0 +1,50 @@
+name: One-time JRA historical card numbers probe (no published horse data)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/jra-card-probe.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  historical-card:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install parser dependency
+        run: python -m pip install 'beautifulsoup4>=4.12,<5'
+      - name: Test made-up race HTML (no external requests)
+        run: python -m unittest discover -s tests -p 'test_jra_*probe.py' -v
+      - name: One-off fetch of known official past card
+        shell: bash
+        env:
+          BAKEN_ALLOW_JRA_TEST: 'yes'
+        run: |
+          set +e
+          python scripts/jra_card_probe.py \
+            --live-once \
+            --min-horses 16 \
+            --status-file docs/jra-card-probe-status.json
+          code=$?
+          echo "CARD_EXIT_CODE=$code" >> "$GITHUB_ENV"
+          exit 0
+      - name: Save horse COUNT only to public GitHub status
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/jra-card-probe-status.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Update one-card horse count status (not horse data) [skip ci]"
+            git push origin HEAD:main
+          fi
+      - name: Fail on incomplete extraction
+        if: env.CARD_EXIT_CODE != '0'
+        run: exit 1
