@@ -87,11 +87,26 @@ def parse_program(html: str, day: str) -> list[dict]:
 def read_one_public_page(url: str) -> str:
     # Check robots for this user agent, and do not bypass a refusal or error.
     robots_url = "https://www.jra.go.jp/robots.txt"
+    try:
+        rule_request = Request(robots_url, headers={
+            "User-Agent": USER_AGENT, "Accept": "text/plain"
+        })
+        with urlopen(rule_request, timeout=20) as rules_response:
+            if rules_response.status != 200:
+                raise ValueError("robots_unexpected_http")
+            if rules_response.geturl().split("/")[2] != "www.jra.go.jp":
+                raise ValueError("robots_redirect_to_other_host")
+            raw_rules = rules_response.read(50001)
+            if len(raw_rules) > 50000:
+                raise ValueError("robots_too_large")
+    except HTTPError as error:
+        raise ValueError("robots_http_" + str(error.code)) from None
+    except URLError:
+        raise ValueError("robots_network_error") from None
     robots = RobotFileParser()
-    robots.set_url(robots_url)
-    robots.read()
+    robots.parse(raw_rules.decode("utf-8", errors="strict").splitlines())
     if not robots.can_fetch(USER_AGENT, url):
-        raise ValueError("robots_disallow_or_unavailable")
+        raise ValueError("robots_disallow")
     request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html"})
     with urlopen(request, timeout=20) as response:
         if response.status != 200:
