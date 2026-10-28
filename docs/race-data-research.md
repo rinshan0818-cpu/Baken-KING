@@ -162,3 +162,30 @@ Baken-KINGは**非商用・広告なし・課金なし**の個人と少人数の
 - 自動取得が許容されるかは**非商用・本人1人用でも別途確認**。過去データ・単なる数値・著作物、元サイトの利用規約はそれぞれ別の論点。
 
 参照：jra-scr README https://github.com/kawaberi01/jra-scr ; keiba-scraping README https://github.com/KeibaAI-developer/keiba-scraping ; data-interface README https://github.com/KeibaAI-developer/keiba-data-interface ; JRA利用案内 https://www.jra.go.jp/use/
+
+## 2026-10-29 検証フェーズ：公開ソースの構造を追加確認
+
+### 第一候補の注意点（jra-scr）
+- READMEではPython 3.12+、FastAPI、SQLiteキャッシュ、出馬表・オッズ・結果・払戻APIを説明。
+- 取得元はJRA公式サイトHTMLの解析。データ利用規約・アクセス頻度の確認を開発者自身も注意喚起。
+- **公開のファイル一覧にLICENSEファイルは確認できない**（2026-10-29閲覧）。ソースの再配布・改変を当然に認めるものと扱わない。検証前に開発者に利用ライセンスを確認する。
+- ローカルAPIは既定で127.0.0.1:8000で、READMEに**認証未実装のためインターネット公開禁止**と明記。iPhoneから直接接続できる公開サーバーではない。
+- 保存済み発走前スナップショットは、**過去に収集して保存したもの**の参照であり、過去の全レースの発走前オッズが自動復元できるわけではない。
+- 参照：https://github.com/kawaberi01/jra-scr 、https://github.com/kawaberi01/jra-scr/blob/main/docs/jra/05_API%E4%BB%95%E6%A7%98.md
+
+### 第二候補の注意点（keiba-scraping）
+- MITコードライセンスはGitHubページで確認。
+- **出馬表のEntryPageScraper、結果と8券種払戻のResultPageScraperはnetkeibaのページを例示**。一方、JRA公式からのオッズ取得は別のPlaywright関数として実装。
+- そのため、**JRA公式だけで出馬表→全払戻が揃うと断定できない**。netkeibaの利用規約上の取り扱いを慎重に評価する必要がある。
+- 参照：https://github.com/KeibaAI-developer/keiba-scraping
+
+### Baken-KING側の検証コード（実データ取得なし）
+- `tests/race-data.test.cjs`：架空の過去レースfixtureを検証し、重複馬番拒否と本番購入禁止を確認するオフラインテスト。
+- `.github/workflows/validate-race-data.yml`：LinuxのGitHub Actionsで上記テストを走らせる設定を追加。**ワークフローの実行成功までは未確認**。
+- 第三者の競馬サイトへのアクセス・取得・保存・公開は行わない。これはデータ変換基盤の動作検証であり、jra-scrやkeiba-scrapingの実行テストではない。
+
+### 次の進捗ゲート
+1. jra-scrの作者に**コード使用ライセンス**と、非商用個人利用での取得方針の助言を照会。
+2. 取得元サイトの利用条件と個人的な自動取得の扱いを確認。
+3. 条件を満たす場合のみ非公開のLinux環境で、過去の出馬表・結果・払戻を単発取得して検証（公開リポジトリへ収録しない）。
+4. データ形式が確定したら変換アダプターを作成し、本人のiPhoneへ**認証付き**で接続。GitHub PagesにAPI秘密情報を埋め込まない。
