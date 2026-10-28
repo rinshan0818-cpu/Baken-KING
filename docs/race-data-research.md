@@ -321,3 +321,13 @@ jra-scrのPython/Linux動作可否を確かめるため、Baken-KINGに**独立�
 - 初回は`jra.jp/robots.txt`取得判定に失敗、次に`www.jra.go.jp`の文字コードが原因で失敗。公式`www.jra.go.jp/robots.txt`のポリシーを遵守し、HTML文字コード判定を修正して成功。
 - **大切な未達成**：この成功は「開催予定」に限定する。馬番・出走取消・結果・払戻は未取得。iPhone自動反映や恒常的スケジュール実行、サイト利用・情報再利用に関する許可は未確立。
 - 続いて実レースの馬番を検証するため、`scripts/jra_card_probe.py`と`.github/workflows/jra-card-probe.yml`を追加。対象は2026年10月25日東京11RのJRA公式過去出馬表**1レースのみ**。公開保存するのは抽出成否と頭数だけ。初回はHTML表の構造が想定と異なり`horse_number_table_missing`、現在匿名の表構造情報を使って改善中。
+
+## 2026-10-29 追加確定：出馬表の掲載終了と、JRA公式結果・7券種の自動検出成功
+
+- 2026/10/25 東京11Rの旧出馬表を公式ページで改めて読むと **「このレースの出馬表の掲載は終了しております」** と表示。[確認ページ](https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde1005202604091120261025%2F3A)。したがって旧出馬表から馬番を後追いで取得できず、`horse_number_table_missing`はCSS構造ではなく**対象情報の掲載期限切れ**と判明した。これは馬番を金曜／土曜の番号確定後に早めに保存する重要な理由。
+- `scripts/jra_card_probe.py`に`card_publication_ended`の明示的な検出を追加、架空の掲載終了HTMLを使った回帰テストも追加。**過去出馬表への自動再試行を停止**。
+- 出馬表と違って過去の公式[レース結果](https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1005202604091120261025%2FF6)は現在も閲覧可能。独立した `scripts/jra_result_probe.py`で1回だけJRA公式HTMLを自動取得し、**着順表示・払戻セクション・7券種の存在を実際のページ上で検証成功**。
+- GitHub Actionsが書き戻した[実際の検証メタデータ](jra-result-probe-status.json)：`status:"ok"`、`stage:"completed"`、`resultTextPresent:true`、`payoutSectionPresent:true`、`payoutTypeCount:7`。実レースの馬名、馬番、払戻の組合せ・金額、ページ本文を**公開GitHubへ保存していない**。
+- `tests/test_jra_result_probe.py`に架空の7券種HTMLテストも追加。**結果・払戻の各馬番・金額の機械的な構造化、完全性検証、自動精算・iPhoneへの認証配信はまだ未達成**。これはまず公式の実ページへアクセスし7券種の掲載存在を機械的に確認できたという成果。
+- **成功した単発検証後**、`.github/workflows/jra-calendar-probe.yml`・`jra-result-probe.yml`・`jra-card-probe.yml`をすべて手動起動専用に変更した。自動定期アクセスや、同じ期限切れページへの無意味な再アクセスを避けるため。取得元の利用規約・著作物の扱い、本人用保存と自動アクセス可否を確認するまで継続運用しない。
+- 達成した確定事実は「公式予定の**10/31・11/1の48レース**を自動取得・解析」「10/25東京11Rで公式結果・7券種の表示を自動検出」。**馬番の事前自動取得・各券種ごとの配当額抽出は未達成**。
