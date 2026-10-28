@@ -184,10 +184,12 @@ def run() -> int:
         reason = str(exc) if isinstance(exc, ValueError) else type(exc).__name__
         if len(reason) > 50 or not re.fullmatch(r"[A-Za-z0-9_]+", reason):
             reason = "other_value_error" if isinstance(exc, ValueError) else "other_exception"
+        safe_detail = re.sub(r"[^A-Za-z0-9 _.,:()=-]", "", str(exc))[:140]
         status = {
             "checkedAtUtc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "date": args.date, "url": url, "phase": "program-only",
             "status": "failed", "errorCode": reason, "stage": stage,
+            "diagnostic": safe_detail if reason in ("other_value_error", "other_exception") else None,
             "sourceDataPublished": False,
         }
         code = 1
