@@ -1,1 +1,16 @@
-{"status":"not-run","date":"2026-10-25","venue":"東京","raceNumber":11,"phase":"historic-results-payouts-availability-only","sourceDataPublished":false}
+{
+  "status": "ok",
+  "stage": "completed",
+  "resultTextPresent": true,
+  "payoutSectionPresent": true,
+  "payoutTypeCount": 7,
+  "htmlTableCount": 3,
+  "resultTableCount": 0,
+  "resultRowCount": 0,
+  "checkedAtUtc": "2026-10-28T22:46:32+00:00",
+  "date": "2026-10-25",
+  "venue": "東京",
+  "raceNumber": 11,
+  "phase": "historic-results-payouts-availability-only",
+  "sourceDataPublished": false
+}
