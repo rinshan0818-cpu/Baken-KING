@@ -226,3 +226,18 @@ Baken-KINGは**非商用・広告なし・課金なし**の個人と少人数の
 - `convertOdds`は**外部データの真偽・利用許諾を検証しない**。現在は情報変換のみであり、アプリでオッズ表示・購入・自動精算を行うものではない。
 - **Linux上でのjra-scr実アクセスは未実施**：作者のライセンス表示がないこと、JRAのHTML自動取得の利用条件が未確定なこと、本人専用の非公開実行環境・接続手段が未整備なことが理由。GitHub Actionsの公開ログや成果物に実データを残さない。
 - **候補の位置づけ**：技術的に有望だが、自動取得の権利・運用はまだ未解決。公開GitHub Pagesへ実JRAデータを配置しない。
+
+## 2026-10-29 Linux実行PoC（実際の競馬サイトへのアクセスなし）
+
+jra-scrのPython/Linux動作可否を確かめるため、Baken-KINGに**独立したGitHub Actionsワークフロー**を追加した。
+
+- ファイル：`.github/workflows/check-jra-scr-offline.yml`
+- 実行環境：UbuntuのGitHub Actions、Python 3.12。
+- 対象ソース：`kawaberi01/jra-scr`の固定コミット `3ee05a4f7896cc2d50358096672393ce95364ff4`。GitHub Actions内の一時ディレクトリにチェックアウトするだけで、Baken-KINGの配布物へ取り込まない。
+- 検証内容：依存ライブラリの導入、`jra_srb.models`からの`RaceCard/RaceOdds/RaceResult`読込、**架空の馬**だけで各モデルを組み立てるオフライン・スモークテスト。
+- 自動起動条件：ワークフローファイル自体の変更時。`workflow_dispatch`で手動起動も可能。現在の実行状況：https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml
+- **スモークテスト成功はこの時点で未確認**。実行ログで確認するまで「Linux実行成功」と断定しない。
+- **実JRAサイト・netkeibaサイトへのアクセスなし。** 取得・保存・再配信の利用条件が確定する前に自動スクレイピングを実行しない。
+- この検証に通れば、少なくともWindowsがなくてもPython環境でjra-scrのモデルを扱えるかが確かめられる。ただしWeb取得自体の可否や利用許諾は別の問題。
+
+次の段階では、①Actionsの実行ログと失敗原因、②プログラムのLICENSE（作者への確認が必要）、③JRAサイトへの個人用自動取得可否、④非公開の個人データ保存・iPhone接続を順番に解決する。
