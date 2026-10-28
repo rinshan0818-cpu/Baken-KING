@@ -108,18 +108,24 @@ def read_one_public_page(url: str) -> str:
     if not robots.can_fetch(USER_AGENT, url):
         raise ValueError("robots_disallow")
     request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html"})
-    with urlopen(request, timeout=20) as response:
-        if response.status != 200:
-            raise ValueError("http_error")
-        content = response.read(MAX_HTML_BYTES + 1)
-        if len(content) > MAX_HTML_BYTES:
-            raise ValueError("response_too_large")
-        content_type = response.headers.get("Content-Type", "").lower()
-        if "html" not in content_type:
-            raise ValueError("unexpected_content_type")
-        # Japanese JRA pages normally declare utf-8 in their HTML.
-        encoding = response.headers.get_content_charset() or "utf-8"
-        return content.decode(encoding, errors="strict")
+    try:
+        with urlopen(request, timeout=20) as response:
+            if response.status != 200:
+                raise ValueError("program_unexpected_http")
+            if response.geturl().split("/")[2] != "www.jra.go.jp":
+                raise ValueError("program_redirect_to_other_host")
+            content = response.read(MAX_HTML_BYTES + 1)
+            if len(content) > MAX_HTML_BYTES:
+                raise ValueError("response_too_large")
+            content_type = response.headers.get("Content-Type", "").lower()
+            if "html" not in content_type:
+                raise ValueError("unexpected_content_type")
+            encoding = response.headers.get_content_charset() or "utf-8"
+            return content.decode(encoding, errors="strict")
+    except HTTPError as error:
+        raise ValueError("program_http_" + str(error.code)) from None
+    except URLError:
+        raise ValueError("program_network_error") from None
 
 
 def summarize(races: list[dict], day: str, url: str) -> dict:
@@ -151,6 +157,7 @@ def run() -> int:
     status_path = Path(args.status_file)
     status_path.parent.mkdir(parents=True, exist_ok=True)
     url = "not-fetched"
+    stage = "validation"
     try:
         if bool(args.html_file) == bool(args.live_once):
             raise ValueError("choose_one_input_mode")
@@ -158,26 +165,29 @@ def run() -> int:
             raise ValueError("invalid_min_races")
         url = jra_calendar_url(args.date)
         if args.live_once:
+            stage = "robots_and_program_fetch"
             import os
             if os.environ.get("BAKEN_ALLOW_JRA_TEST") != "yes":
                 raise ValueError("live_fetch_not_enabled")
             html = read_one_public_page(url)
         else:
             html = Path(args.html_file).read_text(encoding="utf-8")
+        stage = "html_parsing"
         races = parse_program(html, args.date)
         if len(races) < args.min_races:
             raise ValueError("insufficient_race_rows")
         status = summarize(races, args.date, url)
+        status["stage"] = "completed"
         code = 0
     except (ValueError, HTTPError, URLError, UnicodeError, OSError) as exc:
         # NEVER include HTTP body, race data, cookies or raw exception paths.
         reason = str(exc) if isinstance(exc, ValueError) else type(exc).__name__
         if len(reason) > 50 or not re.fullmatch(r"[A-Za-z0-9_]+", reason):
-            reason = "invalid_source"
+            reason = "other_value_error" if isinstance(exc, ValueError) else "other_exception"
         status = {
             "checkedAtUtc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "date": args.date, "url": url, "phase": "program-only",
-            "status": "failed", "errorCode": reason,
+            "status": "failed", "errorCode": reason, "stage": stage,
             "sourceDataPublished": False,
         }
         code = 1
