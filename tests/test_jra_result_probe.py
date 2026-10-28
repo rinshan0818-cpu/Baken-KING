@@ -17,15 +17,18 @@ def fixture():
     <table><tr><th>着順</th><th>馬番</th><th>馬名</th></tr>
     <tr><td>1</td><td>4</td><td>架空A</td></tr></table>
     <h2>払戻金</h2><p>単勝 4 100円</p><p>複勝 4 100円</p>
-    <p>馬連 2-4 100円</p><p>ワイド 2-4 100円</p>
+    <p>馬連 2-4 590円</p><p>ワイド 2-4 100円</p>
     <p>馬単 4-2 100円</p><p>3連複 2-4-5 100円</p>
-    <p>3連単 4-2-5 100円</p><h2>勝馬の紹介</h2></body></html>"""
+    <p>3連単 4-2-5 7,670円</p><h2>勝馬の紹介</h2></body></html>"""
 
 
 class ResultProbeTests(unittest.TestCase):
     def test_synthetic_seven_payout_categories(self):
         result = probe.inspect_results(fixture())
         self.assertEqual(result["payoutTypeCount"], 7)
+        self.assertEqual(result["parsedPayoutTypeCount"], 7)
+        self.assertEqual(result["parsedPayoutEntryCount"], 7)
+        self.assertTrue(result["independentReferenceCheck"])
         self.assertEqual(result["resultTableCount"], 1)
 
     def test_wrong_date(self):
