@@ -31,7 +31,7 @@ def jra_calendar_url(day: str) -> str:
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day):
         raise ValueError("invalid_date_format")
     dt = datetime.strptime(day, "%Y-%m-%d")
-    return f"https://jra.jp/keiba/calendar{dt.year}/{dt.year}/{dt.month:02d}/{dt.day:02d}{dt.day:02d}.html"
+    return f"https://jra.jp/keiba/calendar{dt.year}/{dt.year}/{dt.month:02d}/{dt.month:02d}{dt.day:02d}.html"
 
 
 def parse_program(html: str, day: str) -> list[dict]:
