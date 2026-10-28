@@ -63,5 +63,42 @@ function convertResult(result,cardRace){
  });
  return {status:"provisional",finish:ranked.map(e=>e.number),payouts};
 }
-root.BakenJraAdapter={convert,convertResult};
+
+// Convert the documented RaceOdds/OddsEntry model. This is not an odds provider.
+// Reject unverified timestamps and unsupported multi-price ranges instead of
+// presenting them as a single real-time price.
+function convertOdds(data,race){
+ if(!race||!race.raceId||!data||typeof data!=="object")throw Error("オッズ情報が不足しています");
+ const timestamp=Date.parse(data.fetched_at);
+ if(typeof data.fetched_at!=="string"||!/(Z|[+-]\d{2}:\d{2})$/.test(data.fetched_at)||!Number.isFinite(timestamp))throw Error("取得時刻のないオッズは使えません");
+ const preRace=timestamp<Date.parse(race.scheduledStartAt);
+ const groups=[];
+ if(Array.isArray(data.entries)&&data.bet_type)groups.push({kind:data.bet_type,items:data.entries});
+ if(data.odds&&typeof data.odds==="object"&&!Array.isArray(data.odds)){
+  for(const [kind,items] of Object.entries(data.odds)){if(Array.isArray(items))groups.push({kind,items})}
+ }
+ if(!groups.length)throw Error("対象のオッズがありません");
+ const output=[],seen=new Set();
+ for(const group of groups){
+  const type=betKinds[group.kind];if(!type)continue;
+  for(const item of group.items){
+   if(!item||typeof item!=="object")throw Error("オッズ項目が不正です");
+   if(item.odds_min!==null&&item.odds_min!==undefined||item.odds_max!==null&&item.odds_max!==undefined)continue;
+   const combination=Array.isArray(item.combination)?item.combination.join("-"):String(item.combination||"");
+   const numbers=parseNumbers(combination);
+   if(numbers.length!==choices[type]||numbers.some(n=>!race.horses.some(h=>h.number===n)))throw Error("オッズ馬番が不正です");
+   const odds=Number(String(item.odds||"").replace(/[,，倍\s]/g,""));
+   if(!Number.isFinite(odds)||odds<1||odds>99999)continue;
+   const orderedTypes=new Set(["馬単","三連単"]);
+   const normalized=orderedTypes.has(type)?numbers:numbers.slice().sort((a,b)=>a-b);
+   const key=type+":"+normalized.join("-");
+   if(seen.has(key))continue;
+   seen.add(key);
+   output.push({type,numbers:normalized,odds});
+  }
+ }
+ if(!output.length)throw Error("利用可能なオッズがありません");
+ return {raceId:race.raceId,observedAt:data.fetched_at,isBeforeStart:preRace,entries:output,verified:false};
+}
+root.BakenJraAdapter={convert,convertResult,convertOdds};
 })(typeof window!=="undefined"?window:globalThis);
