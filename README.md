@@ -228,3 +228,13 @@
 - `keiba-scraping` はMITコードライセンス。ただし出馬表と8券種の払戻の具体例はnetkeiba由来。JRA公式データだけで全てを揃えると誤認しない。
 - 最優先課題は両ツールの権利・技術的な可用性の検証。利用条件確認前に実データを公開リポジトリへ載せない。
 - 詳細：[`docs/race-data-research.md`](docs/race-data-research.md)。
+
+## 2026-10-29：jra-scrデータ型の直接確認と独自変換アダプター
+
+- jra-scrの `src/jra_srb/models.py` で出馬表／オッズ／結果／払戻のJSONモデルを確認。馬番・枠番・配当が文字列であり、Baken-KING側への型変換が必要。
+- 対応券種の列挙に**枠連が見当たらない**。全8券種対応とはまだ言えない。
+- jra-scrの`LICENSE`は取得できず、`pyproject.toml`にもライセンス指定が見当たらない。**元コードはコピーしていない**。
+- **独自実装 `jra-adapter.js`**：将来、許諾済みのjra-scr形式データを使えるようになったときの出馬表変換（10競馬場、馬番、枠番、取消、発走時刻）。今は架空入力のみ。
+- **`tests/jra-adapter.test.cjs`** を追加し、GitHub Actionsのオフライン検証対象を拡張。ワークフローの実行成功は未確認。
+- **実JRAの取得・保存・アプリ連携は未実装**。現在の画面バージョンはv2.5のまま。
+- 詳細：[`docs/race-data-research.md`](docs/race-data-research.md)。
