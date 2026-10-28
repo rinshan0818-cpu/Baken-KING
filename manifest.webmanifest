@@ -1,0 +1,17 @@
+{
+  "name": "Baken-KING",
+  "short_name": "Baken-KING",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F5F7FB",
+  "theme_color": "#0B2D5B",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
