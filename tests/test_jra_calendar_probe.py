@@ -30,11 +30,11 @@ class CalendarProbeTest(unittest.TestCase):
     def test_date_url_is_official_layout(self):
         self.assertEqual(
             probe.jra_calendar_url("2026-10-31"),
-            "https://jra.jp/keiba/calendar2026/2026/10/1031.html",
+            "https://www.jra.go.jp/keiba/calendar2026/2026/10/1031.html",
         )
         self.assertEqual(
             probe.jra_calendar_url("2026-11-01"),
-            "https://jra.jp/keiba/calendar2026/2026/11/1101.html",
+            "https://www.jra.go.jp/keiba/calendar2026/2026/11/1101.html",
         )
 
     def test_fictional_two_venues_twenty_four_races(self):
