@@ -16,7 +16,7 @@ function convert(card,options){
   if(typeof r.horse_name!=="string"||!r.horse_name.trim())throw Error("馬名が不正");
   return {number:n,frame:f,name:r.horse_name,status:r.status==="withdrawn"?"scratched":"running"};
  });
- const result={schemaVersion:1,date:options.date,venue,raceNumber:options.raceNumber,
+ const result={schemaVersion:1,date:options.date,venue,raceNumber:options.raceNumber,upstreamRaceId:card.race_id?String(card.race_id):undefined,
   scheduledStartAt:options.date+"T"+card.start_time+":00+09:00",
   source:{kind:"fixture",label:"変換構造のオフライン試験用（実データではない）"},horses};
  // Results and payouts intentionally not accepted until source rules and exact semantics are verified.
@@ -43,6 +43,7 @@ function parseYen(raw){
 }
 function convertResult(result,cardRace){
  if(!cardRace||!Array.isArray(cardRace.horses)||!result||!Array.isArray(result.results)||!Array.isArray(result.payouts))throw Error("結果・払戻が不足しています");
+ if(cardRace.upstreamRaceId&&result.race_id&&String(result.race_id)!==cardRace.upstreamRaceId)throw Error("結果のレースIDが出馬表と一致しません");
  const validNumbers=new Set(cardRace.horses.map(x=>x.number));
  if(!result.results.length)throw Error("着順が空です");
  const ranked=result.results.map(e=>{
@@ -69,6 +70,7 @@ function convertResult(result,cardRace){
 // presenting them as a single real-time price.
 function convertOdds(data,race){
  if(!race||!race.raceId||!data||typeof data!=="object")throw Error("オッズ情報が不足しています");
+ if(race.upstreamRaceId&&data.race_id&&String(data.race_id)!==race.upstreamRaceId)throw Error("オッズのレースIDが出馬表と一致しません");
  const timestamp=Date.parse(data.fetched_at);
  if(typeof data.fetched_at!=="string"||!/(Z|[+-]\d{2}:\d{2})$/.test(data.fetched_at)||!Number.isFinite(timestamp))throw Error("取得時刻のないオッズは使えません");
  const preRace=timestamp<Date.parse(race.scheduledStartAt);
