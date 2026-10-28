@@ -42,7 +42,8 @@ BET_SELECTION_SIZES = {
 def extract_payouts(html: str) -> list[dict]:
     """In-memory seven-type parsing; never commits or prints individual values."""
     soup = BeautifulSoup(html, "html.parser")
-    lines = [line.strip().replace(" ", "") for line in soup.get_text("\n", strip=True).splitlines()]
+    lines = [piece.strip() for line in soup.get_text("\n", strip=True).splitlines()
+             for piece in re.split(r"[\s\u3000]+", line.strip())]
     lines = [line for line in lines if line]
     end = next((i for i, line in enumerate(lines) if "勝馬の紹介" in line), len(lines))
     starts = [i for i, line in enumerate(lines[:end]) if line == "払戻金"]
