@@ -2,6 +2,9 @@ name: JRA historical payout page one-off check (metadata only)
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/jra-result-probe.yml'
 
 permissions:
   contents: write
