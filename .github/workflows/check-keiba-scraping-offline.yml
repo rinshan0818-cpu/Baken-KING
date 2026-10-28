@@ -1,0 +1,40 @@
+name: Check MIT-licensed keiba-scraping on Linux (offline)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/check-keiba-scraping-offline.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch fixed MIT-licensed source revision
+        run: |
+          git clone https://github.com/KeibaAI-developer/keiba-scraping.git upstream-keiba-scraping
+          cd upstream-keiba-scraping
+          git checkout --detach 16280733a2fb344b7733a2a9ef8a9d4e1aacacf0
+          test -f LICENSE
+      - name: Install Python package (not browser drivers)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ./upstream-keiba-scraping
+      - name: Check install without scraping any racing websites
+        run: |
+          python - <<'PY'
+          import importlib
+          import importlib.metadata
+          version=importlib.metadata.version("keiba-scraping")
+          module=importlib.import_module("scraping")
+          print("Installed:", version)
+          print("Imported:", module.__name__)
+          print("NO JRA/netkeiba requests, NO scraped data stored")
+          PY
