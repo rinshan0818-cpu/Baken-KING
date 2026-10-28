@@ -47,8 +47,8 @@ class PayoutParseError(ValueError):
         self.category_counts = {kind: counts[kind] for kind in BET_SELECTION_SIZES}
         text = BeautifulSoup(html, "html.parser").get_text("\n", strip=True)
         self.token_stats = {
-            "priceTokenCount": len(re.findall(r"\\d[\\d,，]*\\s*円", text)),
-            "hyphenatedComboCount": len(re.findall(r"(?<!\\d)\\d{1,2}-\\d{1,2}(?:-\\d{1,2})?", text))
+            "priceTokenCount": len(re.findall(r"\d[\d,，]*\s*円", text)),
+            "hyphenatedComboCount": len(re.findall(r"(?<!\d)\d{1,2}-\d{1,2}(?:-\d{1,2})?", text))
         }
 
 
