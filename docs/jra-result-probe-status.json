@@ -2,7 +2,20 @@
   "status": "failed",
   "stage": "parse",
   "errorCode": "seven_payout_values_missing",
-  "checkedAtUtc": "2026-10-28T22:48:48+00:00",
+  "parsedCountsByType": {
+    "win": 0,
+    "place": 0,
+    "quinella": 0,
+    "wide": 0,
+    "exacta": 0,
+    "trio": 0,
+    "trifecta": 0
+  },
+  "safeTokenStats": {
+    "priceTokenCount": 12,
+    "hyphenatedComboCount": 8
+  },
+  "checkedAtUtc": "2026-10-28T22:49:59+00:00",
   "date": "2026-10-25",
   "venue": "東京",
   "raceNumber": 11,
