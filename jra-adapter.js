@@ -103,5 +103,29 @@ function convertOdds(data,race){
  if(!output.length)throw Error("利用可能なオッズがありません");
  return {raceId:race.raceId,observedAt:data.fetched_at,isBeforeStart:preRace,entries:output,verified:false};
 }
-root.BakenJraAdapter={convert,convertResult,convertOdds};
+
+// JRA-srb MeetingSnapshot -> pre-race program index. No horses until the card exists.
+function convertMeeting(meeting){
+ if(!meeting||typeof meeting.date!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(meeting.date))throw Error("開催日が不正です");
+ const venue=venues[meeting.course];
+ if(!venue||!Array.isArray(meeting.races))throw Error("開催場・レース一覧が不正です");
+ const numbers=new Set();
+ const races=meeting.races.map(r=>{
+  const no=Number(r.race_no);
+  if(!Number.isInteger(no)||no<1||no>12||numbers.has(no))throw Error("レース番号の重複または範囲外です");
+  numbers.add(no);
+  const time=r.start_time??null;
+  if(time!==null&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(time))throw Error("発走予定時刻が不正です");
+  return {
+   raceId:meeting.date+"-"+venue+"-"+no,
+   upstreamRaceId:r.race_id?String(r.race_id):null,
+   date:meeting.date,venue,raceNumber:no,raceName:r.race_name||null,
+   scheduledStartAt:time?meeting.date+"T"+time+":00+09:00":null,
+   cardAvailable:false,purchaseAllowed:false
+  };
+ });
+ races.sort((a,b)=>a.raceNumber-b.raceNumber);
+ return {date:meeting.date,venue,races,sourceVerified:false};
+}
+root.BakenJraAdapter={convert,convertResult,convertOdds,convertMeeting};
 })(typeof window!=="undefined"?window:globalThis);
