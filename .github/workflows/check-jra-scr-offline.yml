@@ -1,0 +1,59 @@
+name: Check jra-scr on Linux (offline only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check out pinned public jra-scr source for temporary testing
+        shell: bash
+        run: |
+          git clone https://github.com/kawaberi01/jra-scr.git upstream-jra-scr
+          cd upstream-jra-scr
+          git checkout --detach 3ee05a4f7896cc2d50358096672393ce95364ff4
+      - name: Install library and required Python dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ./upstream-jra-scr
+      - name: Validate imports and JSON model shape without network requests
+        shell: bash
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          from jra_srb.models import RaceCard, RaceOdds, RaceResult, Runner, OddsEntry, PayoutEntry
+          card = RaceCard(
+              race_id="FAKE-001",
+              source="offline-smoke-test",
+              fetched_at=datetime.now(timezone.utc),
+              runners=[Runner(frame_no="1", horse_no="1", horse_name="架空の馬")]
+          )
+          odds = RaceOdds(
+              race_id="FAKE-001",
+              source="offline-smoke-test",
+              fetched_at=datetime.now(timezone.utc),
+              bet_type="win",
+              entries=[OddsEntry(bet_type="win", combination=["1"], odds="2.5")]
+          )
+          result = RaceResult(
+              race_id="FAKE-001",
+              source="offline-smoke-test",
+              fetched_at=datetime.now(timezone.utc),
+              payouts=[PayoutEntry(bet_type="win", combination="1", payout="250")]
+          )
+          assert card.runners[0].horse_no == "1"
+          assert odds.entries[0].odds == "2.5"
+          assert result.payouts[0].payout == "250"
+          print("PASS: jra-scr imports and card / odds / result models on Linux")
+          print("NO JRA requests, NO netkeiba requests, NO private or real race data")
+          PY
