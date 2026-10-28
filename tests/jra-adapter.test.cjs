@@ -34,5 +34,18 @@ assert.equal(ctx.BakenRaceData.parseRace({...JSON.parse(fs.readFileSync(path.joi
 assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,results:[{rank:"1",horse_no:"1"},{rank:"1",horse_no:"2"}]},fullRace),/同着/);
 assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,payouts:[{bet_type:"frame",combination:"1-2",payout:"100円"}]},fullRace),/未対応券種/);
 assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,payouts:[{bet_type:"win",combination:"1",payout:"不明"}]},fullRace),/払戻金/);
+
+const fakeOdds={bet_type:"quinella",fetched_at:"2025-10-25T14:50:00+09:00",entries:[{combination:["2","1"],odds:"12.4"}]};
+const mappedOdds=ctx.BakenJraAdapter.convertOdds(fakeOdds,fullRace);
+assert.equal(mappedOdds.entries[0].type,"馬連");
+assert.equal(mappedOdds.entries[0].numbers.join("-"),"1-2");
+assert.equal(mappedOdds.isBeforeStart,true);
+assert.equal(mappedOdds.verified,false);
+assert.throws(()=>ctx.BakenJraAdapter.convertOdds({...fakeOdds,fetched_at:null},fullRace),/取得時刻/);
+const ranged={...fakeOdds,entries:[{combination:["1","2"],odds_min:"2.0",odds_max:"3.0"}]};
+assert.throws(()=>ctx.BakenJraAdapter.convertOdds(ranged,fullRace),/利用可能/);
+const stale=ctx.BakenJraAdapter.convertOdds({...fakeOdds,fetched_at:"2025-10-25T15:46:00+09:00"},fullRace);
+assert.equal(stale.isBeforeStart,false);
+console.log("PASS: odds snapshot normalization, timestamp and range validation");
 console.log("PASS: seven synthetic wager payouts, safety rejections and result mapping");
 console.log("PASS: documented JSON card mapping, withdrawal, timestamps, validation and production lock");
