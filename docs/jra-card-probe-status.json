@@ -1,9 +1,11 @@
 {
-  "status": "not-run",
+  "checkedAtUtc": "2026-10-28T22:41:02+00:00",
   "date": "2026-10-25",
   "venue": "東京",
   "raceNumber": 11,
   "phase": "past-card-horse-number-probe",
-  "sourceDataPublished": false,
-  "note": "Only aggregate horse count, not names or numbers, will be published."
+  "status": "failed",
+  "errorCode": "horse_number_table_missing",
+  "stage": "horse_number_parse",
+  "sourceDataPublished": false
 }
