@@ -11,12 +11,13 @@ function convert(card,options){
  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(card.start_time||""))throw Error("発走時刻が不明・不正");
  if(!Array.isArray(card.runners)||!card.runners.length)throw Error("出馬表が空です");
  const horses=card.runners.map(r=>{
-  const n=Number(r.horse_no),f=Number(r.frame_no);
-  if(!Number.isInteger(n)||n<1||n>18||!Number.isInteger(f)||f<1||f>8)throw Error("馬番・枠番が不正");
-  if(typeof r.horse_name!=="string"||!r.horse_name.trim())throw Error("馬名が不正");
-  return {number:n,frame:f,name:r.horse_name,status:r.status==="withdrawn"?"scratched":"running"};
+  const n=Number(r.horse_no), f=r.frame_no===null||r.frame_no===undefined||r.frame_no===""?null:Number(r.frame_no);
+  if(!Number.isInteger(n)||n<1||n>18||(f!==null&&(!Number.isInteger(f)||f<1||f>8)))throw Error("馬番・枠番が不正");
+  if(!["active","withdrawn","excluded",undefined,null].includes(r.status))throw Error("出走状態が不明です");
+  return {number:n,...(f===null?{}:{frame:f}),...(r.horse_name?{name:r.horse_name}:{}),
+   status:r.status==="withdrawn"?"scratched":r.status==="excluded"?"excluded":"running"};
  });
- const result={schemaVersion:1,date:options.date,venue,raceNumber:options.raceNumber,upstreamRaceId:card.race_id?String(card.race_id):undefined,
+ const result={schemaVersion:1,date:options.date,venue,raceNumber:options.raceNumber,raceName:card.race_name||null,upstreamRaceId:card.race_id?String(card.race_id):undefined,
   scheduledStartAt:options.date+"T"+card.start_time+":00+09:00",
   source:{kind:"fixture",label:"変換構造のオフライン試験用（実データではない）"},horses};
  // Results and payouts intentionally not accepted until source rules and exact semantics are verified.
