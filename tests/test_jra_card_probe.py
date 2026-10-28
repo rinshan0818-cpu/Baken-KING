@@ -34,6 +34,12 @@ class CardProbeTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate"):
             probe.parse_horse_numbers(html)
 
+    def test_expired_card_is_not_a_parser_failure(self):
+        html = "<html><body><h1>2026年10月25日 4回東京9日 11レース</h1>" \
+               "このレースの出馬表の掲載は終了しております。</body></html>"
+        with self.assertRaisesRegex(ValueError, "card_publication_ended"):
+            probe.parse_horse_numbers(html)
+
     def test_no_table_stops(self):
         with self.assertRaisesRegex(ValueError, "table_missing"):
             probe.parse_horse_numbers(fake_card().replace("馬番", "番号"))
