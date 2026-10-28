@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""One-off, privacy-safe compatibility probe of one public JRA results page.
+
+Never saves official page HTML, horse names, horse numbers or payout values.
+A successful probe does NOT imply a licensed data feed or confirmed settlement.
+"""
+from __future__ import annotations
+
+import argparse
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import re
+from bs4 import BeautifulSoup
+from jra_calendar_probe import read_one_public_page
+
+RESULT_URL = (
+    "https://www.jra.go.jp/JRADB/accessS.html?"
+    "CNAME=pw01sde1005202604091120261025%2FF6"
+)
+PAYOUT_TYPES = {
+    "win": ("単勝",), "place": ("複勝",),
+    "quinella": ("馬連",), "wide": ("ワイド",),
+    "exacta": ("馬単",), "trio": ("3連複", "三連複"),
+    "trifecta": ("3連単", "三連単")
+}
+
+
+def inspect_results(html: str) -> dict:
+    soup = BeautifulSoup(html, "html.parser")
+    text = soup.get_text("\n", strip=True).replace("\u3000", " ")
+    if not re.search(r"2026\s*年\s*10\s*月\s*25\s*日", text):
+        raise ValueError("result_date_mismatch")
+    if not re.search(r"4\s*回\s*東京\s*9\s*日", text):
+        raise ValueError("result_meeting_mismatch")
+    if not re.search(r"11\s*レース", text):
+        raise ValueError("result_race_mismatch")
+    if "払戻金" not in text or "着順" not in text:
+        raise ValueError("result_or_payout_missing")
+    end = text.find("勝馬の紹介")
+    payout_start = text.rfind("払戻金", 0, end if end >= 0 else len(text))
+    if payout_start == -1:
+        raise ValueError("payout_section_missing")
+    section = text[payout_start:end if end >= 0 else len(text)]
+    present = [bet for bet, alternatives in PAYOUT_TYPES.items()
+               if any(label in section for label in alternatives)]
+    if len(present) < 7:
+        raise ValueError("seven_payout_types_missing")
+    tables = soup.find_all("table")
+    results_tables = [table for table in tables
+                      if "着順" in table.get_text(" ", strip=True)[:200]
+                      and "馬" in table.get_text(" ", strip=True)[:200]]
+    return {
+        "resultTextPresent": True, "payoutSectionPresent": True,
+        "payoutTypeCount": len(present),
+        "htmlTableCount": len(tables),
+        "resultTableCount": len(results_tables),
+        "resultRowCount": sum(len(t.find_all("tr")) for t in results_tables),
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--html-file", help="Offline fictional input")
+    parser.add_argument("--live-once", action="store_true")
+    parser.add_argument("--status-file", required=True)
+    args = parser.parse_args()
+    stage = "input"
+    try:
+        if bool(args.html_file) == bool(args.live_once):
+            raise ValueError("choose_one_input_mode")
+        if args.live_once:
+            import os
+            if os.environ.get("BAKEN_ALLOW_JRA_TEST") != "yes":
+                raise ValueError("live_fetch_not_enabled")
+            stage = "fetch"
+            html = read_one_public_page(RESULT_URL)
+        else:
+            html = Path(args.html_file).read_text(encoding="utf-8")
+        stage = "parse"
+        counts = inspect_results(html)
+        status = {"status": "ok", "stage": "completed", **counts}
+        code = 0
+    except (ValueError, OSError, UnicodeError) as error:
+        reason = str(error) if isinstance(error, ValueError) else type(error).__name__
+        if not re.fullmatch(r"[A-Za-z0-9_]{1,50}", reason):
+            reason = "other_error"
+        status = {"status": "failed", "stage": stage, "errorCode": reason}
+        code = 1
+    status.update({
+        "checkedAtUtc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "date": "2026-10-25", "venue": "東京", "raceNumber": 11,
+        "phase": "historic-results-payouts-availability-only",
+        "sourceDataPublished": False
+    })
+    out = Path(args.status_file)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print("JRA result probe", status["status"], status.get("payoutTypeCount", 0), "types")
+    return code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
