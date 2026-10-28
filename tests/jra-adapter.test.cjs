@@ -31,8 +31,17 @@ const converted=ctx.BakenJraAdapter.convertResult(fixtureResult,fullRace);
 assert.equal(converted.payouts.length,7);assert.equal(converted.payouts[6].yenPer100,45670);
 assert.equal(converted.status,"provisional");
 assert.equal(ctx.BakenRaceData.parseRace({...JSON.parse(fs.readFileSync(path.join(root,"data/historical-fixture.json"),"utf8")),result:JSON.parse(JSON.stringify(converted))}).result.finish[0],1);
-assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,results:[{rank:"1",horse_no:"1"},{rank:"1",horse_no:"2"}]},fullRace),/同着/);
-assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,payouts:[{bet_type:"frame",combination:"1-2",payout:"100円"}]},fullRace),/未対応券種/);
+const tiedFinish=ctx.BakenJraAdapter.convertResult({...fixtureResult,results:[{rank:"1",horse_no:"1"},{rank:"1",horse_no:"2"}]},fullRace);
+assert.equal(tiedFinish.placements[0].rank,1);
+assert.equal(tiedFinish.placements[1].rank,1);
+const abnormal=ctx.BakenJraAdapter.convertResult({...fixtureResult,results:[
+ {rank:"1",horse_no:"1"},{rank:"2",horse_no:"2"},{rank:"競走中止",horse_no:"3"},{rank:"失格",horse_no:"4"}
+]},fullRace);
+assert.equal(abnormal.nonFinishers[0].status,"dnf");
+assert.equal(abnormal.nonFinishers[1].status,"disqualified");
+assert.equal(ctx.BakenJraAdapter.convertResult({...fixtureResult,payouts:[{bet_type:"frame",combination:"1-2",payout:"100円"}]},fullRace).payouts.length,0);
+assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,results:[{rank:"1",horse_no:"1"},{rank:"2",horse_no:"1"}]},fullRace),/重複/);
+assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,results:[{rank:"不明",horse_no:"1"}]},fullRace),/不明な結果区分/);
 assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,payouts:[{bet_type:"win",combination:"1",payout:"不明"}]},fullRace),/払戻金/);
 
 const fakeOdds={bet_type:"quinella",fetched_at:"2025-10-25T14:50:00+09:00",entries:[{combination:["2","1"],odds:"12.4"}]};
