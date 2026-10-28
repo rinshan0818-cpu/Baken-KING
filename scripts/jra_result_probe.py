@@ -10,6 +10,7 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+from collections import Counter
 import re
 from bs4 import BeautifulSoup
 from jra_calendar_probe import read_one_public_page
@@ -37,6 +38,18 @@ BET_SELECTION_SIZES = {
     "win": 1, "place": 1, "quinella": 2,
     "wide": 2, "exacta": 2, "trio": 3, "trifecta": 3
 }
+
+
+class PayoutParseError(ValueError):
+    def __init__(self, message: str, entries: list[dict], html: str):
+        super().__init__(message)
+        counts = Counter(x["kind"] for x in entries)
+        self.category_counts = {kind: counts[kind] for kind in BET_SELECTION_SIZES}
+        text = BeautifulSoup(html, "html.parser").get_text("\n", strip=True)
+        self.token_stats = {
+            "priceTokenCount": len(re.findall(r"\\d[\\d,，]*\\s*円", text)),
+            "hyphenatedComboCount": len(re.findall(r"(?<!\\d)\\d{1,2}-\\d{1,2}(?:-\\d{1,2})?", text))
+        }
 
 
 def extract_payouts(html: str) -> list[dict]:
@@ -101,13 +114,13 @@ def inspect_results(html: str) -> dict:
     parsed_entries = extract_payouts(html)
     available = {entry["kind"] for entry in parsed_entries}
     if len(available) != 7:
-        raise ValueError("seven_payout_values_missing")
+        raise PayoutParseError("seven_payout_values_missing", parsed_entries, html)
     # This archived race is independently checkable against the JRA official
     # page: validate two known combinations without publishing their values.
     sample = {(entry["kind"], tuple(entry["numbers"])): entry["yenPer100"]
               for entry in parsed_entries}
     if sample.get(("quinella", (2, 4))) != 590 or sample.get(("trifecta", (4, 2, 5))) != 7670:
-        raise ValueError("reference_payout_mismatch")
+        raise PayoutParseError("reference_payout_mismatch", parsed_entries, html)
     tables = soup.find_all("table")
     results_tables = [table for table in tables
                       if "着順" in table.get_text(" ", strip=True)[:200]
@@ -151,6 +164,9 @@ def main() -> int:
         if not re.fullmatch(r"[A-Za-z0-9_]{1,50}", reason):
             reason = "other_error"
         status = {"status": "failed", "stage": stage, "errorCode": reason}
+        if isinstance(error, PayoutParseError):
+            status["parsedCountsByType"] = error.category_counts
+            status["safeTokenStats"] = error.token_stats
         code = 1
     status.update({
         "checkedAtUtc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
