@@ -9,6 +9,8 @@ on:
       - 'jra-adapter.js'
       - 'race-bundle.js'
       - 'tests/race-bundle.test.cjs'
+      - 'scripts/inspect-private-race.cjs'
+      - 'tests/private-race-cli.test.cjs'
       - 'tests/jra-adapter.test.cjs'
       - '.github/workflows/validate-race-data.yml'
 jobs:
@@ -26,3 +28,4 @@ jobs:
           node tests/race-data.test.cjs
           node tests/jra-adapter.test.cjs
           node tests/race-bundle.test.cjs
+          node tests/private-race-cli.test.cjs
