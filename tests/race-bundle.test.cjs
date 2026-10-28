@@ -31,4 +31,10 @@ assert.equal(bundle.mode.development.allowed,true);
 assert.throws(()=>ctx.BakenRaceBundle.combine({card,odds:[{...odds[0],race_id:"WRONG"}],result,options}),/レースID/);
 assert.throws(()=>ctx.BakenRaceBundle.combine({card,odds:[{...odds[0],fetched_at:"2025-10-25T15:46:00+09:00"}],result,options}),/発走後/);
 assert.throws(()=>ctx.BakenRaceBundle.combine({card,odds,result:{...result,race_id:"WRONG"},options}),/レースID/);
+
+const nameless={...card,runners:card.runners.map(({horse_no})=>({horse_no}))};
+const noNameBundle=ctx.BakenRaceBundle.combine({card:nameless,odds:[],result,options});
+assert.equal(noNameBundle.finished.result.payouts[0].yenPer100,480);
+assert.equal(noNameBundle.race.horses[0].nameKnown,false);
+assert.equal(noNameBundle.race.horses[0].frame,null);
 console.log("PASS: offline fictional end-to-end historical card/odds/results with guarded joins");
