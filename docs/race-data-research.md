@@ -189,3 +189,21 @@ Baken-KINGは**非商用・広告なし・課金なし**の個人と少人数の
 2. 取得元サイトの利用条件と個人的な自動取得の扱いを確認。
 3. 条件を満たす場合のみ非公開のLinux環境で、過去の出馬表・結果・払戻を単発取得して検証（公開リポジトリへ収録しない）。
 4. データ形式が確定したら変換アダプターを作成し、本人のiPhoneへ**認証付き**で接続。GitHub PagesにAPI秘密情報を埋め込まない。
+
+## 2026-10-29 jra-scr実装のデータ型を直接照合（出典リポジトリ確認）
+
+参照：https://github.com/kawaberi01/jra-scr/blob/main/src/jra_srb/models.py
+
+- `RaceCard`：`race_id`, `course`, `start_time`, `runners`。馬は `horse_no`, `frame_no`, `horse_name`, `status`（active/withdrawn）。**馬番等は文字列で返る**。
+- `RaceOdds`：`bet_type`, `entries`, `odds`, `fetched_at`。 `OddsEntry` に `combination`, `odds`, `odds_min`, `odds_max`。競馬データの時点を区別する必要がある。
+- `RaceResult`：`results` の各着順要素に `rank`, `horse_no`、`payouts` に `bet_type`, `combination`, `payout`（文字列）。JRAの同着、返還、人気、配当表記の精査は未実施。
+- `BetType` は win/place/quinella/wide/exacta/trio/trifecta。**枠連に対応するbet typeが列挙されていない**ので、Baken-KINGの全8券種へそのまま対応するとは言い切れない。
+- `README.md` は公式HTML解析が含まれること、アクセス間隔や規約に注意すべきこと、ローカルAPIを認証なしで公開しないよう警告している。
+- `LICENSE` の取得をGitHub Contents APIで試したが404。 `pyproject.toml` にライセンス指定も見当たらず、**著作権者からの利用条件が明確になるまで、このプロジェクトのコードをコピー／改変しない**。
+
+### 今回作成した自作アダプター
+
+- `jra-adapter.js`：ドキュメント化された**出馬表JSONの項目**を、Baken-KINGの共通スキーマへ変換（10競馬場、馬番、枠番、馬名、取消、発走時刻）。**他者のソースコードをコピーしない・実サイトへアクセスしない**。
+- `tests/jra-adapter.test.cjs`：全て架空の出馬表を使った変換検証。既存の `tests/race-data.test.cjs` と共にGitHub Actionsで実行する設定。
+- 実レース結果・払戻・オッズの変換はデータ表記と権利を確認してから。コード作成は接続・自動取得の成功を意味しない。
+- GitHub Actionsの**実行結果は未確認**。ワークフローを追加したことと実行成功は区別する。
