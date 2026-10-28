@@ -278,3 +278,11 @@
 - ワークフロー変更時に実行する設定および手動実行の入口を追加。**実行完了・成功は現時点で未確認**。確認URL：https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml
 - これに成功しても実JRAデータの取得・利用許諾・iPhone連携が確立するわけではない。次の課題は実行結果、権利確認、非公開実行・データ保存環境。
 - アプリ本体はv2.5のまま。今後も公式のURL・保存データ・5タブ構成を維持する。
+
+## 2026-10-29：実データ取得前の検証状況と問い合わせ準備
+
+- jra-scrの固定コミット `3ee05a4f7896cc2d50358096672393ce95364ff4` に、オフラインLinuxテストで必要な `RaceCard`・`RaceOdds`・`RaceResult` モデルが存在することをGitHubから直接確認。
+- GitHub Actionsワークフローはコミット済みだが、**実行結果は取得できておらず、成功とは断定しない**。確認URL：https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml
+- **[jra-scrの作者へのライセンス・実行条件問い合わせ案](docs/jra-scr-permission-check.md)**を用意。問い合わせは未送信。作者のコード許諾とJRAデータ取得元の規約は別に確認が必要。
+- jra-scrが使えることを正式確認する前に、実JRAサイトからの定期自動収集・公開GitHubへの実データ保存は行わない。
+- iPhoneのみ・1人用・無料・非商用・枠連なし（7券種）方針は継続。アプリUIはv2.5のまま。
