@@ -312,3 +312,12 @@ jra-scrのPython/Linux動作可否を確かめるため、Baken-KINGに**独立�
 - 初回のActionsは実際に動き、**失敗原因が`robots_disallow_or_unavailable`であることをGitHubファイルから確認できた**。対象の`jra.jp/robots.txt`はWeb閲覧で確認できず、同じJRA公式ページの `www.jra.go.jp/robots.txt` は `User-agent: *`、`Disallow:`（空）と公開されていた。そこで**ページとrobots.txtの両方を`www.jra.go.jp`ホストへ切り替え、テストを更新した**。再実行の成功はレポートを確認するまで未確定。
 - robots.txtにクロール禁止がないことは、商用・第三者再配信・著作権などの利用許諾を意味しない。今回の実装は一時的な**本人用の可用性・構造確認**であり、常時の自動巡回やデータ配信は有効にしない。
 - [Actions実行画面](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/jra-calendar-probe.yml)／[検証結果のメタデータ（現在状態）](jra-calendar-probe-status.json)。
+
+## 2026-10-29：**実JRA公式の土日48レースをGitHub Actionsで自動取得・解析成功**
+
+- **達成**：`.github/workflows/jra-calendar-probe.yml` がGitHub ActionsのUbuntu/Python 3.12からJRA公式の2026年10月31日・11月1日競馬番組を実際に取得。UnicodeのShift_JIS系を含む日本語エンコーディングに対応して解析に成功。両日とも東京12レース・京都12レース、**週末合計48レース**の予定が抽出された。
+- 成功を確認した正確な記録：[10/31](jra-calendar-probe-status.json) と [11/1](jra-calendar-probe-status-sunday.json)。両JSONは `status:"ok"`、`stage:"completed"`、競馬場別件数を持つ。GitHub Actionsが直接作成したので**架空HTMLのテスト結果ではなく実ページ取得結果**である。
+- 自動取得スクリプト：[scripts/jra_calendar_probe.py](../scripts/jra_calendar_probe.py)。入力した開催日について開催予定のレース番号・レース名・発走予定時刻を抽出するが、データ本体はRunnerの一時メモリに保持。公開レポジトリ／Pages／Actions成果物にレース本文を置かず、結果を**安全な集計件数**だけに限定。
+- 初回は`jra.jp/robots.txt`取得判定に失敗、次に`www.jra.go.jp`の文字コードが原因で失敗。公式`www.jra.go.jp/robots.txt`のポリシーを遵守し、HTML文字コード判定を修正して成功。
+- **大切な未達成**：この成功は「開催予定」に限定する。馬番・出走取消・結果・払戻は未取得。iPhone自動反映や恒常的スケジュール実行、サイト利用・情報再利用に関する許可は未確立。
+- 続いて実レースの馬番を検証するため、`scripts/jra_card_probe.py`と`.github/workflows/jra-card-probe.yml`を追加。対象は2026年10月25日東京11RのJRA公式過去出馬表**1レースのみ**。公開保存するのは抽出成否と頭数だけ。初回はHTML表の構造が想定と異なり`horse_number_table_missing`、現在匿名の表構造情報を使って改善中。
