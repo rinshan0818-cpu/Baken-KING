@@ -1,7 +1,14 @@
 {
-  "status": "not-run",
+  "checkedAtUtc": "2026-10-28T22:39:42+00:00",
   "date": "2026-11-01",
-  "phase": "program-only",
+  "url": "https://www.jra.go.jp/keiba/calendar2026/2026/11/1101.html",
+  "phase": "program-only-not-official-final-card",
+  "status": "ok",
+  "venueRaceCounts": {
+    "東京": 12,
+    "京都": 12
+  },
+  "totalRaces": 24,
   "sourceDataPublished": false,
-  "note": "One-time Sunday JRA program test; never stores race names or horse data."
+  "stage": "completed"
 }
