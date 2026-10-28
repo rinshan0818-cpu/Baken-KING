@@ -110,3 +110,55 @@ Baken-KINGは**非商用・広告なし・課金なし**の個人と少人数の
 - データ入手手段だけでなく、**①取得、②加工・保存、③GitHubへのコミット・公開、④友人への表示、⑤定期更新**の各許諾範囲を確認する。
 - 非商用という理由だけで許諾済みとみなさない。
 - 承認が取れるまでは、本番用の実レースデータ公開・自動取得は実装しない。
+
+## 2026-10-29 GitHub公開プロジェクト追加比較（iPhone専用・1人用へ方針転換後）
+
+調査基準：①JRA出馬表・オッズ・着順・払戻、②Python/Linux環境での実行可能性、③ゲーム向けJSON化、④コードの利用ライセンス、⑤取得元サイトの規約と私的利用範囲、⑥iPhoneへの安全なデータ連携。下記は**README・公開ドキュメントの確認**であり、実アクセス・再現試験は未実施。
+
+| 候補 | 出馬表 | オッズ | 結果・払戻 | 技術評価 | 主要な未解決点 |
+| --- | --- | --- | --- | --- | --- |
+| [kawaberi01/jra-scr](https://github.com/kawaberi01/jra-scr)（README内名称はjra-srb） | ○ | ○ | ○ | **第一候補**。Python 3.12+, FastAPI, JSON API、ローカルキャッシュ・スナップショット機能あり | リポジトリの明示的ライセンスを今回確認できず。GitHub Actionsの短時間実行は未検証。JRAサイトの利用条件を要検証 |
+| [KeibaAI-developer/keiba-scraping](https://github.com/KeibaAI-developer/keiba-scraping) | ○ | ○ | ○（8券種の払戻メソッド） | **第二候補**。MITコードライセンス、Python、pandas、Playwright。過去レースの検証向き | JRAオッズ取得にはPlaywright/Chromiumが必要。netkeiba取得部分を混同しない。元サイトのデータ利用許諾は別 |
+| [KeibaAI-developer/keiba-data-interface](https://github.com/KeibaAI-developer/keiba-data-interface) | ○ | ○ | ○ | **第三候補**。MIT、プロバイダー交換を抽象化 | 取得本体はkeiba-scrapingまたはJRA-VANの外部依存。単独で新しい取得経路を生むものではない |
+| [tsukasaI/keiba-ai](https://github.com/tsukasaI/keiba-ai) | ○ | △ | △ | 古いKaggleの過去データ（1986〜2021）とライブ取得コードの参考 | AI予想に重点、Baken-KINGの8券種払戻・リアルタイム取得の一式は未確認。Kaggle配布元の権利を要確認 |
+| [SatoHub/k-bar-ai](https://github.com/SatoHub/k-bar-ai) | ○ | ○ | △ | Playwright・FastAPI・Next.jsなどの構成例 | JRA-VAN/JV-Linkに依存する部分あり、クラウドの個人運用には複雑 |
+| [AlexBerns/Horse-Racing](https://github.com/AlexBerns/Horse-Racing) | △ | ○ | △ | 2020〜2022年の歴史データを利用した学習研究事例 | ライブ取得には不向きで、データの再利用権も未確認 |
+
+**記号：○=READMEに対応記述あり、△=部分対応または未確認。「動作検証済み」の意味ではない。**
+
+### jra-scrで優先確認したい具体的機能
+
+- `GET /meetings/{date_}/{course}/races/{race_no}/card`：出馬表。
+- 同 `/odds`：券種別オッズ。
+- 同 `/result`：着順・払戻。
+- `/jra/races/{race_id}/pre-race-snapshot`：保存済みの**発走前の**出馬表とオッズの再現。
+- `/jra/races/{race_id}/odds-timeline`：購入時点のオッズ検証に利用可能な形式。
+- ドキュメント：https://github.com/kawaberi01/jra-scr/blob/main/docs/jra/05_API%E4%BB%95%E6%A7%98.md
+- `127.0.0.1:8000` のローカルAPIであり、そのままiPhone上のGitHub Pagesからアクセスできない。
+- リポジトリに明示的なライセンスがなければ**ソース公開≠改変・再配布自由**。インストールして検証する前にライセンスを確認。
+
+### keiba-scrapingの特徴
+
+- 単勝・複勝・枠連・馬連・ワイド・馬単・三連複・三連単の払戻メソッドを公開。
+- `pandas.DataFrame` 形式のためBaken-KING JSONへ変換が必要。
+- Python 3.12以上。JRAオッズ取得はPlaywright/Chromium、Selenium利用機能ではChromeDriverが必要。
+- ソフトウェア自体はMIT。ただしこのライセンスは**JRA/netkeibaから取得したデータへの権利を付与しない**。
+- https://github.com/KeibaAI-developer/keiba-scraping
+
+### 技術上の次のPoCゲート（この段階では実行していない）
+
+1. **コードライセンス確認**、対象サービスの利用条件とアクセス制御の確認。許諾のない自動収集やGitHub公開へのアップロードをしない。
+2. 許容される検証範囲で、過去の同一レースの**出馬表→払戻まで**を1つの取得方式で得られるかテスト。再現できたデータは公開GitHubへ置かない。
+3. 結果ページを使って発走前オッズを補完しない。時点を区別し、取消、枠番、的中組合せの整合性を検証。
+4. Linuxで処理できる場合も、GitHub Actionsでの定期実行可否、保存先、非公開認証、無料枠、遅延・実行スケジュールを実測する。
+5. **個人専用の非公開保存領域とiPhoneとの連携が必要**。GitHub Pagesだけではサーバー秘密情報や個人データを安全に隠せない。
+6. データの権利・技術の両面がクリアになるまでアプリ本体はv2.5維持。試作する場合も架空fixtureで先に検証。
+
+### 設計上の注意
+
+- 出走馬データと同一レースの時点別オッズ、結果・払戻をraceIdに紐付ける。
+- 開発用の過去レーステストと、本番の仮想成績を分ける。
+- 本番の購入締切はクライアント時計だけに依存せず、信頼できる時刻基準が必要。
+- 自動取得が許容されるかは**非商用・本人1人用でも別途確認**。過去データ・単なる数値・著作物、元サイトの利用規約はそれぞれ別の論点。
+
+参照：jra-scr README https://github.com/kawaberi01/jra-scr ; keiba-scraping README https://github.com/KeibaAI-developer/keiba-scraping ; data-interface README https://github.com/KeibaAI-developer/keiba-data-interface ; JRA利用案内 https://www.jra.go.jp/use/
