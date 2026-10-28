@@ -36,6 +36,8 @@ def parse_horse_numbers(html: str) -> list[int]:
         raise ValueError("card_meeting_mismatch")
     if not re.search(r"11\s*レース", body):
         raise ValueError("card_race_mismatch")
+    if "出馬表の掲載は終了" in body:
+        raise ValueError("card_publication_ended")
 
     candidates = []
     for table in soup.find_all("table"):
