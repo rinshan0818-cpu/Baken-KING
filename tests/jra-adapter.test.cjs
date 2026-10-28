@@ -53,4 +53,20 @@ assert.throws(()=>ctx.BakenJraAdapter.convertOdds({...fakeOdds,race_id:"WRONG"},
 assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,race_id:"WRONG"},tagged),/レースID/);
 console.log("PASS: odds snapshot normalization, timestamp and range validation");
 console.log("PASS: seven synthetic wager payouts, safety rejections and result mapping");
+
+const fakeMeeting={date:"2026-10-31",course:"tokyo",races:[
+ {race_no:11,race_id:"SAMPLE-11",race_name:"架空特別",start_time:"15:30"},
+ {race_no:1,race_id:"SAMPLE-01",race_name:null,start_time:"09:50"},
+ {race_no:12,race_id:"SAMPLE-12",race_name:null,start_time:null}
+]};
+const schedule=ctx.BakenJraAdapter.convertMeeting(fakeMeeting);
+assert.equal(schedule.venue,"東京");
+assert.equal(schedule.races[0].raceNumber,1);
+assert.equal(schedule.races[1].scheduledStartAt,"2026-10-31T15:30:00+09:00");
+assert.equal(schedule.races[2].scheduledStartAt,null);
+assert.equal(schedule.races[0].purchaseAllowed,false);
+assert.equal(schedule.races[0].cardAvailable,false);
+assert.throws(()=>ctx.BakenJraAdapter.convertMeeting({...fakeMeeting,races:[fakeMeeting.races[0],fakeMeeting.races[0]]}),/レース番号/);
+assert.throws(()=>ctx.BakenJraAdapter.convertMeeting({...fakeMeeting,races:[{race_no:1,start_time:"25:70"}]}),/発走予定時刻/);
+console.log("PASS: meetings can be indexed before card publication without horses or odds");
 console.log("PASS: documented JSON card mapping, withdrawal, timestamps, validation and production lock");
