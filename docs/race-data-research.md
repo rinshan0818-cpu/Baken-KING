@@ -249,3 +249,13 @@ jra-scrのPython/Linux動作可否を確かめるため、Baken-KINGに**独立�
 - `tests/race-bundle.test.cjs`を追加し、GitHub Actionsのローカルデータ検証ワークフローへ統合。
 - 独立JS簡易実行では架空データの統合・異なるレースID拒否・本番購入禁止を確認。ただしワークフローの実際の実行結果は未確認。
 - **実在のJRAレース取得とは別**。現状は接続先に依存しない変換処理が揃っただけで、スクレイパーのLinux起動成功・許諾・iPhone接続を立証したものではない。
+
+## 2026-10-29：第2候補のMITライセンスとLinuxオフライン試験を確定
+
+- `KeibaAI-developer/keiba-scraping`の `LICENSE` と `pyproject.toml` をGitHub上で直接取得。ソフトウェアは**MITライセンス**、Python 3.12以上、必要パッケージにPlaywrightやSeleniumを含むことを確認。https://github.com/KeibaAI-developer/keiba-scraping
+- 第一候補`kawaberi01/jra-scr`は引き続き`LICENSE`ファイル不明。公開ソースを見られることと、ローカルに導入・改変する許諾があることは区別する。GitHub公式ライセンス説明：https://docs.github.com/ja/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository
+- **Baken-KINGへ追加**：`.github/workflows/check-keiba-scraping-offline.yml`。固定コミット `16280733a2fb344b7733a2a9ef8a9d4e1aacacf0` をUbuntu / Python 3.12で導入、`import scraping`によってライブラリの導入・読み込みを確認する。競馬サイトへのリクエストなし、Playwrightのブラウザー操作なし。ワークフローが成功したかは**未確認**。
+- Actions URL：https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-keiba-scraping-offline.yml
+- 第一候補のjra-scrはJRA公式HTML解析を中心に設計。第二候補のkeiba-scrapingは出馬表と確定結果・払戻の例示取得元がnetkeibaであり、**両者のデータ権利・取得経路は異なる**。
+- 重要：MITは**取得先の競馬データの権利を付与しない**。外部サイトの利用条件と個人用の自動取得可否を確認するまでは実データを公開・自動取得しない。
+- Actionsの実行ステータスは使用可能なGitHubツールでは通常push起因のワークフロー実行履歴を参照できない。プログラムの書き込み完了とLinuxでの成功を混同しない。
