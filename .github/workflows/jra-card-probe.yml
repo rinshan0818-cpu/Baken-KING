@@ -1,4 +1,4 @@
-name: One-time JRA historical card numbers probe (structural diagnostics only)
+name: One-time JRA historical card numbers probe (anonymized DOM check)
 
 on:
   workflow_dispatch:
