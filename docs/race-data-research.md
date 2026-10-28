@@ -302,3 +302,13 @@ jra-scrのPython/Linux動作可否を確かめるため、Baken-KINGに**独立�
 2. 適切な条件の下で、10月31日・11月1日の**最新出馬表の馬番**を取得・登録できるかを非公開環境でテストする。
 3. 結果確定・全払戻・返還を実データで検証し、翌日公式PDFで照合する（公開GitHubに実レースを置かない）。
 4. 取得時刻・出典・更新履歴を保持できる本人専用の非公開API／ストレージへ接続する。
+
+## 2026-10-29：**JRA公式の開催番組を実際に1回取得する**GitHub Actions PoC
+
+- **新しい発見・以前の説明の訂正**：JRA公式[FAQ](https://www.jra.go.jp/faq/pop02/2_2.html)では、通常の出馬表は木曜日16時過ぎに**馬・枠番号なし**で発表し、通常の**番号付き出馬表はレース前日10時過ぎ**と説明。天皇賞（秋）等のGⅠは木曜14時過ぎに番号付きとなる特例がある。したがって2026/10/31（土曜）の通常レースは10/30（金曜）10時過ぎ、11/1（日曜）は10/31（土曜）10時過ぎを目安にする。以前の「木曜日に馬番が確定する」という一律の解釈は誤り。
+- JRA公式の2026/10/31番組URLは `https://www.jra.go.jp/keiba/calendar2026/2026/10/1031.html`、2026/11/1は `https://www.jra.go.jp/keiba/calendar2026/2026/11/1101.html`。**番組はレース予定であり確定出馬表ではない**。
+- `scripts/jra_calendar_probe.py`：作者独自のPython+BeautifulSoup解析。JRAの開催番組を**明示的に1回だけ**取得するコード（`--live-once`と`BAKEN_ALLOW_JRA_TEST=yes`が必須）。取得前に同一ホストのrobots.txtを確認し、拒否・不明なら停止。取得HTMLを公開レポジトリ・ログ・成果物に保存しない。
+- `.github/workflows/jra-calendar-probe.yml`：Ubuntu上で架空HTMLのオフラインテストを通した後、2026/10/31の番組HTMLを1ページだけ読み取り、**日付・競馬場別レース数のみ** `docs/jra-calendar-probe-status.json`に公開して、接続ツールから成否を確認可能にする（GitHub Pagesに開催データ本文は掲載しない）。
+- 初回のActionsは実際に動き、**失敗原因が`robots_disallow_or_unavailable`であることをGitHubファイルから確認できた**。対象の`jra.jp/robots.txt`はWeb閲覧で確認できず、同じJRA公式ページの `www.jra.go.jp/robots.txt` は `User-agent: *`、`Disallow:`（空）と公開されていた。そこで**ページとrobots.txtの両方を`www.jra.go.jp`ホストへ切り替え、テストを更新した**。再実行の成功はレポートを確認するまで未確定。
+- robots.txtにクロール禁止がないことは、商用・第三者再配信・著作権などの利用許諾を意味しない。今回の実装は一時的な**本人用の可用性・構造確認**であり、常時の自動巡回やデータ配信は有効にしない。
+- [Actions実行画面](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/jra-calendar-probe.yml)／[検証結果のメタデータ（現在状態）](jra-calendar-probe-status.json)。
