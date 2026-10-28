@@ -1,11 +1,14 @@
 {
-  "checkedAtUtc": "2026-10-28T22:37:30+00:00",
+  "checkedAtUtc": "2026-10-28T22:38:17+00:00",
   "date": "2026-10-31",
   "url": "https://www.jra.go.jp/keiba/calendar2026/2026/10/1031.html",
-  "phase": "program-only",
-  "status": "failed",
-  "errorCode": "other_value_error",
-  "stage": "robots_and_program_fetch",
-  "diagnostic": "utf-8 codec cant decode byte 0x8a in position 74: invalid start byte",
-  "sourceDataPublished": false
+  "phase": "program-only-not-official-final-card",
+  "status": "ok",
+  "venueRaceCounts": {
+    "東京": 12,
+    "京都": 12
+  },
+  "totalRaces": 24,
+  "sourceDataPublished": false,
+  "stage": "completed"
 }
