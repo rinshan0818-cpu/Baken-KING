@@ -6,6 +6,8 @@ on:
       - 'race-data.js'
       - 'data/historical-fixture.json'
       - 'tests/race-data.test.cjs'
+      - 'jra-adapter.js'
+      - 'tests/jra-adapter.test.cjs'
       - '.github/workflows/validate-race-data.yml'
 jobs:
   fixture-check:
@@ -18,4 +20,6 @@ jobs:
         with:
           node-version: '22'
       - name: Test fictional historical data and safe purchase rules
-        run: node tests/race-data.test.cjs
+        run: |
+          node tests/race-data.test.cjs
+          node tests/jra-adapter.test.cjs
