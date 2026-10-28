@@ -47,23 +47,35 @@ function convertResult(result,cardRace){
  if(cardRace.upstreamRaceId&&String(result.race_id||"")!==cardRace.upstreamRaceId)throw Error("結果のレースIDが出馬表と一致しません");
  const validNumbers=new Set(cardRace.horses.map(x=>x.number));
  if(!result.results.length)throw Error("着順が空です");
- const ranked=result.results.map(e=>{
-  const rank=String(e.rank||"").trim(),number=Number(e.horse_no);
-  if(!/^\d+$/.test(rank)||!Number.isInteger(number)||!validNumbers.has(number))throw Error("確定着順を認識できません");
-  return {rank:Number(rank),number};
- });
- const seen=new Set();
- for(const e of ranked){if(seen.has(e.rank))throw Error("同着は未対応です");seen.add(e.rank)}
- ranked.sort((a,b)=>a.rank-b.rank);
- if(ranked.some((e,i)=>e.rank!==i+1))throw Error("着順の欠落を認識しました");
- const payouts=result.payouts.map(p=>{
+ const nonRank={"中止":"dnf","競走中止":"dnf","失格":"disqualified","除外":"excluded","競走除外":"excluded","取消":"scratched","出走取消":"scratched"};
+ const ranked=[],nonFinishers=[],seenHorses=new Set();
+ for(const entry of result.results){
+  const label=String(entry.rank??"").trim();
+  const number=Number(entry.horse_no);
+  if(!Number.isInteger(number)||!validNumbers.has(number)||seenHorses.has(number))throw Error("着順の馬番が不正・重複しています");
+  seenHorses.add(number);
+  if(/^\\d+$/.test(label)){
+   const rank=Number(label);
+   if(rank<1||rank>18)throw Error("着順の範囲が不正です");
+   ranked.push({rank,number});
+  }else if(Object.prototype.hasOwnProperty.call(nonRank,label)){
+   nonFinishers.push({number,status:nonRank[label]});
+  }else throw Error("不明な結果区分です: "+label);
+ }
+ ranked.sort((a,b)=>a.rank-b.rank||a.number-b.number);
+ const payouts=[];
+ for(const p of result.payouts){
+  // Frame quinella is intentionally outside the supported seven ticket types.
+  if(["frame","bracket","wakuren","枠連"].includes(p.bet_type))continue;
   const type=betKinds[p.bet_type];
   if(!type)throw Error("未対応券種です: "+p.bet_type);
   const numbers=parseNumbers(p.combination);
   if(numbers.length!==choices[type]||numbers.some(n=>!validNumbers.has(n)))throw Error("払戻の買い目が不正です");
-  return {type,numbers,yenPer100:parseYen(p.payout)};
- });
- return {status:"provisional",finish:ranked.map(e=>e.number),payouts};
+  payouts.push({type,numbers,yenPer100:parseYen(p.payout)});
+ }
+ // The scraper model has no trusted official-final/refund-completeness flag.
+ // Return provisional only; settlement must wait for separately verified flags.
+ return {status:"provisional",finish:ranked.map(e=>e.number),placements:ranked,nonFinishers,payouts};
 }
 
 // Convert the documented RaceOdds/OddsEntry model. This is not an odds provider.
