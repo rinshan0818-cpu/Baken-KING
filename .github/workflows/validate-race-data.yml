@@ -1,0 +1,21 @@
+name: Validate race data (offline)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'race-data.js'
+      - 'data/historical-fixture.json'
+      - 'tests/race-data.test.cjs'
+      - '.github/workflows/validate-race-data.yml'
+jobs:
+  fixture-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test fictional historical data and safe purchase rules
+        run: node tests/race-data.test.cjs
