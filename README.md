@@ -210,3 +210,13 @@
 - Baken-KINGのGitHub Pages上に実レースデータを置かない。非商用・本人だけ利用でも公開データ配信と個人閲覧は区別する。
 - 開発用過去レースは、出典・利用条件が明らかなものだけ使用。現行v2.5の架空フィクスチャでスキーマ検証を継続。
 - **現時点の結論：iPhoneだけで実レースを自動取得してゲームに組み込み、かつ無料で利用できる許諾確認済み経路は見つかっていない。** 取得方法の探索を優先。
+
+## 2026-10-29 GitHubデータ取得候補の比較（追加調査）
+
+- GitHub公開の競馬データ取得候補を6件比較。詳細：[`docs/race-data-research.md`](docs/race-data-research.md)。
+- **第一候補：`kawaberi01/jra-scr`**（READMEではjra-srb）。JRA出馬表・券種別オッズ・結果・払戻のローカルJSON APIと、発走前スナップショット機構を記載。Python 3.12+、GitHub ActionsなどのLinux実行はまだ実証していない。コードライセンス明示も要確認。
+- **第二候補：`KeibaAI-developer/keiba-scraping`**。MITライセンスのPythonライブラリ。8券種の払戻メソッドが揃い、オッズ取得にはPlaywrightが必要。
+- **第三候補：`keiba-data-interface`**。取得元を切り替えるMITライセンスの抽象化層だが、実取得は前述のscrapingまたはJRA-VANに依存。
+- その他、`tsukasaI/keiba-ai`（歴史データ・予想）、`SatoHub/k-bar-ai`（複雑なWebアプリ構成）、`AlexBerns/Horse-Racing`（過去データ研究）を確認。
+- **いずれも現時点でBaken-KINGへの実データ自動連携は未実装・未検証。** ソフトウェアのMIT許諾と、元データの取得・保存・表示が許されるかは別。
+- 今後は第一・第二候補の利用条件／再現性を優先検証し、問題が解決するまでは架空fixtureで開発を進める。現行アプリのバージョンはv2.5のまま。
