@@ -1,5 +1,8 @@
 # 🏇 Baken-KING
 
+[![Race data offline tests](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/validate-race-data.yml/badge.svg)](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/validate-race-data.yml) [![jra-scr Linux test](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml/badge.svg)](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml) [![MIT scraper Linux test](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-keiba-scraping-offline.yml/badge.svg)](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-keiba-scraping-offline.yml)
+
+
 **コンセプト：スマホの中に、競馬場の馬券体験を。**
 
 実際のお金を賭けず、仮想資金で競馬の予想・馬券購入・払戻・成績管理を楽しむゲーム。将来的には競馬場で紙のマークカードを塗り、発売機で馬券を買い、払戻機で精算するようなワクワク感をスマホで再現する。
