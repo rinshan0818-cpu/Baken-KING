@@ -1,9 +1,10 @@
 {
-  "checkedAtUtc": "2026-10-28T22:35:22+00:00",
+  "checkedAtUtc": "2026-10-28T22:36:32+00:00",
   "date": "2026-10-31",
   "url": "https://www.jra.go.jp/keiba/calendar2026/2026/10/1031.html",
   "phase": "program-only",
   "status": "failed",
-  "errorCode": "invalid_source",
+  "errorCode": "other_value_error",
+  "stage": "robots_and_program_fetch",
   "sourceDataPublished": false
 }
