@@ -1,4 +1,4 @@
-name: One-time JRA historical card numbers probe (no published horse data)
+name: One-time JRA historical card numbers probe (structural diagnostics only)
 
 on:
   workflow_dispatch:
