@@ -37,16 +37,28 @@ jobs:
             --live-once \
             --min-races 24 \
             --status-file docs/jra-calendar-probe-status.json
-          code=$?
-          echo "PROBE_EXIT_CODE=$code" >> "$GITHUB_ENV"
-          echo "Public report contains only source, UTC time and counts; NO horse names or data."
+          saturday_exit=$?
+          # At most one additional page; no parallel requests.
+          sleep 2
+          python scripts/jra_calendar_probe.py \
+            --date 2026-11-01 \
+            --live-once \
+            --min-races 24 \
+            --status-file docs/jra-calendar-probe-status-sunday.json
+          sunday_exit=$?
+          if [ "$saturday_exit" -eq 0 ] && [ "$sunday_exit" -eq 0 ]; then
+            echo "PROBE_EXIT_CODE=0" >> "$GITHUB_ENV"
+          else
+            echo "PROBE_EXIT_CODE=1" >> "$GITHUB_ENV"
+          fi
+          echo "Public reports contain only source, UTC time and race counts. NO raw race data."
           exit 0
       - name: Commit only aggregate probe status for remote inspection
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/jra-calendar-probe-status.json
+          git add docs/jra-calendar-probe-status.json docs/jra-calendar-probe-status-sunday.json
           if ! git diff --staged --quiet; then
             git commit -m "Update official program probe status (counts only) [skip ci]"
             git push origin HEAD:main
