@@ -26,6 +26,57 @@ PAYOUT_TYPES = {
 }
 
 
+BET_TYPE_TOKENS = {
+    "単勝": "win", "複勝": "place", "馬連": "quinella",
+    "ワイド": "wide", "馬単": "exacta",
+    "3連複": "trio", "三連複": "trio",
+    "3連単": "trifecta", "三連単": "trifecta",
+    "枠連": "skip_frame"
+}
+BET_SELECTION_SIZES = {
+    "win": 1, "place": 1, "quinella": 2,
+    "wide": 2, "exacta": 2, "trio": 3, "trifecta": 3
+}
+
+
+def extract_payouts(html: str) -> list[dict]:
+    """In-memory seven-type parsing; never commits or prints individual values."""
+    soup = BeautifulSoup(html, "html.parser")
+    lines = [line.strip().replace(" ", "") for line in soup.get_text("\n", strip=True).splitlines()]
+    lines = [line for line in lines if line]
+    end = next((i for i, line in enumerate(lines) if "勝馬の紹介" in line), len(lines))
+    starts = [i for i, line in enumerate(lines[:end]) if line == "払戻金"]
+    if not starts:
+        raise ValueError("payout_section_missing")
+    current = None
+    pending = None
+    entries = []
+    seen = set()
+    for token in lines[starts[-1] + 1:end]:
+        if token in BET_TYPE_TOKENS:
+            current = BET_TYPE_TOKENS[token]
+            pending = None
+            continue
+        if current is None or current == "skip_frame":
+            continue
+        if re.fullmatch(r"\d{1,2}(?:[-－]\d{1,2}){0,2}", token):
+            numbers = [int(x) for x in re.split(r"[-－]", token)]
+            if len(numbers) == BET_SELECTION_SIZES[current] and all(1 <= n <= 18 for n in numbers) and len(set(numbers)) == len(numbers):
+                pending = numbers
+            continue
+        if pending is not None and re.fullmatch(r"[0-9,，]+円", token):
+            yen = int(token[:-1].replace(",", "").replace("，", ""))
+            if not 1 <= yen <= 100000000:
+                raise ValueError("payout_amount_invalid")
+            key = (current, tuple(pending))
+            if key in seen:
+                raise ValueError("duplicate_payout_entry")
+            seen.add(key)
+            entries.append({"kind": current, "numbers": pending, "yenPer100": yen})
+            pending = None
+    return entries
+
+
 def inspect_results(html: str) -> dict:
     soup = BeautifulSoup(html, "html.parser")
     text = soup.get_text("\n", strip=True).replace("\u3000", " ")
@@ -46,6 +97,16 @@ def inspect_results(html: str) -> dict:
                if any(label in section for label in alternatives)]
     if len(present) < 7:
         raise ValueError("seven_payout_types_missing")
+    parsed_entries = extract_payouts(html)
+    available = {entry["kind"] for entry in parsed_entries}
+    if len(available) != 7:
+        raise ValueError("seven_payout_values_missing")
+    # This archived race is independently checkable against the JRA official
+    # page: validate two known combinations without publishing their values.
+    sample = {(entry["kind"], tuple(entry["numbers"])): entry["yenPer100"]
+              for entry in parsed_entries}
+    if sample.get(("quinella", (2, 4))) != 590 or sample.get(("trifecta", (4, 2, 5))) != 7670:
+        raise ValueError("reference_payout_mismatch")
     tables = soup.find_all("table")
     results_tables = [table for table in tables
                       if "着順" in table.get_text(" ", strip=True)[:200]
@@ -53,6 +114,9 @@ def inspect_results(html: str) -> dict:
     return {
         "resultTextPresent": True, "payoutSectionPresent": True,
         "payoutTypeCount": len(present),
+        "parsedPayoutEntryCount": len(parsed_entries),
+        "parsedPayoutTypeCount": len(available),
+        "independentReferenceCheck": True,
         "htmlTableCount": len(tables),
         "resultTableCount": len(results_tables),
         "resultRowCount": sum(len(t.find_all("tr")) for t in results_tables),
