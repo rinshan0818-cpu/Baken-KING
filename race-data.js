@@ -22,9 +22,11 @@ function parseRace(raw){
  if(typeof raw.scheduledStartAt!=="string"||!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\+09:00$/.test(raw.scheduledStartAt)||Number.isNaN(Date.parse(raw.scheduledStartAt)))throw Error("発走時刻は日本時間のISO形式で指定してください");
  if(raw.scheduledStartAt.slice(0,10)!==date)throw Error("開催日と発走日が一致しません");
  if(!["fixture","licensed","user-provided"].includes(raw.source?.kind))throw Error("データの出典を指定してください");
+ const upstreamRaceId=raw.upstreamRaceId===undefined?null:raw.upstreamRaceId;
+ if(upstreamRaceId!==null&&(typeof upstreamRaceId!=="string"||upstreamRaceId.length<1||upstreamRaceId.length>100))throw Error("取得元レースIDが不正です");
  const result=raw.result||null;
  if(result!==null&&(!["official-final","provisional"].includes(result.status)||!Array.isArray(result.finish)||result.finish.some(n=>!numbers.has(n))||new Set(result.finish).size!==result.finish.length))throw Error("結果データが不正です");
- return Object.freeze({schemaVersion:1,raceId:date+"-"+venue+"-"+raceNumber,date,venue,raceNumber,scheduledStartAt:raw.scheduledStartAt,horses,source:{kind:raw.source.kind,label:String(raw.source.label||"").slice(0,100)},result});
+ return Object.freeze({schemaVersion:1,raceId:date+"-"+venue+"-"+raceNumber,date,venue,raceNumber,scheduledStartAt:raw.scheduledStartAt,upstreamRaceId,horses,source:{kind:raw.source.kind,label:String(raw.source.label||"").slice(0,100)},result});
 }
 function purchaseState(race,mode,now=Date.now()){
  if(mode==="development")return {allowed:race.source.kind==="fixture",reason:race.source.kind==="fixture"?"開発専用・正式成績には計上しません":"開発用の架空データのみ購入できます"};
