@@ -69,6 +69,32 @@ def parse_horse_numbers(html: str) -> list[int]:
     return first
 
 
+def structure_counts(html: str) -> dict:
+    # Only HTML structural statistics. Never expose horse names or the numbers.
+    soup = BeautifulSoup(html, "html.parser")
+    tables = soup.find_all("table")
+    rows = soup.find_all("tr")
+    potential = 0
+    by_column = [0, 0, 0, 0, 0, 0]
+    for table in tables:
+        text = table.get_text(" ", strip=True)[:700]
+        if "馬番" in text and "馬名" in text:
+            potential += 1
+    for row in rows:
+        cells = row.find_all(["td", "th"], recursive=False)
+        for i, cell in enumerate(cells[:len(by_column)]):
+            value = re.sub(r"\\s+", "", cell.get_text(" ", strip=True))
+            if re.fullmatch(r"\\d{1,2}", value) and 1 <= int(value) <= 18:
+                by_column[i] += 1
+    image_count = len(soup.find_all("img", alt=re.compile("枠")))
+    return {
+        "tableCount": len(tables), "tableRowCount": len(rows),
+        "tablesWithCardHeaders": potential,
+        "numericCellsByPosition": by_column,
+        "frameImageCount": image_count,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--html-file", help="Offline fictional input")
@@ -114,6 +140,8 @@ def main() -> int:
             "status": "failed", "errorCode": reason, "stage": stage,
             "sourceDataPublished": False,
         }
+        if stage == "horse_number_parse":
+            result["structureCounts"] = structure_counts(html)
         exit_code = 1
     output = Path(args.status_file)
     output.parent.mkdir(parents=True, exist_ok=True)
