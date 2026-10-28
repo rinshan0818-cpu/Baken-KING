@@ -1,5 +1,5 @@
 {
-  "checkedAtUtc": "2026-10-28T22:42:15+00:00",
+  "checkedAtUtc": "2026-10-28T22:44:09+00:00",
   "date": "2026-10-25",
   "venue": "東京",
   "raceNumber": 11,
@@ -20,6 +20,22 @@
       0,
       0
     ],
-    "frameImageCount": 0
+    "frameImageCount": 0,
+    "tagCounts": {
+      "div": 197,
+      "span": 407,
+      "li": 171,
+      "p": 30,
+      "dl": 0,
+      "dt": 0,
+      "dd": 0,
+      "a": 233,
+      "ul": 34,
+      "script": 20,
+      "iframe": 1,
+      "font": 0
+    },
+    "numericTextParentCounts": {},
+    "isNoScriptPage": true
   }
 }
