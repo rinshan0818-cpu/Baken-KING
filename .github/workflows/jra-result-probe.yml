@@ -1,4 +1,4 @@
-name: JRA historic payout parse diagnostics (metadata only)
+name: JRA result payout values check (anonymous totals only)
 
 on:
   workflow_dispatch:
