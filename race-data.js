@@ -15,7 +15,7 @@ function parseRace(raw){
   numbers.add(h.number);
   if(h.name!==undefined&&h.name!==null&&(typeof h.name!=="string"||h.name.trim().length>80))throw Error("馬名が不正です");
   const nameKnown=typeof h.name==="string"&&h.name.trim().length>0;
-  if(h.frame!==undefined&&(!Number.isInteger(h.frame)||h.frame<1||h.frame>8))throw Error("枠番は1〜8です");
+  if(h.frame!==undefined&&h.frame!==null&&(!Number.isInteger(h.frame)||h.frame<1||h.frame>8))throw Error("枠番は1〜8です");
   const state=h.status||"running";
   if(!["running","scratched","excluded"].includes(state))throw Error("出走状態が不正です");
   return {number:h.number,name:nameKnown?h.name.trim():"馬番"+h.number,nameKnown,frame:h.frame??null,status:state};
