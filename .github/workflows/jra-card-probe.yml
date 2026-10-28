@@ -1,10 +1,7 @@
-name: One-time JRA historical card numbers probe (anonymized DOM check)
+name: Manual-only historical JRA card probe (may be expired)
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/jra-card-probe.yml'
 
 permissions:
   contents: write
