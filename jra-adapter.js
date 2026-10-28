@@ -54,7 +54,7 @@ function convertResult(result,cardRace){
   const number=Number(entry.horse_no);
   if(!Number.isInteger(number)||!validNumbers.has(number)||seenHorses.has(number))throw Error("着順の馬番が不正・重複しています");
   seenHorses.add(number);
-  if(/^\\d+$/.test(label)){
+  if(/^\d+$/.test(label)){
    const rank=Number(label);
    if(rank<1||rank>18)throw Error("着順の範囲が不正です");
    ranked.push({rank,number});
