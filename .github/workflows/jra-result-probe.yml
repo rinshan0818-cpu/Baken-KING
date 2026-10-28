@@ -1,4 +1,4 @@
-name: JRA historical payout page one-off check (metadata only)
+name: JRA historic payout parse diagnostics (metadata only)
 
 on:
   workflow_dispatch:
