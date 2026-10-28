@@ -217,3 +217,12 @@ Baken-KINGは**非商用・広告なし・課金なし**の個人と少人数の
 - `tests/jra-adapter.test.cjs` に7券種の架空配当テストと不正データの拒否テストを追加。ワークフローは既存のNode 22オフラインテストを使用。
 - **未実施**：jra-scrの実行、JRAサイトへの実アクセス、実データの取得、実際の文字列形式の網羅、取消返還・同着精算、CI成功確認、iPhoneからの接続。
 - 今後の重要な確認：プロジェクト作者にコード利用許諾を照会すること、取得元の個人利用規約を確認すること、外部に公開しないLinux環境で単発動作テストを実施すること。
+
+## 2026-10-29：オッズの形式対応と取得実行の判断
+
+- GitHub上の`kawaberi01/jra-scr`の`src/jra_srb/models.py`とAPI仕様を再確認。オッズは`RaceOdds.bet_type / entries / odds / fetched_at`、各`OddsEntry`は`combination / odds / odds_min / odds_max`等を持つ。API仕様は https://github.com/kawaberi01/jra-scr/blob/main/docs/jra/05_API%E4%BB%95%E6%A7%98.md 。
+- Baken-KINGの独立した`jra-adapter.js`に`convertOdds`を追加。7券種に対応する買い目を正規化し、取得日時`observedAt`と発走前かどうか`isBeforeStart`を保持する。範囲オッズや日時不明のデータを単一の確定値として扱わない。
+- `tests/jra-adapter.test.cjs`に架空の馬連オッズ、順不同の組合せ、時刻未指定・オッズ幅・発走後取得の異常系を追加。独立して架空データを用いた簡易評価では、出馬表→オッズ→結果・払戻の変換が成立した。**GitHub Actionsの実行完了は未確認**。
+- `convertOdds`は**外部データの真偽・利用許諾を検証しない**。現在は情報変換のみであり、アプリでオッズ表示・購入・自動精算を行うものではない。
+- **Linux上でのjra-scr実アクセスは未実施**：作者のライセンス表示がないこと、JRAのHTML自動取得の利用条件が未確定なこと、本人専用の非公開実行環境・接続手段が未整備なことが理由。GitHub Actionsの公開ログや成果物に実データを残さない。
+- **候補の位置づけ**：技術的に有望だが、自動取得の権利・運用はまだ未解決。公開GitHub Pagesへ実JRAデータを配置しない。
