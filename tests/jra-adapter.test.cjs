@@ -46,6 +46,11 @@ const ranged={...fakeOdds,entries:[{combination:["1","2"],odds_min:"2.0",odds_ma
 assert.throws(()=>ctx.BakenJraAdapter.convertOdds(ranged,fullRace),/利用可能/);
 const stale=ctx.BakenJraAdapter.convertOdds({...fakeOdds,fetched_at:"2025-10-25T15:46:00+09:00"},fullRace);
 assert.equal(stale.isBeforeStart,false);
+
+const tagged=ctx.BakenJraAdapter.convert({...fakeFull,race_id:"JRA-TEST-001"},opts);
+assert.equal(tagged.upstreamRaceId,"JRA-TEST-001");
+assert.throws(()=>ctx.BakenJraAdapter.convertOdds({...fakeOdds,race_id:"WRONG"},tagged),/レースID/);
+assert.throws(()=>ctx.BakenJraAdapter.convertResult({...fixtureResult,race_id:"WRONG"},tagged),/レースID/);
 console.log("PASS: odds snapshot normalization, timestamp and range validation");
 console.log("PASS: seven synthetic wager payouts, safety rejections and result mapping");
 console.log("PASS: documented JSON card mapping, withdrawal, timestamps, validation and production lock");
