@@ -53,41 +53,41 @@ class PayoutParseError(ValueError):
 
 
 def extract_payouts(html: str) -> list[dict]:
-    """In-memory seven-type parsing; never commits or prints individual values."""
+    """Private in-memory value extraction; public output remains counts only."""
+    import unicodedata
     soup = BeautifulSoup(html, "html.parser")
-    lines = [piece.strip() for line in soup.get_text("\n", strip=True).splitlines()
-             for piece in re.split(r"[\s\u3000]+", line.strip())]
-    lines = [line for line in lines if line]
-    end = next((i for i, line in enumerate(lines) if "勝馬の紹介" in line), len(lines))
-    starts = [i for i, line in enumerate(lines[:end]) if line == "払戻金"]
-    if not starts:
+    text = unicodedata.normalize("NFKC", soup.get_text(" ", strip=True))
+    end = text.find("勝馬の紹介")
+    if end == -1:
+        end = len(text)
+    start = text.rfind("払戻金", 0, end)
+    if start == -1:
         raise ValueError("payout_section_missing")
-    current = None
-    pending = None
-    entries = []
-    seen = set()
-    for token in lines[starts[-1] + 1:end]:
-        if token in BET_TYPE_TOKENS:
-            current = BET_TYPE_TOKENS[token]
-            pending = None
+    section = text[start + len("払戻金"):end]
+    labels = sorted(BET_TYPE_TOKENS, key=len, reverse=True)
+    label_pattern = re.compile("|".join(map(re.escape, labels)))
+    matched = list(label_pattern.finditer(section))
+    entries, seen = [], set()
+    for index, found in enumerate(matched):
+        kind = BET_TYPE_TOKENS[found.group(0)]
+        if kind == "skip_frame":
             continue
-        if current is None or current == "skip_frame":
-            continue
-        if re.fullmatch(r"\d{1,2}(?:[-－]\d{1,2}){0,2}", token):
-            numbers = [int(x) for x in re.split(r"[-－]", token)]
-            if len(numbers) == BET_SELECTION_SIZES[current] and all(1 <= n <= 18 for n in numbers) and len(set(numbers)) == len(numbers):
-                pending = numbers
-            continue
-        if pending is not None and re.fullmatch(r"[0-9,，]+円", token):
-            yen = int(token[:-1].replace(",", "").replace("，", ""))
+        snippet = section[found.end():matched[index + 1].start() if index + 1 < len(matched) else len(section)]
+        pairs = re.finditer(r"(?<!\d)(\d{1,2}(?:\s*[-－]\s*\d{1,2}){0,2})\s+([\d,，]+)\s*円", snippet)
+        for pair in pairs:
+            numbers = [int(x) for x in re.split(r"\s*[-－]\s*", pair.group(1))]
+            if len(numbers) != BET_SELECTION_SIZES[kind] or len(set(numbers)) != len(numbers):
+                continue
+            if any(n < 1 or n > 18 for n in numbers):
+                continue
+            yen = int(pair.group(2).replace(",", "").replace("，", ""))
             if not 1 <= yen <= 100000000:
                 raise ValueError("payout_amount_invalid")
-            key = (current, tuple(pending))
+            key = (kind, tuple(numbers))
             if key in seen:
                 raise ValueError("duplicate_payout_entry")
             seen.add(key)
-            entries.append({"kind": current, "numbers": pending, "yenPer100": yen})
-            pending = None
+            entries.append({"kind": kind, "numbers": numbers, "yenPer100": yen})
     return entries
 
 
