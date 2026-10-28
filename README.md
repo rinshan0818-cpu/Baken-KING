@@ -270,3 +270,11 @@
 - `tests/jra-adapter.test.cjs`に取り違えの拒否テストを追加。架空データを使ったコード評価では出馬表→オッズ→払戻の結合と誤ID拒否を確認済み。
 - **実JRAデータ取得成功・外部スクレイパーの本番実行・GitHub Actions実行成功を意味しない**。外部データの利用条件は依然未確定。
 - Windowsなし・iPhone専用・本人1人・非商用・枠連不要の方針は維持。画面はv2.5のまま。
+
+## 2026-10-29：jra-scrのLinux動作検証をGitHub Actionsに追加
+
+- `.github/workflows/check-jra-scr-offline.yml` を追加。Ubuntu + Python 3.12でjra-scrの**固定コミット**を一時的に取得し、Pythonモデルのインポートと架空の出馬表・オッズ・結果の生成を検証。
+- **実JRAサイトやnetkeibaへのリクエストは一切行わない**。元コードはBaken-KINGに複製せず、実レースデータも保存しない。
+- ワークフロー変更時に実行する設定および手動実行の入口を追加。**実行完了・成功は現時点で未確認**。確認URL：https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml
+- これに成功しても実JRAデータの取得・利用許諾・iPhone連携が確立するわけではない。次の課題は実行結果、権利確認、非公開実行・データ保存環境。
+- アプリ本体はv2.5のまま。今後も公式のURL・保存データ・5タブ構成を維持する。
