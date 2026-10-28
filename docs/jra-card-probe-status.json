@@ -1,5 +1,5 @@
 {
-  "checkedAtUtc": "2026-10-28T22:41:02+00:00",
+  "checkedAtUtc": "2026-10-28T22:42:15+00:00",
   "date": "2026-10-25",
   "venue": "東京",
   "raceNumber": 11,
@@ -7,5 +7,19 @@
   "status": "failed",
   "errorCode": "horse_number_table_missing",
   "stage": "horse_number_parse",
-  "sourceDataPublished": false
+  "sourceDataPublished": false,
+  "structureCounts": {
+    "tableCount": 0,
+    "tableRowCount": 0,
+    "tablesWithCardHeaders": 0,
+    "numericCellsByPosition": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "frameImageCount": 0
+  }
 }
