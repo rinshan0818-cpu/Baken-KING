@@ -296,3 +296,12 @@
 - `jra-scr` のソースライセンスおよびJRAサイトの自動取得条件は未確認。実データの取得・公開を行わない。
 - iPhone専用・自分1人・無料・非商用・7券種の方針を維持。アプリ本体はv2.5のまま。
 - 次の優先事項は、Linuxワークフロー実行結果の確認、権利・利用条件の確認、非公開での実レース1件の単発取得。
+
+## 2026-10-29：第二候補 keiba-scraping のLinuxオフライン検証を追加
+
+- 第二候補 `KeibaAI-developer/keiba-scraping` のMITライセンスファイルをGitHubから直接確認。**コード利用条件は第一候補jra-scrより明瞭**。
+- `.github/workflows/check-keiba-scraping-offline.yml` を追加。Ubuntu/Python 3.12で固定コミットをインストールし、Pythonパッケージを読み込めるかを確認する。**スクレイピング・実レースデータ保存なし**。
+- [GitHub Actionsテスト画面](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-keiba-scraping-offline.yml)。実行結果はまだ取得・確認できていない。
+- keiba-scrapingの実データの出馬表・結果・払戻はnetkeiba由来の機能があり、MITだから競馬情報を自由に利用できるわけではない。JRA・netkeibaの利用条件は別に確認する。
+- 第一候補のjra-scrはライセンス不明のため、利用許可の確認を継続。**取得元の条件が解決するまで実JRAデータの自動取得・外部公開は未実施**。
+- アプリ本体はv2.5のまま。詳細は `docs/race-data-research.md`。
