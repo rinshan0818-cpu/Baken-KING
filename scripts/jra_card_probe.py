@@ -83,8 +83,8 @@ def structure_counts(html: str) -> dict:
     for row in rows:
         cells = row.find_all(["td", "th"], recursive=False)
         for i, cell in enumerate(cells[:len(by_column)]):
-            value = re.sub(r"\\s+", "", cell.get_text(" ", strip=True))
-            if re.fullmatch(r"\\d{1,2}", value) and 1 <= int(value) <= 18:
+            value = re.sub(r"\s+", "", cell.get_text(" ", strip=True))
+            if re.fullmatch(r"\d{1,2}", value) and 1 <= int(value) <= 18:
                 by_column[i] += 1
     image_count = len(soup.find_all("img", alt=re.compile("枠")))
     return {
