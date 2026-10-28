@@ -121,7 +121,7 @@ def read_one_public_page(url: str) -> str:
             if "html" not in content_type:
                 raise ValueError("unexpected_content_type")
             declared = response.headers.get_content_charset()
-            embedded = re.search(rb"charset\\s*=\\s*['\\\"]?([A-Za-z0-9_-]+)", content[:4096], re.I)
+            embedded = re.search(rb'charset\s*=\s*["\x27]?([A-Za-z0-9_-]+)', content[:4096], re.I)
             meta_encoding = embedded.group(1).decode("ascii") if embedded else None
             for encoding in (declared, meta_encoding, "utf-8", "cp932"):
                 if not encoding:
