@@ -87,11 +87,31 @@ def structure_counts(html: str) -> dict:
             if re.fullmatch(r"\d{1,2}", value) and 1 <= int(value) <= 18:
                 by_column[i] += 1
     image_count = len(soup.find_all("img", alt=re.compile("枠")))
+    from collections import Counter
+    tags = Counter(tag.name for tag in soup.find_all(True))
+    candidates = Counter()
+    for node in soup.find_all(string=True):
+        value = re.sub(r"\s+", "", str(node))
+        if not re.fullmatch(r"\d{1,2}", value):
+            continue
+        if not 1 <= int(value) <= 18:
+            continue
+        parent = node.parent
+        if parent is None:
+            continue
+        classes = [str(x) for x in parent.get("class", [])]
+        # CSS token names only: do not expose horse numbers or text.
+        marker = parent.name + "." + ".".join(classes[:2])
+        candidates[marker[:64]] += 1
     return {
         "tableCount": len(tables), "tableRowCount": len(rows),
         "tablesWithCardHeaders": potential,
         "numericCellsByPosition": by_column,
         "frameImageCount": image_count,
+        "tagCounts": {tag: tags[tag] for tag in
+            ("div", "span", "li", "p", "dl", "dt", "dd", "a", "ul", "script", "iframe", "font")},
+        "numericTextParentCounts": dict(candidates.most_common(10)),
+        "isNoScriptPage": bool(soup.find("noscript")),
     }
 
 
