@@ -8,10 +8,16 @@
   "theme_color": "#0B2D5B",
   "icons": [
     {
+      "src": "baken_king_icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
