@@ -120,8 +120,17 @@ def read_one_public_page(url: str) -> str:
             content_type = response.headers.get("Content-Type", "").lower()
             if "html" not in content_type:
                 raise ValueError("unexpected_content_type")
-            encoding = response.headers.get_content_charset() or "utf-8"
-            return content.decode(encoding, errors="strict")
+            declared = response.headers.get_content_charset()
+            embedded = re.search(rb"charset\\s*=\\s*['\\\"]?([A-Za-z0-9_-]+)", content[:4096], re.I)
+            meta_encoding = embedded.group(1).decode("ascii") if embedded else None
+            for encoding in (declared, meta_encoding, "utf-8", "cp932"):
+                if not encoding:
+                    continue
+                try:
+                    return content.decode(encoding, errors="strict")
+                except (LookupError, UnicodeError):
+                    pass
+            raise ValueError("unsupported_html_encoding")
     except HTTPError as error:
         raise ValueError("program_http_" + str(error.code)) from None
     except URLError:
