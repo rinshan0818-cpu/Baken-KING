@@ -220,3 +220,11 @@
 - その他、`tsukasaI/keiba-ai`（歴史データ・予想）、`SatoHub/k-bar-ai`（複雑なWebアプリ構成）、`AlexBerns/Horse-Racing`（過去データ研究）を確認。
 - **いずれも現時点でBaken-KINGへの実データ自動連携は未実装・未検証。** ソフトウェアのMIT許諾と、元データの取得・保存・表示が許されるかは別。
 - 今後は第一・第二候補の利用条件／再現性を優先検証し、問題が解決するまでは架空fixtureで開発を進める。現行アプリのバージョンはv2.5のまま。
+
+## 2026-10-29 実装・調査の追加進捗（アプリはv2.5のまま）
+
+- `tests/race-data.test.cjs` と `.github/workflows/validate-race-data.yml` を追加。**外部サイトアクセスなし**で、過去の架空fixture、馬番検証、本番購入禁止のルールをLinuxで自動テストする構成。GitHub Actionsでの実行成功は未確認。
+- `jra-scr` は出馬表・オッズ・結果・払戻のローカルAPIが充実。**公開ルートにLICENSEの明示なし**、127.0.0.1のAPIは**認証がないためインターネット公開不可**。再利用・運用方式の確認が必要。
+- `keiba-scraping` はMITコードライセンス。ただし出馬表と8券種の払戻の具体例はnetkeiba由来。JRA公式データだけで全てを揃えると誤認しない。
+- 最優先課題は両ツールの権利・技術的な可用性の検証。利用条件確認前に実データを公開リポジトリへ載せない。
+- 詳細：[`docs/race-data-research.md`](docs/race-data-research.md)。
