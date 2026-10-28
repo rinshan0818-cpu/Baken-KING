@@ -1,7 +1,9 @@
 {
-  "status": "not-run",
+  "checkedAtUtc": "2026-10-28T22:33:39+00:00",
   "date": "2026-10-31",
+  "url": "https://jra.jp/keiba/calendar2026/2026/10/1031.html",
   "phase": "program-only",
-  "sourceDataPublished": false,
-  "note": "This file contains only sanitized diagnostic metadata. It will be replaced by GitHub Actions if the one-shot fetch runs."
+  "status": "failed",
+  "errorCode": "robots_disallow_or_unavailable",
+  "sourceDataPublished": false
 }
