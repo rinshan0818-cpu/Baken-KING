@@ -305,3 +305,12 @@
 - keiba-scrapingの実データの出馬表・結果・払戻はnetkeiba由来の機能があり、MITだから競馬情報を自由に利用できるわけではない。JRA・netkeibaの利用条件は別に確認する。
 - 第一候補のjra-scrはライセンス不明のため、利用許可の確認を継続。**取得元の条件が解決するまで実JRAデータの自動取得・外部公開は未実施**。
 - アプリ本体はv2.5のまま。詳細は `docs/race-data-research.md`。
+
+## 2026-10-29：本人専用データを公開せずに1レース検証するCLI
+
+- `scripts/inspect-private-race.cjs` を追加。**非公開のローカルJSONファイル**から`options`（開催日・競馬場・R）、`card`（出馬表）、`odds`（発走前オッズの配列・任意）、`result`（結果・払戻・任意）を読み込み、既存の`race-bundle.js`へ流して形式・レースID・時刻を検証する。
+- 実行例：`node scripts/inspect-private-race.cjs /private/path/race-package.json`。**JRAサイトへのアクセスは一切しない**。ファイル内容そのものをGitHubにアップロードしない。検証結果は馬名などを表示しない要約。
+- `tests/private-race-cli.test.cjs` を追加。架空データで正常な統合と別レースIDの拒否をテストする。GitHub Actionsの既存`validate-race-data.yml`にも追加。
+- **利用者はiPhoneのみ**。このCLIは開発環境／将来の非公開Linux環境向けで、現時点でiPhone上から実行できる機能ではない。実JRAデータ取得やサービス連携が可能になったわけではない。
+- GitHub Actionsの通常push実行履歴は現在利用可能な接続では確認できない。ワークフロー作成済み＝テスト実行成功とは扱わない。Actions：https://github.com/rinshan0818-cpu/Baken-KING/actions
+- 実JRA取得・個人利用条件・第三者ソースのコードライセンスは引き続き未解決。アプリUIはv2.5のまま。
