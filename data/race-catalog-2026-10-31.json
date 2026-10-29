@@ -17,8 +17,95 @@
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 1,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "status": "entries_unassigned",
+      "horsesLoaded": true,
+      "numbersConfirmed": false,
+      "title": "2歳未勝利",
+      "startTime": "09:50",
+      "surface": "ダート",
+      "distance": 1600,
+      "horses": [
+        {
+          "name": "アークレイリ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "イントゥーザブルー",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "ウスズミザクラ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "サイボーグ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "サクラトップオメガ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "チャリンコリン",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "トルタネーラ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "ドーンオブホープ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "ニシノツムジカゼ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "ハイファイネスト",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "パレスラン",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "フィックスユー",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "フジサンインフレ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "ホウオウシュウ",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "ボディビルダー",
+          "number": null,
+          "frame": null
+        },
+        {
+          "name": "ランフェザー",
+          "number": null,
+          "frame": null
+        }
+      ]
     },
     {
       "id": "2026-10-31-東京-2",
@@ -290,7 +377,9 @@
       "venue": "東京",
       "raceNumber": 11,
       "status": "numbered",
-      "horsesLoaded": true
+      "horsesLoaded": true,
+      "numbersConfirmed": true,
+      "title": "天皇賞（秋）"
     },
     {
       "id": "2026-11-01-東京-12",
