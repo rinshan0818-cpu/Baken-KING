@@ -105,7 +105,10 @@
           "number": null,
           "frame": null
         }
-      ]
+      ],
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-2",
@@ -113,7 +116,14 @@
       "venue": "東京",
       "raceNumber": 2,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳未勝利",
+      "startTime": "10:20",
+      "surface": "芝",
+      "distance": 1600,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-3",
@@ -121,7 +131,14 @@
       "venue": "東京",
       "raceNumber": 3,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳未勝利",
+      "startTime": "10:50",
+      "surface": "芝",
+      "distance": 2000,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-4",
@@ -129,7 +146,14 @@
       "venue": "東京",
       "raceNumber": 4,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳新馬",
+      "startTime": "11:20",
+      "surface": "ダート",
+      "distance": 1400,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-5",
@@ -137,7 +161,14 @@
       "venue": "東京",
       "raceNumber": 5,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳新馬",
+      "startTime": "12:10",
+      "surface": "芝",
+      "distance": 1800,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-6",
@@ -145,7 +176,14 @@
       "venue": "東京",
       "raceNumber": 6,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "3歳以上1勝クラス",
+      "startTime": "12:40",
+      "surface": "ダート",
+      "distance": 2100,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-7",
@@ -153,7 +191,14 @@
       "venue": "東京",
       "raceNumber": 7,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "3歳以上1勝クラス",
+      "startTime": "13:10",
+      "surface": "芝",
+      "distance": 2000,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-8",
@@ -161,7 +206,14 @@
       "venue": "東京",
       "raceNumber": 8,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "3歳以上2勝クラス",
+      "startTime": "13:45",
+      "surface": "ダート",
+      "distance": 1400,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-9",
@@ -169,7 +221,14 @@
       "venue": "東京",
       "raceNumber": 9,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "オキザリス賞",
+      "startTime": "14:20",
+      "surface": "ダート",
+      "distance": 1400,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-10",
@@ -177,7 +236,14 @@
       "venue": "東京",
       "raceNumber": 10,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "国立特別",
+      "startTime": "14:55",
+      "surface": "芝",
+      "distance": 1600,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-11",
@@ -185,7 +251,14 @@
       "venue": "東京",
       "raceNumber": 11,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "ペルセウスステークス",
+      "startTime": "15:30",
+      "surface": "ダート",
+      "distance": 1600,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-東京-12",
@@ -193,7 +266,14 @@
       "venue": "東京",
       "raceNumber": 12,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "3歳以上1勝クラス",
+      "startTime": "16:15",
+      "surface": "芝",
+      "distance": 1800,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-1",
@@ -201,7 +281,14 @@
       "venue": "京都",
       "raceNumber": 1,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳未勝利",
+      "startTime": "10:05",
+      "surface": "ダート",
+      "distance": 1400,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-2",
@@ -209,7 +296,14 @@
       "venue": "京都",
       "raceNumber": 2,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳未勝利",
+      "startTime": "10:35",
+      "surface": "芝",
+      "distance": 1600,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-3",
@@ -217,7 +311,14 @@
       "venue": "京都",
       "raceNumber": 3,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳未勝利",
+      "startTime": "11:05",
+      "surface": "芝",
+      "distance": 1800,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-4",
@@ -225,7 +326,14 @@
       "venue": "京都",
       "raceNumber": 4,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "障害3歳以上未勝利",
+      "startTime": "11:35",
+      "surface": "障害",
+      "distance": 2910,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-5",
@@ -233,7 +341,14 @@
       "venue": "京都",
       "raceNumber": 5,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳新馬",
+      "startTime": "12:25",
+      "surface": "芝",
+      "distance": 2000,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-6",
@@ -241,7 +356,14 @@
       "venue": "京都",
       "raceNumber": 6,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "2歳新馬",
+      "startTime": "12:55",
+      "surface": "ダート",
+      "distance": 1400,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-7",
@@ -249,7 +371,14 @@
       "venue": "京都",
       "raceNumber": 7,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "3歳以上1勝クラス",
+      "startTime": "13:25",
+      "surface": "ダート",
+      "distance": 1800,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-8",
@@ -257,7 +386,14 @@
       "venue": "京都",
       "raceNumber": 8,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "3歳以上2勝クラス",
+      "startTime": "14:00",
+      "surface": "ダート",
+      "distance": 1200,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-9",
@@ -265,7 +401,14 @@
       "venue": "京都",
       "raceNumber": 9,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "北野特別",
+      "startTime": "14:35",
+      "surface": "芝",
+      "distance": 2000,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-10",
@@ -273,7 +416,14 @@
       "venue": "京都",
       "raceNumber": 10,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "ハロウィンステークス",
+      "startTime": "15:10",
+      "surface": "ダート",
+      "distance": 1900,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-11",
@@ -281,7 +431,14 @@
       "venue": "京都",
       "raceNumber": 11,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "ファンタジーステークス",
+      "startTime": "15:45",
+      "surface": "芝",
+      "distance": 1400,
+      "grade": "GⅢ",
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-10-31-京都-12",
@@ -289,7 +446,14 @@
       "venue": "京都",
       "raceNumber": 12,
       "status": "awaiting_numbers",
-      "horsesLoaded": false
+      "horsesLoaded": false,
+      "title": "3歳以上1勝クラス",
+      "startTime": "16:25",
+      "surface": "芝",
+      "distance": 1600,
+      "grade": null,
+      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
+      "metadataStatus": "scheduled"
     },
     {
       "id": "2026-11-01-東京-1",
