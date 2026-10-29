@@ -1,0 +1,400 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-29",
+  "source": "JRA公式出馬表（公開状況の確認）",
+  "note": "馬番未確定のレースは購入不可。各レースの出走馬データは未取り込み。",
+  "dates": [
+    "2026-10-31",
+    "2026-11-01"
+  ],
+  "venues": [
+    "東京",
+    "京都"
+  ],
+  "races": [
+    {
+      "id": "2026-10-31-東京-1",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 1,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-2",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 2,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-3",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 3,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-4",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 4,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-5",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 5,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-6",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 6,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-7",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 7,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-8",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 8,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-9",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 9,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-10",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 10,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-11",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 11,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-東京-12",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "raceNumber": 12,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-1",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 1,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-2",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 2,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-3",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 3,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-4",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 4,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-5",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 5,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-6",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 6,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-7",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 7,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-8",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 8,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-9",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 9,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-10",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 10,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-11",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 11,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-10-31-京都-12",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "raceNumber": 12,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-1",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 1,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-2",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 2,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-3",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 3,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-4",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 4,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-5",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 5,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-6",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 6,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-7",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 7,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-8",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 8,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-9",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 9,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-10",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 10,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-東京-11",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 11,
+      "status": "numbered",
+      "horsesLoaded": true
+    },
+    {
+      "id": "2026-11-01-東京-12",
+      "date": "2026-11-01",
+      "venue": "東京",
+      "raceNumber": 12,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-1",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 1,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-2",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 2,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-3",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 3,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-4",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 4,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-5",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 5,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-6",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 6,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-7",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 7,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-8",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 8,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-9",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 9,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-10",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 10,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-11",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 11,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    },
+    {
+      "id": "2026-11-01-京都-12",
+      "date": "2026-11-01",
+      "venue": "京都",
+      "raceNumber": 12,
+      "status": "awaiting_numbers",
+      "horsesLoaded": false
+    }
+  ]
+}
