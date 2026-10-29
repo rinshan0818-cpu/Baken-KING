@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="667" viewBox="0 0 1100 667">
+<defs>
+<pattern id="paper" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#fafff8"/><rect width="1.5" height="10" fill="#d4efd9" opacity=".65"/><rect x="5" width="1" height="10" fill="#d4efd9" opacity=".45"/></pattern>
+<linearGradient id="mint"><stop stop-color="#d6f4e1"/><stop offset="1" stop-color="#bde9d1"/></linearGradient>
+<g id="seal" fill="none" stroke="#7acfa2" stroke-width="9"><circle r="59"/><path d="M-22 37Q-35 10-17-22L-24-44L-1-32L17-40L14-22Q31-12 31 8L16 24L-5 27L-12 40Z" fill="#7acfa2" stroke="none"/></g>
+</defs>
+<rect width="1100" height="667" fill="url(#paper)"/>
+<rect width="326" height="667" fill="url(#mint)" opacity=".58"/>
+<g opacity=".15"><use href="#seal" transform="translate(550 175)"/><use href="#seal" transform="translate(880 175)"/><use href="#seal" transform="translate(550 438)"/><use href="#seal" transform="translate(880 438)"/></g>
+<g font-family="Georgia,serif" font-size="68" font-weight="bold" fill="#62b98c" opacity=".10"><text x="395" y="310">BAKEN KING</text><text x="650" y="605">BAKEN KING</text></g>
+<!-- Only functional dividers: no rectangular frames around race, bet method, numbers or amounts. -->
+<path d="M326 50V615M450 50V615" stroke="#629c7a" stroke-width="2" opacity=".6"/>
+<path d="M50 615H1050" stroke="#629c7a" stroke-width="1.5" opacity=".3"/>
+<g fill="#285b42" font-family="sans-serif" font-size="14" opacity=".65"><text x="35" y="42">BAKEN KING</text><text x="35" y="637">VIRTUAL RACE TICKET · NOT VALID FOR WAGERING</text></g>
+</svg>
