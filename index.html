@@ -2058,12 +2058,12 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
  function draw(){
   const type=typeEl.value,mode=modeEl.value,k=specs[type];
   if(k===1&&mode!=='normal'){modeEl.value='normal'}
-  const formation=modeEl.value==='formation';
-  const wheel=modeEl.value==='wheel';
   const normalOption=modeEl.querySelector('option[value="normal"]');
   normalOption.disabled=ordered.has(type);
   normalOption.textContent=ordered.has(type)?'通常（着順指定不可）':'通常';
   if(ordered.has(type)&&modeEl.value==='normal'){modeEl.value='formation';pick=[];legs=[[],[],[]];active=0}
+  const formation=modeEl.value==='formation';
+  const wheel=modeEl.value==='wheel';
   const positionWrap=document.getElementById('bkWheelPosition').closest('div');
   positionWrap.hidden=!wheel||!ordered.has(type);
   document.getElementById('bkWheelMulti').closest('label').hidden=!wheel||!ordered.has(type);
