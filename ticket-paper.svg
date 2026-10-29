@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540">
+<defs>
+<pattern id="lines" width="9" height="9" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="#f9fff9"/><rect x="0" width="2" height="9" fill="#c7f0d5" opacity=".55"/><rect x="5" width="1" height="9" fill="#d7f6e2" opacity=".8"/></pattern>
+<linearGradient id="band"><stop stop-color="#e6f9ee"/><stop offset=".85" stop-color="#b7e7d1"/><stop offset="1" stop-color="#d3f4e3"/></linearGradient>
+<g id="seal" fill="none" stroke="#7fd5a0" stroke-width="13"><circle r="77"/><path d="M-31 46Q-47 12-22-29L-32-61L-1-43L22-56L19-29Q42-17 41 9L23 31L-6 34L-16 52Z" fill="#7fd5a0" stroke="none"/><path d="M-25-14Q-46 3-47 24" stroke-width="8"/></g>
+</defs>
+<rect width="1200" height="540" fill="url(#lines)"/>
+<rect x="0" width="310" height="540" fill="url(#band)" opacity=".55"/>
+<g opacity=".20">
+<use href="#seal" transform="translate(520 118) scale(.75)"/>
+<use href="#seal" transform="translate(910 118) scale(.75)"/>
+<use href="#seal" transform="translate(520 372) scale(.75)"/>
+<use href="#seal" transform="translate(910 372) scale(.75)"/>
+</g>
+<g font-family="Georgia,serif" font-size="95" font-weight="bold" fill="#68c68e" opacity=".14">
+<text x="390" y="280">BAKEN KING</text>
+<text x="710" y="505">BAKEN KING</text>
+</g>
+</svg>
