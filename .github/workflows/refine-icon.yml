@@ -1,0 +1,44 @@
+name: Refine existing Baken-KING icon
+on:
+  push:
+    paths:
+      - '.github/workflows/refine-icon.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Enlarge original artwork slightly to reduce bottom spacing
+        run: |
+          python -m pip install --quiet Pillow
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          path = Path("baken_king_icon_512.png")
+          image = Image.open(path).convert("RGB")
+          width, height = image.size
+          # Reframe the existing approved artwork, without generating a new horse.
+          # Keep the entire canvas filled and shift the content downward slightly.
+          scale = 1.075
+          enlarged = image.resize((round(width*scale), round(height*scale)), Image.Resampling.LANCZOS)
+          x = (enlarged.width-width)//2
+          y = max(0, (enlarged.height-height)//2 - 9)
+          result = enlarged.crop((x, y, x+width, y+height))
+          result.save(path, format="PNG", optimize=True)
+          PY
+      - name: Commit updated existing PNG
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baken_king_icon_512.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Refine existing icon framing to reduce bottom whitespace"
+            git push
+          fi
