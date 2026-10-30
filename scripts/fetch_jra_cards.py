@@ -16,7 +16,7 @@ from jra_card_parser import parse_card
 from jra_card_normalizer import normalize_cards
 
 def fetch_cards(manifest, delay=1.5):
-    cards, errors = [], []
+    cards, errors, diagnostics = [], [], []
     if not isinstance(manifest, list) or len(manifest) > 24:
         raise ValueError("manifest_must_be_list_of_at_most_24")
     seen = set()
@@ -38,11 +38,26 @@ def fetch_cards(manifest, delay=1.5):
                 if len(html) > 3_000_000:
                     raise ValueError("response_too_large")
                 charset = response.headers.get_content_charset() or "utf-8"
-            cards.append(parse_card(html.decode(charset, errors="replace"), *key))
+            decoded = html.decode(charset, errors="replace")
+            try:
+                cards.append(parse_card(decoded, *key))
+            except ValueError as exc:
+                if str(exc) == "card_date_mismatch":
+                    from bs4 import BeautifulSoup
+                    from hashlib import sha256
+                    page = BeautifulSoup(decoded, "html.parser")
+                    title = page.title.get_text(" ", strip=True) if page.title else ""
+                    visible = page.get_text(" ", strip=True)
+                    diagnostics.append({"date":key[0],"venue":key[1],"raceNumber":key[2],
+                                        "title":title[:120], "htmlBytes":len(html),
+                                        "htmlSha256":sha256(html).hexdigest(),
+                                        "visibleTextSample":visible[:350],
+                                        "charset":charset})
+                raise
         except Exception as exc:
             errors.append({"date":key[0],"venue":key[1],"raceNumber":key[2],"error":str(exc)})
         time.sleep(delay)
-    return normalize_cards(cards) if cards else {"schemaVersion":1,"races":[],"raceCount":0}, errors
+    return normalize_cards(cards) if cards else {"schemaVersion":1,"races":[],"raceCount":0}, errors, diagnostics
 
 def main():
     p = argparse.ArgumentParser()
@@ -52,11 +67,11 @@ def main():
     p.add_argument("--errors-output", type=Path, help="Write per-race failure diagnostics")
     a = p.parse_args()
     manifest = json.loads(a.manifest.read_text(encoding="utf-8"))
-    data, errors = fetch_cards(manifest)
+    data, errors, diagnostics = fetch_cards(manifest)
     if errors:
         print(json.dumps({"failures":errors}, ensure_ascii=False, indent=2))
     if a.errors_output:
-        a.errors_output.write_text(json.dumps({"failures":errors,"succeeded":data["raceCount"],"requested":len(manifest)}, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+        a.errors_output.write_text(json.dumps({"failures":errors,"succeeded":data["raceCount"],"requested":len(manifest),"dateMismatchDiagnostics":diagnostics}, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     if a.require_complete and (errors or data["raceCount"] != len(manifest)):
         raise SystemExit("Incomplete fetch: output not written")
     a.output.write_text(json.dumps(data, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
