@@ -6,7 +6,7 @@ from jra_card_parser import parse_card, parse_race_conditions
 
 def fixture(day="2026-10-31", venue="東京", race=3):
     y,m,d=map(int,day.split("-"))
-    rows="".join(f"<tr><td>1</td><td>{n}</td><td>架空馬{n}</td></tr>" for n in (1,2,3))
+    rows="".join(f'<tr><td>1</td><td>{n}</td><td><a href="/horse/{n}">架空馬{n}</a></td></tr>' for n in (1,2,3))
     return f"<html><body>{y}年{m}月{d}日 4回{venue}1日 {race}レース<table><tr><th>枠番</th><th>馬番</th><th>馬名</th></tr>{rows}</table></body></html>"
 
 class CardParserTests(unittest.TestCase):
@@ -25,14 +25,15 @@ class CardParserTests(unittest.TestCase):
         for day,venue,race in [("2026-10-31","東京",3),("2026-11-01","京都",11)]:
             data=parse_card(fixture(day,venue,race),day,venue,race)
             self.assertEqual(data["horseNumbers"],[1,2,3])
+            self.assertEqual(data["horses"][1],{"number":2,"name":"架空馬2"})
     def test_rowspan_frame_column(self):
         html = fixture().replace(
-            '<tr><td>1</td><td>1</td><td>架空馬1</td></tr><tr><td>1</td><td>2</td><td>架空馬2</td></tr>',
-            '<tr><td rowspan="2">1</td><td>1</td><td>架空馬1</td></tr><tr><td>2</td><td>架空馬2</td></tr>'
+            '<tr><td>1</td><td>1</td><td><a href="/horse/1">架空馬1</a></td></tr><tr><td>1</td><td>2</td><td><a href="/horse/2">架空馬2</a></td></tr>',
+            '<tr><td rowspan="2">1</td><td>1</td><td><a href="/horse/1">架空馬1</a></td></tr><tr><td>2</td><td><a href="/horse/2">架空馬2</a></td></tr>'
         )
         self.assertEqual(parse_card(html,"2026-10-31","東京",3)["horseNumbers"],[1,2,3])
     def test_whitespace_in_horse_number(self):
-        html = fixture().replace("<td>2</td><td>架空馬2", "<td> 2 </td><td>架空馬2")
+        html = fixture().replace("<td>2</td><td><a href=\"/horse/2\">架空馬2", "<td> 2 </td><td><a href=\"/horse/2\">架空馬2")
         self.assertEqual(parse_card(html,"2026-10-31","東京",3)["horseNumbers"],[1,2,3])
     def test_wrong_race_rejected(self):
         with self.assertRaisesRegex(ValueError,"card_race_mismatch"):
@@ -42,7 +43,7 @@ class CardParserTests(unittest.TestCase):
             parse_card(fixture()+"出馬表の掲載は終了","2026-10-31","東京",3)
     def test_duplicate_rejected(self):
         with self.assertRaisesRegex(ValueError,"horse_number_duplicate_or_excess"):
-            parse_card(fixture().replace("<td>3</td><td>架空馬3","<td>2</td><td>架空馬3"),"2026-10-31","東京",3)
+            parse_card(fixture().replace("<td>3</td><td><a href=\"/horse/3\">架空馬3","<td>2</td><td><a href=\"/horse/3\">架空馬3"),"2026-10-31","東京",3)
 
 if __name__=="__main__":
     unittest.main()
