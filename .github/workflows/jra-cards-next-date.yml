@@ -76,6 +76,10 @@ jobs:
           for day in result['days']:
               print(day['date'], day['status'], ','.join(day['venues']))
           PY
+      - name: Discover explicitly linked official card seeds (no publication)
+        if: github.event_name == 'schedule'
+        run: |
+          python scripts/discover_jra_card_seeds.py --schedule artifacts/provisional-schedule.json --output artifacts/card-seed-candidates.json
       - name: Scheduled run status
         if: github.event_name == 'schedule'
         run: echo 'Official provisional venues discovered. Confirmed cards and publication are NOT enabled yet.'
