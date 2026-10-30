@@ -35,6 +35,9 @@ jobs:
           if [ -s artifacts/manifest.json ]; then
             python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json || true
           fi
+          if [ -s artifacts/parsed.json ]; then
+            python scripts/merge_verified_cards.py data/race-catalog-2026-10-31.json artifacts/parsed.json artifacts/merged-catalog.json || true
+          fi
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'workflow_dispatch'
         with:
