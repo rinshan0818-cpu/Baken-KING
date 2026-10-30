@@ -1,0 +1,29 @@
+name: JRA official connectivity diagnostic
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "One official JRA race-card URL (https://jra.jp/ or www.jra.go.jp/)"
+        required: true
+        type: string
+      authorized:
+        description: "I have verified that automated access for this use is permitted"
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  connectivity:
+    if: ${{ inputs.authorized }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check one JRA URL (no scraping or storage)
+        env:
+          TARGET_URL: ${{ inputs.url }}
+        run: python scripts/jra_access_probe.py --url "$TARGET_URL" --authorized
