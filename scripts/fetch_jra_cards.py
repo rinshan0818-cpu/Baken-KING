@@ -58,6 +58,26 @@ def fetch_cards(manifest, delay=1.5):
             try:
                 cards.append(parse_card(decoded, *key))
             except ValueError as exc:
+                if str(exc).startswith("horse_numbers_not_contiguous"):
+                    from bs4 import BeautifulSoup
+                    page = BeautifulSoup(decoded, "html.parser")
+                    rows = []
+                    for tr in page.select("tr"):
+                        cells = tr.find_all(["td", "th"], recursive=False)
+                        if not cells:
+                            continue
+                        labels = [c.get_text(" ", strip=True)[:65] for c in cells]
+                        # Record candidate rows around the missing horse number.
+                        if any(re.search(r"(?<!\\d)13(?!\\d)|取消|除外|出走取消", x) for x in labels):
+                            rows.append({"class":tr.get("class", []),
+                                         "cells":labels[:15],
+                                         "images":[{"alt":im.get("alt", ""),
+                                                    "src":im.get("src", "")[-75:]}
+                                                   for im in tr.find_all("img")[:8]]})
+                    diagnostics.append({"date":key[0],"venue":key[1],
+                                        "raceNumber":key[2],
+                                        "issue":"horse_numbers_not_contiguous",
+                                        "matchingRows":rows[:35]})
                 if str(exc) == "card_date_mismatch":
                     from bs4 import BeautifulSoup
                     from hashlib import sha256
