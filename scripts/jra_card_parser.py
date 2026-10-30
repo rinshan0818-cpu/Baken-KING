@@ -30,13 +30,23 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         if "馬番" not in head or "馬名" not in head:
             continue
         numbers = []
+        # JRA layouts may contain rowspans in the frame-number column.
+        # Select the horse-number cell by class/header where possible,
+        # otherwise accept the numeric cell immediately before the horse name.
         for tr in table.find_all("tr"):
             cells = tr.find_all(["td", "th"], recursive=False)
-            if len(cells) < 3:
+            if len(cells) < 2 or any(c.name == "th" for c in cells):
                 continue
-            raw = re.sub(r"\s+", "", cells[1].get_text(" ", strip=True))
-            if re.fullmatch(r"\d{1,2}", raw) and 1 <= int(raw) <= 18:
-                numbers.append(int(raw))
+            labels = [re.sub(r"\\s+", "", c.get_text(" ", strip=True)) for c in cells]
+            possible = []
+            for i, raw in enumerate(labels[:-1]):
+                if not re.fullmatch(r"\\d{1,2}", raw) or not 1 <= int(raw) <= 18:
+                    continue
+                following = labels[i + 1]
+                if following and not re.fullmatch(r"\\d{1,2}", following):
+                    possible.append(int(raw))
+            if possible:
+                numbers.append(possible[-1])
         if len(numbers) >= 2:
             candidates.append(numbers)
     if not candidates:
