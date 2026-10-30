@@ -11,6 +11,7 @@ def main():
     report = json.loads(report_path.read_text(encoding="utf-8"))
     seeds_by_date = json.loads(Path(str(report_path) + ".seeds.json").read_text(encoding="utf-8"))
     daily = []
+    local_cards = []
     for date_report in report["dates"]:
         day = date_report["date"]
         seeds = seeds_by_date.get(day, [])
@@ -25,6 +26,7 @@ def main():
             if entries:
                 cards, failures, _ = fetch_cards(entries)
                 summary["parsed"] = cards["raceCount"]
+                local_cards.extend(cards["races"])
                 summary["failures"] = [
                     {"venue": f["venue"], "raceNumber": f["raceNumber"],
                      "error": f["error"][:120]} for f in failures
@@ -44,6 +46,8 @@ def main():
     summary = {"dates": daily, "discovered": sum(d["discovered"] for d in daily),
                "parsed": sum(d["parsed"] for d in daily),
                "venues": sorted({v for d in daily for v in d.get("venues", [])})}
+    Path("private-cards.json").write_text(
+        json.dumps({"races": local_cards}, ensure_ascii=False), encoding="utf-8")
     Path("upcoming-card-validation.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False))
