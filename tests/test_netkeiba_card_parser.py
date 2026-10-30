@@ -48,6 +48,11 @@ class NetkeibaCardParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate_horse_names"):
             parse_netkeiba_card(html, "2026-10-31", "東京", 1)
 
+    def test_partially_parsed_horse_row_fails(self):
+        html = HTML.replace('<td class="HorseName"><a>サンプルB</a></td>', '<td>サンプルB</td>')
+        with self.assertRaisesRegex(ValueError, "incomplete_horse_row"):
+            parse_netkeiba_card(html, "2026-10-31", "東京", 1)
+
     def test_missing_rows(self):
         with self.assertRaises(ValueError):
             parse_netkeiba_card("<html></html>", "2026-10-31", "東京", 1)
