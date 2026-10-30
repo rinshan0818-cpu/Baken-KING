@@ -2224,21 +2224,22 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
  date.value='2026-11-01';race.value='11';
  function update(){
   const entry=catalog?.races?.find(x=>x.date===date.value&&x.venue===venue.value&&x.raceNumber===Number(race.value));
-  const numbered=entry?.numbersConfirmed===true;
+  const numbered=entry?.numbersConfirmed===true&&Array.isArray(entry.horses)&&entry.horses.length>0;
   const hasEntries=Array.isArray(entry?.horses)&&entry.horses.length>0;
   ten.hidden=!numbered;ten.style.display=numbered?'':'none';
   if(numbered)window.dispatchEvent(new CustomEvent('baken:catalog-race-selected',{detail:{race:entry}}));
-  pre.hidden=!hasEntries;pre.style.display=hasEntries?'':'none';
+  // Confirmed cards use the real ticket builder, not the pre-draw list.
+  pre.hidden=numbered||!hasEntries;pre.style.display=(!numbered&&hasEntries)?'':'none';
   go.hidden=true;
   list.replaceChildren();
   if(hasEntries){
    document.getElementById('preDrawRaceTitle').textContent=date.value.replaceAll('-','/')+' '+venue.value+race.value+'R '+(entry.title||'出馬表');
    for(const horse of entry.horses){const line=document.createElement('div');line.className='line';line.textContent=(entry.numbersConfirmed?horse.number+'番　':'')+horse.name+(horse.scratched?'　【出走取消・選択不可】':entry.numbersConfirmed?'':'　（馬番未確定）');list.append(line)}
   }
-  status.textContent=!catalog?'レース情報を読み込み中です。':numbered?'出馬表・馬番確定：仮想購入可能':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭'+(entry.numbersConfirmed?'（馬番確定）':'（馬番未確定）'):' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
+  status.textContent=!catalog?'レース情報を読み込み中です。':numbered?'馬番確定・出馬表取得済み：下の画面から仮想購入できます。':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭'+(entry.numbersConfirmed?'（馬番確定）':'（馬番未確定）'):' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
  }
  date.onchange=update;venue.onchange=update;race.onchange=update;
- fetch('./data/race-catalog-2026-10-31.json',{cache:'no-store'})
+ fetch('./data/race-catalog-2026-10-31.json?v=20261030-24cards',{cache:'no-store'})
  .then(x=>{if(!x.ok)throw Error('fetch');return x.json()})
  .then(x=>{if(!Array.isArray(x.races))throw Error('schema');catalog=x;update()})
  .catch(()=>{status.textContent='レース情報の読み込みに失敗しました。更新して再試行してください。';ten.style.display='none';pre.style.display='none'});
