@@ -26,149 +26,421 @@
       "distance": 1600,
       "horses": [
         {
-          "name": "トルタネーラ",
           "number": 1,
-          "frame": 1
+          "name": "トルタネーラ",
+          "frame": null
         },
         {
-          "name": "ニシノツムジカゼ",
           "number": 2,
-          "frame": 1
+          "name": "ニシノツムジカゼ",
+          "frame": null
         },
         {
-          "name": "ドーンオブホープ",
           "number": 3,
-          "frame": 2
+          "name": "ドーンオブホープ",
+          "frame": null
         },
         {
-          "name": "ボディビルダー",
           "number": 4,
-          "frame": 2
+          "name": "ボディビルダー",
+          "frame": null
         },
         {
-          "name": "ハイファイネスト",
           "number": 5,
-          "frame": 3
+          "name": "ハイファイネスト",
+          "frame": null
         },
         {
-          "name": "イントゥーザブルー",
           "number": 6,
-          "frame": 3
+          "name": "イントゥーザブルー",
+          "frame": null
         },
         {
-          "name": "フジサンインフレ",
           "number": 7,
-          "frame": 4
+          "name": "フジサンインフレ",
+          "frame": null
         },
         {
-          "name": "フィックスユー",
           "number": 8,
-          "frame": 4
+          "name": "フィックスユー",
+          "frame": null
         },
         {
-          "name": "サイボーグ",
           "number": 9,
-          "frame": 5
+          "name": "サイボーグ",
+          "frame": null
         },
         {
-          "name": "サクラトップオメガ",
           "number": 10,
-          "frame": 5
+          "name": "サクラトップオメガ",
+          "frame": null
         },
         {
-          "name": "ランフェザー",
           "number": 11,
-          "frame": 6
+          "name": "ランフェザー",
+          "frame": null
         },
         {
-          "name": "ホウオウシュウ",
           "number": 12,
-          "frame": 6
+          "name": "ホウオウシュウ",
+          "frame": null
         },
         {
-          "name": "チャリンコリン",
           "number": 13,
-          "frame": 7
+          "name": "チャリンコリン",
+          "frame": null
         },
         {
-          "name": "パレスラン",
           "number": 14,
-          "frame": 7
+          "name": "パレスラン",
+          "frame": null
         },
         {
-          "name": "アークレイリ",
           "number": 15,
-          "frame": 8
+          "name": "アークレイリ",
+          "frame": null
         },
         {
-          "name": "ウスズミザクラ",
           "number": 16,
-          "frame": 8
+          "name": "ウスズミザクラ",
+          "frame": null
         }
       ],
       "grade": null,
       "metadataSource": "JRA公式出馬表 2026-10-31 東京1R",
-      "metadataStatus": "verified"
+      "metadataStatus": "parsed_verified",
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-2",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 2,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳未勝利",
       "startTime": "10:20",
       "surface": "芝",
       "distance": 1600,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "ヒミツヘイキ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ドナフェリーチェ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "セラフィムコード",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "キタノバトゥーキ",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "ダンツトリノ",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "クリガーレ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "トーセンイルン",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "アイビークロノス",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ローザヴェローナ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "コスモシグナス",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-3",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 3,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳未勝利",
       "startTime": "10:50",
       "surface": "芝",
       "distance": 2000,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "フィニート",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "グランドストーリー",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "スカイミラー",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "リカジョンファンク",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "ゴールドテソーロ",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "アオイゲート",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "サラサシンシアズ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "アトミックリーチ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-4",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 4,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳新馬",
       "startTime": "11:20",
       "surface": "ダート",
       "distance": 1400,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "アワフェリシティ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "アマネディル",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ワイワイシャイニー",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ホウオウビリオン",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "アヘッドオブオール",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ジャスティンバルサ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "シンクロニシティ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ピトンピンク",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ミヤルロワ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "モリノヤマセミ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ナニワダマシイ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "レーヴマジック",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "チェンジエッジ",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "エコロガルディア",
+          "frame": null
+        },
+        {
+          "number": 15,
+          "name": "エマリュウオー",
+          "frame": null
+        },
+        {
+          "number": 16,
+          "name": "グランドバッシュ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-5",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 5,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳新馬",
       "startTime": "12:10",
       "surface": "芝",
       "distance": 1800,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "サスケサートゥル",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ラヴェーラ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ケープルグラン",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ヴィルアペックス",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "ハクアイソー",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "タイセイリメンバー",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "シャルマンスリール",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "エクアトーレ",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "バーンユアハート",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-6",
@@ -190,270 +462,1636 @@
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 7,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "3歳以上1勝クラス",
       "startTime": "13:10",
       "surface": "芝",
       "distance": 2000,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "デイズインザサン",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "キアラメンテ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ホールドザデイ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "シェーンシュティア",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "ランザワールド",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ジーティーメティオ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ハーディジェナー",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ミッキーマーメイド",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "カンティーナ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "ディヒターリーベ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "オプレントジュエル",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-8",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 8,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "3歳以上2勝クラス",
       "startTime": "13:45",
       "surface": "ダート",
       "distance": 1400,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "スーパーバイザー",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "プレダトゥール",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ダイシンリンク",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ベルメサイア",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "レディサン",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "レジーナローズ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ヘリテージブルーム",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "メモリーグラス",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "トーホウキザン",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "ヴィンブルレー",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ミライテーラー",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "パープルナイト",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "アクアマリーナ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-9",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 9,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "オキザリス賞",
       "startTime": "14:20",
       "surface": "ダート",
       "distance": 1400,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "マイスターシューズ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "コパノキラキラ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "スマートブライド",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ワンスフォーユー",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "クロリス",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "マリノエスプレッソ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "イトウカカリチョウ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "アレックスケー",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "スマートポーション",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "モミスケ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ソラティオ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "グラスラリー",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "ユイノエスポワール",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "ニシノイサリビ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-10",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 10,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "国立特別",
       "startTime": "14:55",
       "surface": "芝",
       "distance": 1600,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "ケイケイ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ブライティアダイヤ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "シャンソンドール",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "キシダンチョウ",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "シャンパンマーク",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "シャイニースイフト",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "フジガイフウ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "パワースナッチ",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ホークマン",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "クールデイトナ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-11",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 11,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "ペルセウスステークス",
       "startTime": "15:30",
       "surface": "ダート",
       "distance": 1600,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "ハセドン",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "シーズンリッチ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ロードラビリンス",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "サフランヒーロー",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "イムホテプ",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ジェイパームス",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "シュラザック",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ハワイアンタイム",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "リサシテーション",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "アドマイヤデイトナ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "エスカル",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "クレーキング",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "クールブロン",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "ナイトアクアリウム",
+          "frame": null
+        },
+        {
+          "number": 15,
+          "name": "ショウナンライシン",
+          "frame": null
+        },
+        {
+          "number": 16,
+          "name": "ピエマンソン",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-12",
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 12,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "3歳以上1勝クラス",
       "startTime": "16:15",
       "surface": "芝",
       "distance": 1800,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "フィクセルリリア",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ダイユウアレグロ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ボニープリンス",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "アイムイン",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "マイネルグレート",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ラッキーストーン",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ラヴェニュー",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "アメテュストス",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "セーヌデローヴ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "オルグジェシダ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "フリーガー",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "ヴァロアーク",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-1",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 1,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳未勝利",
       "startTime": "10:05",
       "surface": "ダート",
       "distance": 1400,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "スリーオブスペイズ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ゴールドアーク",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ウィナーズクロノ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ランズエンド",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "マルモリマイベスト",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ピエナマーズ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "シムサラビン",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ベラジオセブン",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "エアロクリスタ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "ダイユウエゾフジ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "エリーマイラヴ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "アセンシオン",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "ジャスコヒラリアス",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "ピコジャック",
+          "frame": null
+        },
+        {
+          "number": 15,
+          "name": "ヤマトデュノール",
+          "frame": null
+        },
+        {
+          "number": 16,
+          "name": "ヴァルダンセ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-2",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 2,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳未勝利",
       "startTime": "10:35",
       "surface": "芝",
       "distance": 1600,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "フクノブルースカイ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ルガルデ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ナムラサフラン",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ジューンルル",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "サウンドアミューズ",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ラガッタレアーレ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ヒノトリ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ダディーズレガリア",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "コンセルノ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "トゥルーライフ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-3",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 3,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳未勝利",
       "startTime": "11:05",
       "surface": "芝",
       "distance": 1800,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "シルクウォード",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ウィリーウィリー",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "メメヤンチャヒメ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ポカポカヨウキ",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "ブラックミューズ",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "サントボーム",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ディープリメンバー",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "アイオリスパルス",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-4",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 4,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "障害3歳以上未勝利",
       "startTime": "11:35",
       "surface": "障害",
       "distance": 2910,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "グロリアラウス",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "モルゲンゾンネ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ヤコブセン",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "セイフウサツキ",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "カイコウ",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ディープサミット",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ローズピリオド",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ラッキーダイヤ",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ラパンラピッド",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "クリアクォーツ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-5",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 5,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳新馬",
       "startTime": "12:25",
       "surface": "芝",
       "distance": 2000,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "ソトッキー",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "フェイムシーカー",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "トゥーリ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "アントレピード",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "アンドロニクス",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "フラワーマーチ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "デルマクズリュウ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "メイショウイロドリ",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "オーバーアゲイン",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "フォコンノワール",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ヒロノリホープ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "ホウオウトリリオン",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "マンハッタンモーン",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-6",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 6,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "2歳新馬",
       "startTime": "12:55",
       "surface": "ダート",
       "distance": 1400,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "レッドガレオン",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "モアザンヴォルト",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "クローネンリーベ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "サマーレディ",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "キングゴールド",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "クリコリンダ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ドリームハロウ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ジーティーイレブン",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "トップエンドパワー",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "スターシーカー",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ナムラウルフ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "ホーフアイゼン",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "ルシエルノーブル",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "サイモンレコルト",
+          "frame": null
+        },
+        {
+          "number": 15,
+          "name": "マスターピース",
+          "frame": null
+        },
+        {
+          "number": 16,
+          "name": "ビップカレッジ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-7",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 7,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "3歳以上1勝クラス",
       "startTime": "13:25",
       "surface": "ダート",
       "distance": 1800,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "マリノエステーラ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "スカイストライプス",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ハノハノ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ブラックドレス",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "スナークシャラク",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "クラテロス",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ララディアーブル",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ハイロード",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ゴールデンダガー",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "バリオス",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "テーオーアンジェラ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "ジーティーアメリカ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-8",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 8,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "3歳以上2勝クラス",
       "startTime": "14:00",
       "surface": "ダート",
       "distance": 1200,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "ミサビスケッツ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ストラテージュ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ダノンモンテローザ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ビッグドリーム",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "ダズリングダンス",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ズバットマサムネ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ジーベック",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "マメタンク",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ルイステソーロ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "バッハアルプゼー",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ワイノナオミ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "モンサンゴールデン",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "ライトオブヌカタ",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "バイファーザベスト",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-9",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 9,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "北野特別",
       "startTime": "14:35",
       "surface": "芝",
       "distance": 2000,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "ダノンカゼルタ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "キタサンハナビラ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "スターリングアップ",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ホウオウタイタン",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "オメガインペリアル",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "ダイヤモンドハンズ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "カムアップローゼス",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "スカイスプレンダー",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ミカエルパシャ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "ビッグデイメイク",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-10",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 10,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "ハロウィンステークス",
       "startTime": "15:10",
       "surface": "ダート",
       "distance": 1900,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "セブンマジシャン",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ショウサンジョージ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ソルチェリア",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "アークドール",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "キュールエフウジン",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "メイショウコガシラ",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "ルクスビッグスター",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ジョータルマエ",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "システマソラー",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "ブレトワルダ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ペンナヴェローチェ",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "オリーブグリーン",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "タイセイアディクト",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "マテンロウブレイブ",
+          "frame": null
+        },
+        {
+          "number": 15,
+          "name": "サイモンブーケ",
+          "frame": null
+        },
+        {
+          "number": 16,
+          "name": "リューデスハイム",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-11",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 11,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "ファンタジーステークス",
       "startTime": "15:45",
       "surface": "芝",
       "distance": 1400,
       "grade": "GⅢ",
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "レニュアージュ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "セイウンマイラヴ",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ビスケットサンド",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ニクスルーナ",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "バタフライ",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "イモージェン",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "シャンデヴァーグ",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ブライトスクリプト",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ベニバナ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "フェリチタ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ツキミ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-京都-12",
       "date": "2026-10-31",
       "venue": "京都",
       "raceNumber": 12,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "3歳以上1勝クラス",
       "startTime": "16:25",
       "surface": "芝",
       "distance": 1600,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "スマートティアナ",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "テイエムスティール",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "ラパンドール",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "ザラタン",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "サマーブリザード",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "パスコード",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "エスティヴァリス",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "エイズルブルーム",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "アイスヴィレッジ",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "ラヴリーティアラ",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "タイムレスキス",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "マテンロウネイビー",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "カポレイラ",
+          "frame": null
+        },
+        {
+          "number": 14,
+          "name": "ナムラヒナギク",
+          "frame": null
+        },
+        {
+          "number": 15,
+          "name": "メイショウトウコウ",
+          "frame": null
+        },
+        {
+          "number": 16,
+          "name": "エングルマン",
+          "frame": null
+        },
+        {
+          "number": 17,
+          "name": "フォルナックス",
+          "frame": null
+        },
+        {
+          "number": 18,
+          "name": "サトノセプター",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-11-01-東京-1",
