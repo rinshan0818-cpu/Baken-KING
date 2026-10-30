@@ -24,6 +24,17 @@ class HeaderConditionTests(unittest.TestCase):
         self.assertEqual(r["grade"],"(L)")
         self.assertEqual(r["ageCondition"],"3歳以上")
         self.assertEqual(r["distanceMeters"],1400)
+    def test_real_official_course_format(self):
+        r=parse_race_conditions("3歳以上 2勝クラス （混合）［指定］ 定量 コース：1,600メートル（芝・左）")
+        self.assertEqual(r["surface"],"芝")
+        self.assertEqual(r["distanceMeters"],1600)
+        self.assertEqual(r["weightRule"],"定量")
+        self.assertIn("混合",r["restrictions"])
+        self.assertNotIn("direction",r)
+    def test_official_female_race(self):
+        r=parse_race_conditions("3歳以上 1勝クラス 牝［指定］ 定量 コース：2,000メートル（芝・左）")
+        self.assertIn("牝馬限定",r["restrictions"])
+        self.assertEqual(r["distanceMeters"],2000)
     def test_no_guessed_values(self):
         r=parse_race_conditions("2歳 新馬 馬齢")
         self.assertNotIn("distanceMeters",r)
