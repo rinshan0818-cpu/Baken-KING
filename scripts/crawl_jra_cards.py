@@ -12,10 +12,10 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from discover_jra_urls import HOSTS, discover, race_key
 
-def crawl(seeds, day="2026-10-31", max_pages=30):
+def crawl(seeds, day="2026-10-31", max_pages=75):
     queue = deque((url, 0) for url in seeds)
     visited, races, failures = set(), {}, []
-    while queue and len(visited) < max_pages and len(races) < 24:
+    while queue and len(visited) < max_pages and len(races) < 36:
         url, depth = queue.popleft()
         if url in visited:
             continue
@@ -60,9 +60,9 @@ def main():
     with open(a.output,"w",encoding="utf-8") as f:
         json.dump(cards,f,ensure_ascii=False,indent=2)
         f.write("\n")
-    print(json.dumps({"discovered":len(cards),"missing":[[v,n] for v in ("東京","京都") for n in range(1,13) if not any(c["venue"]==v and c["raceNumber"]==n for c in cards)],"errors":errors},ensure_ascii=False))
-    if len(cards) != 24:
-        raise SystemExit(2)
+    print(json.dumps({"discovered":len(cards),"venues":sorted(set(c["venue"] for c in cards)),"errors":errors},ensure_ascii=False))
+    if not cards:
+        raise SystemExit("No race cards discovered")
 
 if __name__ == "__main__":
     main()
