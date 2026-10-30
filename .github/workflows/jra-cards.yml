@@ -1,0 +1,43 @@
+name: JRA card importer validation
+on:
+  push:
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/jra-cards.yml'
+  workflow_dispatch:
+    inputs:
+      official_index_url:
+        description: 'Official JRA page containing race links (optional)'
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install beautifulsoup4
+      - name: Test parsers and import pipeline
+        run: python -m unittest discover -s tests -p 'test_*.py'
+      - name: Discover and fetch official cards (manual only)
+        if: github.event_name == 'workflow_dispatch' && inputs.official_index_url != ''
+        env:
+          JRA_INDEX_URL: ${{ inputs.official_index_url }}
+        run: |
+          mkdir -p artifacts
+          python scripts/discover_jra_urls.py "$JRA_INDEX_URL" artifacts/manifest.json || true
+          if [ -s artifacts/manifest.json ]; then
+            python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json
+          fi
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' && inputs.official_index_url != ''
+        with:
+          name: jra-cards-validation
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 3
