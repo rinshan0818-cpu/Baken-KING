@@ -59,6 +59,11 @@ class CardPipelineTests(unittest.TestCase):
         self.assertEqual([h["number"] for h in card["horses"]], [1, 2, 3])
         self.assertTrue(card["horses"][0]["scratched"])
         self.assertFalse(card["horses"][1].get("scratched", False))
+    def test_standalone_cancel_marker(self):
+        html = sample_html().replace('<td>2</td><td><a>テストホースB</a></td>', '<td>2</td><td><a>テストホースB</a> 取消</td>')
+        card = parse_card(html, "2026-10-31", "東京", 11)
+        self.assertTrue(card["horses"][1]["scratched"])
+
     def test_reject_mismatched_date(self):
         with self.assertRaises(ValueError):
             parse_card(sample_html(),"2026-11-01","東京",11)
