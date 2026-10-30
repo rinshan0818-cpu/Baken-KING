@@ -19,6 +19,9 @@ jobs:
         run: |
           python -m pip install beautifulsoup4
           python -m unittest discover -s tests -p 'test_*.py'
+      - name: Discover upcoming dated JRA links (read-only, no publishing)
+        run: |
+          python scripts/discover_upcoming_jra.py upcoming-discovery.json
       - name: Record weekly ingestion status
         run: |
           python - <<'PY'
@@ -39,5 +42,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: weekly-jra-readiness
-          path: readiness.json
+          path: |\n            readiness.json\n            upcoming-discovery.json
           retention-days: 7
