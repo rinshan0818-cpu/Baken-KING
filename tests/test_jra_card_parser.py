@@ -2,7 +2,7 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from jra_card_parser import parse_card
+from jra_card_parser import parse_card, parse_race_conditions
 
 def fixture(day="2026-10-31", venue="東京", race=3):
     y,m,d=map(int,day.split("-"))
@@ -10,6 +10,17 @@ def fixture(day="2026-10-31", venue="東京", race=3):
     return f"<html><body>{y}年{m}月{d}日 4回{venue}1日 {race}レース<table><tr><th>枠番</th><th>馬番</th><th>馬名</th></tr>{rows}</table></body></html>"
 
 class CardParserTests(unittest.TestCase):
+    def test_race_conditions(self):
+        mixed=parse_race_conditions("3歳以上 オープン （国際）（特指） ハンデ")
+        self.assertTrue(mixed["isHandicap"])
+        self.assertIn("国際",mixed["restrictions"])
+        self.assertIn("特別指定",mixed["restrictions"])
+        female=parse_race_conditions("2歳 オープン (国際)牝(指定) 馬齢")
+        self.assertTrue(female["isFemaleOnly"])
+        self.assertEqual(female["weightRule"],"馬齢")
+        self.assertTrue(parse_race_conditions("（混合）［指定］ 定量")["isMixed"])
+        self.assertIsNone(parse_race_conditions("2歳未勝利")["weightRule"])
+
     def test_multiple_races(self):
         for day,venue,race in [("2026-10-31","東京",3),("2026-11-01","京都",11)]:
             data=parse_card(fixture(day,venue,race),day,venue,race)
