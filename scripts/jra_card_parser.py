@@ -12,7 +12,7 @@ VENUES = ("札幌","函館","福島","新潟","東京","中山","中京","京都
 
 def parse_race_conditions(text: str) -> dict:
     """Extract JRA race restrictions and weight rules without guessing missing data."""
-    compact = re.sub(r"\\s+", "", text).replace("［", "[").replace("］", "]").replace("（", "(").replace("）", ")")
+    compact = re.sub(r"\s+", "", text).replace("［", "[").replace("］", "]").replace("（", "(").replace("）", ")")
     # Only the race header should be passed in; historical form can contain other race types.
     restrictions = []
     if re.search(r"\\(混合\\)|\\(混\\)", compact):
@@ -50,10 +50,10 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_meeting_mismatch")
     if not re.search(rf"(?<!\d){race_number}\s*レース", body):
         raise ValueError("card_race_mismatch")
-    # Race conditions appear above the card; ignore past-performance tables.
+    # Limit condition parsing to the current race heading, not past performances.
     race_match = re.search(rf"(?<!\\d){race_number}\\s*(?:レース|R)", body)
-    race_header = body[race_match.start():] if race_match else body
-    header = race_header.split("出馬表", 1)[0][:900]
+    race_header = body[race_match.end():] if race_match else body
+    header = race_header.split("本賞金", 1)[0].split("枠", 1)[0][:450]
     conditions = parse_race_conditions(header)
     candidates = []
     for table in soup.find_all("table"):
@@ -69,13 +69,13 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             cells = tr.find_all(["td", "th"], recursive=False)
             if len(cells) < 2 or any(c.name == "th" for c in cells):
                 continue
-            labels = [re.sub(r"\\s+", "", c.get_text(" ", strip=True)) for c in cells]
+            labels = [re.sub(r"\s+", "", c.get_text(" ", strip=True)) for c in cells]
             possible = []
             for i, raw in enumerate(labels[:-1]):
-                if not re.fullmatch(r"\\d{1,2}", raw) or not 1 <= int(raw) <= 18:
+                if not re.fullmatch(r"\d{1,2}", raw) or not 1 <= int(raw) <= 18:
                     continue
                 following = labels[i + 1]
-                if following and not re.fullmatch(r"\\d{1,2}", following):
+                if following and not re.fullmatch(r"\d{1,2}", following):
                     possible.append(int(raw))
             if possible:
                 numbers.append(possible[-1])
