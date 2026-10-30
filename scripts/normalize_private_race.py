@@ -54,7 +54,16 @@ def normalize_race(record):
             if not isinstance(yen,int) or isinstance(yen,bool) or yen<0:
                 raise ValueError("invalid_payout_amount")
             payouts.append({"type":kind,"numbers":nums if kind in ORDERED else sorted(nums),"yenPer100":yen})
-        result={"status":"official-final","finish":result["finish"],"payouts":payouts}
+        refunds=[]
+        for item in result.get("refunds",[]):
+            kind=item["type"]
+            nums=item["numbers"]
+            if kind not in BET_TYPES or not isinstance(nums,list) or len(nums)!=SIZE.get(kind) or not all(isinstance(n,int) and not isinstance(n,bool) and 1<=n<=(8 if kind=="bracket" else 18) for n in nums):
+                raise ValueError("invalid_refund_combination")
+            if len(set(nums))!=len(nums) and not (kind=="bracket" and nums[0]==nums[1]):
+                raise ValueError("invalid_refund_combination")
+            refunds.append({"type":kind,"numbers":nums if kind in ORDERED else sorted(nums)})
+        result={"status":"official-final","finish":result["finish"],"payouts":payouts,"refunds":refunds}
     return {"schemaVersion":1,"date":date,"venue":venue,"raceNumber":number,
             "raceName":record.get("raceName"),"scheduledStartAt":record["scheduledStartAt"],
             "upstreamRaceId":str(record["upstreamRaceId"]),
@@ -74,7 +83,14 @@ def payout_for_ticket(ticket, result):
     if not isinstance(numbers,list) or not all(isinstance(n,int) and not isinstance(n,bool) for n in numbers):
         raise ValueError("invalid_ticket_numbers")
     key=tuple(numbers if kind in ORDERED else sorted(numbers))
-    for p in result["payouts"]:
-        if p["type"]==kind and tuple(p["numbers"] if kind in ORDERED else sorted(p["numbers"]))==key:
-            return stake//100*p["yenPer100"]
+    matches=[p for p in result["payouts"] if p["type"]==kind and tuple(p["numbers"] if kind in ORDERED else sorted(p["numbers"]))==key]
+    refunds=[r for r in result.get("refunds",[]) if r["type"]==kind and tuple(r["numbers"] if kind in ORDERED else sorted(r["numbers"]))==key]
+    if matches and refunds:
+        raise ValueError("conflicting_payout_and_refund")
+    if len(matches)>1 or len(refunds)>1:
+        raise ValueError("duplicate_settlement_entry")
+    if refunds:
+        return stake
+    if matches:
+        return stake//100*matches[0]["yenPer100"]
     return 0
