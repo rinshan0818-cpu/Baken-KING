@@ -42,6 +42,17 @@ class CardPipelineTests(unittest.TestCase):
         card = parse_card(html, "2026-10-31", "東京", 11)
         self.assertNotIn("frame", card["horses"][0])
         self.assertNotIn("frame", card["horses"][1])
+    def test_cancelled_horse_keeps_explicit_number(self):
+        html = sample_html().replace('<td>2</td><td><a>テストホースB</a></td>', '<td>2</td><td><a>テストホースB</a> 出走取消</td>')
+        card = parse_card(html, "2026-10-31", "東京", 11)
+        self.assertEqual(card["horses"][1]["number"], 2)
+        self.assertTrue(card["horses"][1]["scratched"])
+        normalized = normalize_cards([card])
+        self.assertTrue(normalized["races"][0]["horses"][1]["scratched"])
+    def test_missing_number_is_not_inferred(self):
+        html = sample_html().replace('<td>2</td><td><a>テストホースB</a></td>', '<td>取消</td><td><a>テストホースB</a></td>')
+        with self.assertRaisesRegex(ValueError,"horse_numbers_not_contiguous"):
+            parse_card(html,"2026-10-31","東京",11)
     def test_reject_mismatched_date(self):
         with self.assertRaises(ValueError):
             parse_card(sample_html(),"2026-11-01","東京",11)
