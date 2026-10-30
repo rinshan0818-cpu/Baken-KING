@@ -30,6 +30,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         if "馬番" not in head or "馬名" not in head:
             continue
         numbers = []
+        horse_names = []
         # JRA layouts may contain rowspans in the frame-number column.
         # Select the horse-number cell by class/header where possible,
         # otherwise accept the numeric cell immediately before the horse name.
@@ -47,16 +48,20 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
                     possible.append(int(raw))
             if possible:
                 numbers.append(possible[-1])
+                horse_names.append(next((a.get_text(" ", strip=True) for a in tr.find_all("a") if a.get_text(" ", strip=True)), ""))
         if len(numbers) >= 2:
-            candidates.append(numbers)
+            candidates.append((numbers, horse_names))
     if not candidates:
         raise ValueError("horse_number_table_missing")
-    candidates.sort(key=len, reverse=True)
-    best = candidates[0]
+    candidates.sort(key=lambda item: len(item[0]), reverse=True)
+    best, names = candidates[0]
     if len(best) != len(set(best)) or len(best) > 18:
         raise ValueError("horse_number_duplicate_or_excess")
-    if len(candidates) > 1 and len(candidates[1]) == len(best) and candidates[1] != best:
+    if len(candidates) > 1 and len(candidates[1][0]) == len(best) and candidates[1][0] != best:
         raise ValueError("ambiguous_horse_number_tables")
+    if sorted(best) != list(range(1, len(best) + 1)):
+        raise ValueError("horse_numbers_not_contiguous")
     return {"date":day,"venue":venue,"raceNumber":race_number,
-            "horseNumbers":best,"horseNumberCount":len(best),
+            "horseNumbers":best,
+            "horseNames":names,"horseNumberCount":len(best),
             "status":"parsed-not-authorized-for-publication"}
