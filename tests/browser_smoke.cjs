@@ -7,10 +7,11 @@ const assert=require('node:assert/strict');
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
   const horses=Array.from({length:8},(_,i)=>({number:i+1,name:'テスト馬'+(i+1),frame:i+1}));
+  const scratchedHorses=horses.map((h,i)=>i===7?{...h,scratched:true}:h);
   const races=[
    {date:'2026-11-07',venue:'東京',raceNumber:1,horses},
    {date:'2026-11-07',venue:'京都',raceNumber:2,horses},
-   {date:'2026-11-08',venue:'東京',raceNumber:3,horses}
+   {date:'2026-11-08',venue:'東京',raceNumber:3,horses:scratchedHorses}
   ];
   await page.route('**/data/authorized-race-cards.json*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races})}));
   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
@@ -22,6 +23,7 @@ const assert=require('node:assert/strict');
   assert.equal(await page.locator('#weekRace').inputValue(),'2');
   await page.locator('#weekDate').selectOption('2026-11-08');
   assert.equal(await page.locator('#weekRace').inputValue(),'3');
+  assert.equal(await page.locator('#autumnHorseList .bk-autumn-row').nth(7).isDisabled(),true,'Scratched horse must not be selectable');
   await page.locator('#realBetType').selectOption('馬連');
   await page.locator('#realBetMode').selectOption('normal');
   await page.locator('#autumnHorseList .bk-autumn-row').nth(0).click();
@@ -31,6 +33,7 @@ const assert=require('node:assert/strict');
   await page.getByRole('button',{name:'この内容で購入'}).click();
   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')));
   assert(saved.bets.some(b=>b.raceDate==='2026-11-08'&&b.raceVenue==='東京'&&b.raceNumber===3&&b.status==='pending'),'Purchase not saved');
+  assert.equal(saved.bets.filter(b=>b.raceDate==='2026-11-08'&&b.raceVenue==='東京'&&b.raceNumber===3).length,1,'Exactly one ticket should be saved');
   assert.deepEqual(errors,[]);
   console.log('PASS: race selection and virtual purchase persistence');
  }finally{await browser.close()}
