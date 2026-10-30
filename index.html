@@ -1871,7 +1871,7 @@ function machineRender(){
   const expanded=bkExpandedTicketRaces.has(key);section.classList.toggle('is-expanded',expanded);
   const toggle=bkNode('button',expanded?'▲':'▼','bk-race-ticket-toggle');toggle.type='button';toggle.setAttribute('aria-label',expanded?'馬券一覧を閉じる':'馬券一覧を開く');toggle.setAttribute('aria-expanded',String(expanded));
   toggle.onclick=()=>{if(bkExpandedTicketRaces.has(key))bkExpandedTicketRaces.delete(key);else bkExpandedTicketRaces.add(key);machineRender()};
-  const title=bkNode('strong',bkTicketRaceTitle(rows[0])+(rows[0].realRaceId?'　天皇賞（秋）':''));header.append(title);
+  const title=bkNode('strong',bkTicketRaceTitle(rows[0])+(rows[0].raceTitle?'　'+rows[0].raceTitle:rows[0].realRaceId==='2026-11-01-TOKYO-11'?'　天皇賞（秋）':''));header.append(title);
   title.style.cursor='pointer';title.onclick=()=>toggle.click();
   const pendingRows=rows.filter(b=>b.status==='pending'),readyRows=rows.filter(b=>b.status!=='pending');
   if(readyRows.length&&!rows[0].realRaceId){
@@ -2050,7 +2050,15 @@ document.getElementById('loadHistoricalFixture').onclick=async()=>{
 
 /* Keep real-race tickets distinguishable from demo tickets in all views. */
 const bkOriginalTicketTitle=bkTicketRaceTitle;
-bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 東京11R':bkOriginalTicketTitle(b)};
+bkTicketRaceTitle=function(b){
+ if(b.raceDate&&b.raceVenue&&b.raceNumber)return b.raceDate.slice(5).replace('-','/')+' '+b.raceVenue+b.raceNumber+'R';
+ if(typeof b.realRaceId==='string'){
+  if(b.realRaceId==='2026-11-01-TOKYO-11')return '11/1 東京11R';
+  const m=b.realRaceId.match(/^(\\d{4}-\\d{2}-\\d{2})-(東京|京都)-(\\d{1,2})$/);
+  if(m)return m[1].slice(5).replace('-','/')+' '+m[2]+m[3]+'R';
+ }
+ return bkOriginalTicketTitle(b);
+};
 /* 2026 Tenno Sho Autumn static official-entry fixture; not an automatic scraper. */
 (()=>{
  let horses=[
@@ -2198,7 +2206,7 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
   bkConfirmPurchase(combos,unit,stake,()=>{
   s.balance-=stake;s.totalStake+=stake;
   const stakeGroups=new Map();for(const p of combos){const value=amountFor(p,unit);if(!stakeGroups.has(value))stakeGroups.set(value,[]);stakeGroups.get(value).push(p)}
-  for(const [groupUnit,groupPicks] of stakeGroups)s.bets.push({id:crypto.randomUUID(),realRaceId:raceId,purchasedAt:new Date().toISOString(),purchaseMonth:bkMonthNow(),season:s.season,type:typeEl.value,mode:modeEl.value,axis:modeEl.value==='wheel'?legs[0][0]:null,wheelAxes:modeEl.value==='wheel'?legs[0].slice():null,wheelPartners:modeEl.value==='wheel'?legs[1].slice():null,wheelMulti:modeEl.value==='wheel'?document.getElementById('bkWheelMulti').checked:false,wheelPosition:modeEl.value==='wheel'?Number(document.getElementById('bkWheelPosition').value):null,formationLegs:modeEl.value==='formation'?legs.map(x=>x.slice()):null,fieldSize:horses.length,nums:groupPicks[0].slice(),picks:groupPicks,unitStake:groupUnit,stake:groupUnit*groupPicks.length,paid:0,status:'pending'});
+  for(const [groupUnit,groupPicks] of stakeGroups)s.bets.push({id:crypto.randomUUID(),realRaceId:raceId,raceDate:currentRace?.date||'2026-11-01',raceVenue:currentRace?.venue||'東京',raceNumber:currentRace?.raceNumber||11,raceTitle:currentRace?.title||'天皇賞（秋）',purchasedAt:new Date().toISOString(),purchaseMonth:bkMonthNow(),season:s.season,type:typeEl.value,mode:modeEl.value,axis:modeEl.value==='wheel'?legs[0][0]:null,wheelAxes:modeEl.value==='wheel'?legs[0].slice():null,wheelPartners:modeEl.value==='wheel'?legs[1].slice():null,wheelMulti:modeEl.value==='wheel'?document.getElementById('bkWheelMulti').checked:false,wheelPosition:modeEl.value==='wheel'?Number(document.getElementById('bkWheelPosition').value):null,formationLegs:modeEl.value==='formation'?legs.map(x=>x.slice()):null,fieldSize:horses.length,nums:groupPicks[0].slice(),picks:groupPicks,unitStake:groupUnit,stake:groupUnit*groupPicks.length,paid:0,status:'pending'});
   pick=[];legs=[[],[],[]];individualStakes.clear();individualToggle.checked=false;active=0;save();info.textContent='仮想馬券を購入しました。残高に反映済み。';draw();
   });
  };
