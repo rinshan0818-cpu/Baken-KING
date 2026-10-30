@@ -8,6 +8,9 @@ on:
       - 'tests/test_normalize_private_race.py'
       - 'tests/test_import_private_race.py'
       - 'scripts/audit_race_import.py'
+      - 'scripts/jra_card_parser.py'
+      - 'tests/test_jra_header_conditions.py'
+      - 'tests/test_race_conditions_import.py'
       - 'tests/test_audit_race_import.py'
       - '.github/workflows/offline-race-tests.yml'
   workflow_dispatch:
@@ -21,8 +24,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - run: python -m pip install beautifulsoup4
       - name: Run offline normalization and settlement tests
         run: |
           python -m unittest discover -s tests -p 'test_*private_race*.py' -v
           python -m unittest discover -s tests -p 'test_import_private_race.py' -v
           python -m unittest discover -s tests -p 'test_audit_race_import.py' -v
+          python -m unittest discover -s tests -p 'test_jra_header_conditions.py' -v
+          python -m unittest discover -s tests -p 'test_race_conditions_import.py' -v
