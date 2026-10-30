@@ -78,6 +78,28 @@ def fetch_cards(manifest, delay=1.5):
                                         "raceNumber":key[2],
                                         "issue":"horse_numbers_not_contiguous",
                                         "matchingRows":rows[:35]})
+                if str(exc) == "horse_number_table_missing":
+                    from bs4 import BeautifulSoup
+                    from hashlib import sha256
+                    page = BeautifulSoup(decoded, "html.parser")
+                    visible = page.get_text(" ", strip=True)
+                    table_headers = []
+                    for table in page.find_all("table")[:12]:
+                        headings = [th.get_text(" ", strip=True)[:35] for th in table.find_all("th")[:18]]
+                        if headings:
+                            table_headers.append(headings)
+                    diagnostics.append({
+                        "date": key[0], "venue": key[1], "raceNumber": key[2],
+                        "issue": "horse_number_table_missing",
+                        "requestedUrlPath": parsed.path,
+                        "requestedCnamePrefix": __import__("urllib.parse", fromlist=["parse_qs"]).parse_qs(parsed.query).get("CNAME", [""])[0][:10],
+                        "finalHost": final_url.hostname, "finalPath": final_url.path,
+                        "htmlBytes": len(html), "htmlSha256": sha256(html).hexdigest(),
+                        "title": page.title.get_text(" ", strip=True)[:100] if page.title else "",
+                        "visibleTextSample": visible[:180],
+                        "tableHeaders": table_headers[:8],
+                        "tableCount": len(page.find_all("table")),
+                    })
                 if str(exc) == "card_date_mismatch":
                     from bs4 import BeautifulSoup
                     from hashlib import sha256
