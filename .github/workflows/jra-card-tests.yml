@@ -1,10 +1,12 @@
-name: JRA card parser validation
+name: Race card parser validation
 on:
   push:
     paths:
       - "scripts/jra_card_*.py"
+      - "scripts/netkeiba_card_parser.py"
       - "scripts/race_card_adapter.py"
       - "tests/test_jra_card_*.py"
+      - "tests/test_netkeiba_card_parser.py"
       - "tests/test_race_card_adapter.py"
       - ".github/workflows/jra-card-tests.yml"
   workflow_dispatch:
