@@ -22,6 +22,16 @@ const fs=require('node:fs');
     raceNumber:i%12+1,scheduledStartAt:'2026-11-07T15:40:00+09:00',horses
   }));
   assert.equal(fullSaturday.length,24,'Expected 24 Saturday races');
+  const raceKeys=new Set(fullSaturday.map(r=>r.date+'|'+r.venue+'|'+r.raceNumber));
+  assert.equal(raceKeys.size,24,'Duplicate Saturday races');
+  const raceDates=new Set(fullSaturday.map(r=>r.date));
+  const raceVenues=new Set(fullSaturday.map(r=>r.venue));
+  assert.equal(raceDates.size,1,'Saturday fixture must be for one date');
+  assert.equal(raceVenues.size,2,'Saturday fixture must contain two venues');
+  for(const venue of raceVenues){
+    assert.deepEqual(fullSaturday.filter(r=>r.venue===venue).map(r=>r.raceNumber).sort((a,b)=>a-b),
+      Array.from({length:12},(_,i)=>i+1),'Venue must have races 1-12');
+  }
   const saturdayPage=await browser.newPage();
   try{
     await saturdayPage.route('**/data/authorized-race-cards.json*',route=>
