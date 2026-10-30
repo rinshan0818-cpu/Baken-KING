@@ -20,6 +20,19 @@ const fs=require('node:fs');
     raceNumber:i%12+1,scheduledStartAt:'2026-11-07T15:40:00+09:00',horses
   }));
   assert.equal(fullSaturday.length,24);
+  const saturdayPage=await browser.newPage();
+  try{
+    await saturdayPage.route('**/data/authorized-race-cards.json*',route=>
+      route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races:fullSaturday})}));
+    await saturdayPage.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
+    await saturdayPage.waitForFunction(()=>window.BakenImportedCards?.length===24);
+    await saturdayPage.locator('[data-nav="predict"]').click();
+    assert.equal(await saturdayPage.locator('#weekVenue option').count(),2);
+    assert.equal(await saturdayPage.locator('#weekRace option').count(),12);
+    await saturdayPage.locator('#weekVenue').selectOption('京都');
+    assert.equal(await saturdayPage.locator('#weekRace option').count(),12);
+    assert.equal(await saturdayPage.locator('#autumnFixtureCard').isVisible(),true);
+  }finally{await saturdayPage.close()}
   await page.route('**/data/authorized-race-cards.json*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races})}));
   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.BakenImportedCards?.length===3);
