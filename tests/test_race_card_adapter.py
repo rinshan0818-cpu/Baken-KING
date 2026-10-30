@@ -2,7 +2,7 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from race_card_adapter import normalize_source_cards, betting_snapshot
+from race_card_adapter import normalize_source_cards, betting_snapshot, horse_options
 
 def sample():
     return {"date":"2026-10-31","venue":"東京","raceNumber":11,
@@ -20,6 +20,20 @@ class SourceAdapterTests(unittest.TestCase):
         self.assertNotIn("horses",snapshot)
         self.assertNotIn("horseNames",snapshot)
         self.assertEqual(snapshot["raceConditions"]["weightRule"],"ハンデ")
+    def test_ui_horse_options(self):
+        race = sample()
+        race["horses"].reverse()
+        self.assertEqual(horse_options(race), [
+            {"value": 1, "label": "1 架空馬A"},
+            {"value": 2, "label": "2 架空馬B"},
+        ])
+
+    def test_ui_horse_options_reject_missing_number(self):
+        race = sample()
+        race["horses"][1]["number"] = 3
+        with self.assertRaisesRegex(ValueError, "invalid_horse_number_sequence"):
+            horse_options(race)
+
     def test_invalid_selection(self):
         with self.assertRaisesRegex(ValueError,"selection_not_in_race"):
             betting_snapshot(sample(),[3])
