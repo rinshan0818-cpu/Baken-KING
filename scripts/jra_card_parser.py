@@ -147,7 +147,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     if len(candidates) > 1 and len(candidates[1][0]) == len(best) and candidates[1][0] != best:
         raise ValueError("ambiguous_horse_number_tables")
     if sorted(best) != list(range(1, len(best) + 1)):
-        raise ValueError("horse_numbers_not_contiguous")
+        raise ValueError("horse_numbers_not_contiguous:" + repr(sorted(best)) + ";candidate_counts=" + repr([len(c[0]) for c in candidates]))
     if not all(names) or len(set(names)) != len(names):
         raise ValueError("horse_names_missing_or_duplicate")
     horses = [{"number": number, "name": name} for number, name in sorted(zip(best, names))]
