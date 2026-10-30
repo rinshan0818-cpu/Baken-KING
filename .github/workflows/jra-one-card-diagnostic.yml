@@ -49,7 +49,7 @@ jobs:
           u = urlparse(os.environ['CARD_URL'])
           if d.isoformat() != os.environ['RACE_DATE'] or os.environ['VENUE'] not in VENUES or not 1 <= n <= 12:
               raise SystemExit('Invalid race identity')
-          if u.scheme != 'https' or u.hostname not in ('jra.jp','sp.jra.jp','app.jra.jp') or u.path != '/JRADB/accessD.html':
+          if u.scheme != 'https' or u.hostname not in ('jra.jp','www.jra.go.jp','sp.jra.jp','app.jra.jp') or u.path != '/JRADB/accessD.html':
               raise SystemExit('Invalid official card URL')
           json.dump([{'date':d.isoformat(),'venue':os.environ['VENUE'],'raceNumber':n,'url':os.environ['CARD_URL']}],open('artifacts/manifest.json','w'),ensure_ascii=False)
           PY
@@ -63,6 +63,9 @@ jobs:
           if len(h)<2 or any('frame' not in x for x in h) or not r.get('scheduledStartAt'):
               raise SystemExit('Incomplete required card fields')
           PY
+      - name: Remove raw card records from diagnostic artifacts
+        if: always()
+        run: rm -f artifacts/parsed.json artifacts/manifest.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
