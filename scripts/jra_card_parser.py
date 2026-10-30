@@ -50,11 +50,16 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_meeting_mismatch")
     if not re.search(rf"(?<!\d){race_number}\s*(?:レース|R)(?!\d)", body):
         raise ValueError("card_race_mismatch")
-    # Read the current race heading only; do not parse historical race conditions.
-    race_match = re.search(rf"(?<!\d){race_number}\s*(?:レース|R)(?!\d)", body)
+    # The navigation contains 1R..12R before the actual race heading.
+    # Anchor the heading to the meeting line, not to the first 1R link.
+    meeting = re.search(rf"\\d{{1,2}}\\s*回\\s*{re.escape(venue)}\\s*\\d{{1,2}}\\s*日", body)
+    if meeting is None:
+        raise ValueError("card_meeting_mismatch")
+    current = body[meeting.end():]
+    race_match = re.search(rf"(?<!\\d){race_number}\\s*(?:レース|R)(?!\\d)", current)
     if race_match is None:
         raise ValueError("card_race_mismatch")
-    header = body[race_match.end():].split("本賞金", 1)[0].split("枠", 1)[0][:450]
+    header = current[race_match.end():].split("本賞金", 1)[0].split("詳細出馬表", 1)[0][:450]
     conditions = parse_race_conditions(header)
     candidates = []
     for table in soup.find_all("table"):
@@ -75,6 +80,10 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         # Expand rowspans so a shared frame-number cell cannot shift the horse-number column.
         pending = {}
         for tr in rows[header_index + 1:]:
+            # Expanded past-performance rows are not horses and must not
+            # consume rowspans belonging to the visible horse rows.
+            if "tr_kako" in tr.get("class", []):
+                continue
             cells = tr.find_all(["td", "th"], recursive=False)
             if not cells:
                 continue
@@ -117,7 +126,8 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             if not 1 <= number <= 18:
                 continue
             name_cell = expanded[name_col]
-            link = name_cell.find("a")
+            name_span = name_cell.select_one(".bamei")
+            link = name_span or name_cell.find("a")
             if link and link.get_text(" ", strip=True):
                 horse_name = link.get_text(" ", strip=True).strip()
             else:
