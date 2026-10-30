@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'index.html'
+      - 'tests/browser_smoke.cjs'
+      - '.github/workflows/ui-smoke.yml'
 permissions:
   contents: read
 jobs:
@@ -13,6 +15,19 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check inline scripts
         run: python3 scripts/check_inline_scripts.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Start local app server
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/baken-server.log 2>&1 &
+          sleep 2
+      - name: Test race selection in Chromium
+        run: node tests/browser_smoke.cjs
       - name: Run Python regression tests
         run: |
           python3 -m pip install beautifulsoup4
