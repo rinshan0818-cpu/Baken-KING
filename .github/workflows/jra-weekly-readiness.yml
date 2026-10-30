@@ -3,13 +3,20 @@ on:
   schedule:
     - cron: '0 23 * * 4'
     - cron: '0 23 * * 5'
+    - cron: '0 23 * * 6'
+    - cron: '0 23 * * 0'
   workflow_dispatch:
+    inputs:
+      start_date:
+        description: "Optional start date YYYY-MM-DD (blank = today JST)"
+        required: false
+        type: string
 permissions:
   contents: read
 jobs:
   readiness:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,8 +27,17 @@ jobs:
           python -m pip install beautifulsoup4
           python -m unittest discover -s tests -p 'test_*.py'
       - name: Discover upcoming dated JRA links (read-only, no publishing)
+        env:
+          USER_START_DATE: ${{ inputs.start_date }}
         run: |
-          python scripts/discover_upcoming_jra.py upcoming-discovery.json
+          START_DATE="$(TZ=Asia/Tokyo date +%F)"
+          if [ -n "$USER_START_DATE" ]; then START_DATE="$USER_START_DATE"; fi
+          DAYS_AHEAD=0
+          # Friday: scan through Monday; Saturday: through Monday; Sunday: through Monday.
+          WEEKDAY="$(TZ=Asia/Tokyo date +%u)"
+          if [ -n "$USER_START_DATE" ]; then WEEKDAY="$(date -u -d "$START_DATE" +%u)"; fi
+          case "$WEEKDAY" in 5) DAYS_AHEAD=3;; 6) DAYS_AHEAD=2;; 7) DAYS_AHEAD=1;; esac
+          python scripts/discover_upcoming_jra.py upcoming-discovery.json --date "$START_DATE" --days-ahead "$DAYS_AHEAD"
       - name: Validate discovered race cards privately
         run: python scripts/validate_upcoming_cards.py upcoming-discovery.json
       - name: Record weekly ingestion status
