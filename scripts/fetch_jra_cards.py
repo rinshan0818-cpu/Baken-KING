@@ -48,7 +48,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("manifest", type=Path)
     p.add_argument("output", type=Path)
-    p.add_argument("--require-complete", action="store_true")
+    p.add_argument("--require-complete", action="store_true")\n    p.add_argument("--errors-output", type=Path, help="Write per-race failure diagnostics")
     a = p.parse_args()
     manifest = json.loads(a.manifest.read_text(encoding="utf-8"))
     data, errors = fetch_cards(manifest)
