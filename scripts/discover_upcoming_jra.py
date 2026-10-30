@@ -67,6 +67,10 @@ def main():
               "foundRaceLinks": len(found), "venues": sorted({k[1] for k in found}),
               "status": "links_found" if found else "not_yet_discovered",
               "errors": errors}
+    # Keep discovered seed URLs in the private job only; do not upload them.
+    seeds_path = args.output + ".seeds.json"
+    with open(seeds_path, "w", encoding="utf-8") as f:
+        json.dump([found[key] for key in sorted(found)], f, ensure_ascii=False)
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
         f.write("\n")
