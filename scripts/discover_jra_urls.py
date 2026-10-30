@@ -12,13 +12,13 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 
 HOSTS = {"jra.jp", "sp.jra.jp", "app.jra.jp"}
-VENUE_CODES = {"東京": "05", "京都": "08"}
+VENUE_CODES = {"札幌": "01", "函館": "02", "福島": "03", "新潟": "04", "東京": "05", "中山": "06", "中京": "07", "京都": "08", "阪神": "09", "小倉": "10"}
 
 def race_key(url, date):
     query = parse_qs(urlparse(url).query)
     token = query.get("CNAME", [""])[0]
     # JRA tokens vary by presentation; validate embedded meeting/venue/race/date.
-    match = re.search(r"01(05|08)\d{8}(\d{2})(\d{8})", token)
+    match = re.search(r"01(0[1-9]|10)\d{8}(\d{2})(\d{8})", token)
     if not match or match.group(3) != date.replace("-", ""):
         return None
     venue = next((v for v, c in VENUE_CODES.items() if c == match.group(1)), None)
