@@ -57,7 +57,8 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
             "raceConditions": {"restrictions": restrictions, "weightRule": rule,
                 "isMixed": "混合" in restrictions,
                 "isFemaleOnly": "牝馬限定" in restrictions,
-                "isHandicap": rule == "ハンデ"}
+                "isHandicap": rule == "ハンデ",
+                **{field:conditions[field] for field in ("ageCondition","classCondition","grade","surface","distanceMeters") if field in conditions}}
         })
     return {"schemaVersion": 1, "races": sorted(output, key=lambda r: (r["date"], r["venue"], r["raceNumber"])),
             "raceCount": len(output)}
