@@ -26,6 +26,15 @@ class PrivateRaceTests(unittest.TestCase):
     def test_invalid_time_rejected(self):
         d=self.sample();d["scheduledStartAt"]="2026-10-31T10:00:00+00:00"
         with self.assertRaises(ValueError):normalize_race(d)
+    def test_malformed_payout_rejected(self):
+        d=self.sample();d["result"]["payouts"][0]["numbers"]=[[1],2]
+        with self.assertRaises(ValueError):normalize_race(d)
+    def test_duplicate_non_bracket_payout_rejected(self):
+        d=self.sample();d["result"]["payouts"][0]["numbers"]=[1,1]
+        with self.assertRaises(ValueError):normalize_race(d)
+    def test_same_frame_bracket_allowed(self):
+        d=self.sample();d["result"]["payouts"]=[{"type":"bracket","numbers":[1,1],"yenPer100":120}]
+        self.assertEqual(normalize_race(d)["result"]["payouts"][0]["numbers"],[1,1])
     def test_invalid_ticket_rejected(self):
         with self.assertRaises(ValueError):
             payout_for_ticket({"type":"win","numbers":[1],"stakeYen":150},self.sample()["result"])
