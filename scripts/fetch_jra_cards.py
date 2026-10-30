@@ -47,8 +47,9 @@ def fetch_cards(manifest, delay=1.5):
         try:
             req = Request(url, headers={"User-Agent": "BakenKingCardImporter/1.0 (personal research)"})
             with urlopen(req, timeout=15) as response:
-                if response.geturl().split("/")[2] not in ("jra.jp", "sp.jra.jp", "app.jra.jp"):
-                    raise ValueError("redirected_to_unapproved_host")
+                final_url = urlparse(response.geturl())
+                if final_url.scheme != "https" or final_url.hostname not in ("jra.jp", "www.jra.go.jp", "sp.jra.jp", "app.jra.jp"):
+                    raise ValueError("redirected_to_unapproved_host:" + (final_url.hostname or "unknown"))
                 html = response.read(3_000_001)
                 if len(html) > 3_000_000:
                     raise ValueError("response_too_large")
