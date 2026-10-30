@@ -58,7 +58,7 @@ jobs:
           if len(confirmed & expected) < 23:
               raise SystemExit("Catalog confirmation count does not match; refusing to publish")
           Path("data/race-catalog-2026-10-31.json").write_text(
-              json.dumps(catalog, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+              json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
           print(f"Publishing {len(confirmed & expected)} confirmed race cards")
           PY
           git config user.name "github-actions[bot]"
@@ -69,6 +69,7 @@ jobs:
             git push
           fi
       - uses: actions/upload-artifact@v4
+        if: always() && github.event_name == 'workflow_dispatch'
         with:
           name: jra-cards-validation
           path: artifacts/
