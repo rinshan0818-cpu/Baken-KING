@@ -10,9 +10,9 @@ const fs=require('node:fs');
   const horses=Array.from({length:8},(_,i)=>({number:i+1,name:'テスト馬'+(i+1),frame:i+1}));
   const scratchedHorses=horses.map((h,i)=>i===7?{...h,scratched:true}:h);
   const races=[
-   {date:'2026-11-07',venue:'東京',raceNumber:1,horses},
-   {date:'2026-11-07',venue:'京都',raceNumber:2,horses},
-   {date:'2026-11-08',venue:'東京',raceNumber:3,horses:scratchedHorses}
+   {date:'2026-11-07',venue:'東京',raceNumber:1,scheduledStartAt:'2026-11-07T10:00:00+09:00',horses},
+   {date:'2026-11-07',venue:'京都',raceNumber:2,scheduledStartAt:'2026-11-07T10:30:00+09:00',horses},
+   {date:'2026-11-08',venue:'東京',raceNumber:3,scheduledStartAt:'2026-11-08T11:00:00+09:00',horses:scratchedHorses}
   ];
   await page.route('**/data/authorized-race-cards.json*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races})}));
   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
