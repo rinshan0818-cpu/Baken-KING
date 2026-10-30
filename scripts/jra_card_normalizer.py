@@ -39,6 +39,8 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
             raise ValueError("horse_name_missing")
         if len(set(names)) != len(names):
             raise ValueError("duplicate_horse_name")
+        if any(h.get("scratched", False) not in (True, False) for h in horses):
+            raise ValueError("invalid_scratched_flag")
         conditions = card.get("raceConditions")
         if not isinstance(conditions, dict):
             raise ValueError("conditions_missing")
@@ -50,7 +52,7 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
             raise ValueError("invalid_restrictions")
         output.append({
             "date": day, "venue": venue, "raceNumber": race,
-            "horses": sorted(({"number": h["number"], "name": h["name"].strip()} for h in horses), key=lambda h: h["number"]),
+            "horses": sorted(({"number": h["number"], "name": h["name"].strip(), "scratched": h.get("scratched", False) is True} for h in horses), key=lambda h: h["number"]),
             "horseCount": len(horses),
             "raceConditions": {"restrictions": restrictions, "weightRule": rule,
                 "isMixed": "混合" in restrictions,
