@@ -48,6 +48,20 @@ class CardParserTests(unittest.TestCase):
     def test_whitespace_in_horse_number(self):
         html = fixture().replace("<td>2</td><td><a href=\"/horse/2\">架空馬2", "<td> 2 </td><td><a href=\"/horse/2\">架空馬2")
         self.assertEqual(parse_card(html,"2026-10-31","東京",3)["horseNumbers"],[1,2,3])
+    def test_number_from_explicit_image_alt(self):
+        html = fixture().replace('<td>1</td><td><a href="/horse/1">',
+            '<td><img alt="馬番1" src="/assets/one.png"></td><td><a href="/horse/1">')
+        data = parse_card(html, "2026-10-31", "東京", 3)
+        self.assertEqual(data["horseNumbers"], [1, 2, 3])
+
+    def test_opaque_number_images_are_not_guessed(self):
+        html = fixture()
+        for n in (1, 2, 3):
+            html = html.replace(f'<td>{n}</td><td><a href="/horse/{n}">',
+                f'<td><img src="/assets/opaque-{n}.png"></td><td><a href="/horse/{n}">')
+        with self.assertRaisesRegex(ValueError, "horse_number_table_missing"):
+            parse_card(html, "2026-10-31", "東京", 3)
+
     def test_wrong_race_rejected(self):
         with self.assertRaisesRegex(ValueError,"card_race_mismatch"):
             parse_card(fixture(),"2026-10-31","東京",4)
