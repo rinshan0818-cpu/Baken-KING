@@ -42,7 +42,7 @@ def fetch_cards(manifest, delay=1.5):
         seen.add(key)
         url = item["url"]
         parsed = urlparse(url)
-        if parsed.scheme != "https" or parsed.hostname not in ("jra.jp", "sp.jra.jp", "app.jra.jp"):
+        if parsed.scheme != "https" or parsed.hostname not in ("jra.jp", "www.jra.go.jp", "sp.jra.jp", "app.jra.jp"):
             raise ValueError("unapproved_host")
         try:
             req = Request(url, headers={"User-Agent": "BakenKingCardImporter/1.0 (personal research)"})
