@@ -447,15 +447,108 @@
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 6,
-      "status": "awaiting_numbers",
-      "horsesLoaded": false,
+      "status": "numbers_confirmed",
+      "horsesLoaded": true,
       "title": "3歳以上1勝クラス",
       "startTime": "12:40",
       "surface": "ダート",
       "distance": 2100,
       "grade": null,
       "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataStatus": "parsed_verified",
+      "horses": [
+        {
+          "number": 1,
+          "name": "ソニックキャット",
+          "frame": null
+        },
+        {
+          "number": 2,
+          "name": "ジオストラテジー",
+          "frame": null
+        },
+        {
+          "number": 3,
+          "name": "オルブライト",
+          "frame": null
+        },
+        {
+          "number": 4,
+          "name": "カイトヴィント",
+          "frame": null
+        },
+        {
+          "number": 5,
+          "name": "グランドスウェル",
+          "frame": null
+        },
+        {
+          "number": 6,
+          "name": "カサビセンス",
+          "frame": null
+        },
+        {
+          "number": 7,
+          "name": "エクセルクラウン",
+          "frame": null
+        },
+        {
+          "number": 8,
+          "name": "ワンダーブリッツ",
+          "frame": null
+        },
+        {
+          "number": 9,
+          "name": "ピードモント",
+          "frame": null
+        },
+        {
+          "number": 10,
+          "name": "ルシャルムール",
+          "frame": null
+        },
+        {
+          "number": 11,
+          "name": "ターフクリスタル",
+          "frame": null
+        },
+        {
+          "number": 12,
+          "name": "クアッドフォルツァ",
+          "frame": null
+        },
+        {
+          "number": 13,
+          "name": "タマモトリノ",
+          "frame": null,
+          "scratched": true
+        },
+        {
+          "number": 14,
+          "name": "ブレイクザアイス",
+          "frame": null
+        },
+        {
+          "number": 15,
+          "name": "モデレートゲイル",
+          "frame": null
+        },
+        {
+          "number": 16,
+          "name": "タケルムサシ",
+          "frame": null
+        }
+      ],
+      "numbersConfirmed": true,
+      "raceConditions": {
+        "restrictions": [
+          "若手騎手"
+        ],
+        "weightRule": null,
+        "isMixed": false,
+        "isFemaleOnly": false,
+        "isHandicap": false
+      }
     },
     {
       "id": "2026-10-31-東京-7",
