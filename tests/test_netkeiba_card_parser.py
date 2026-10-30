@@ -1,0 +1,28 @@
+import sys
+import unittest
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from netkeiba_card_parser import parse_netkeiba_card
+
+HTML = """<div class="RaceData01">芝1600m (混合) (特指) 定量</div>
+<table class="Shutuba_Table"><tbody>
+<tr class="HorseList"><td class="Umaban">2</td><td class="HorseName"><a>サンプルB</a></td></tr>
+<tr class="HorseList"><td class="Umaban">1</td><td class="HorseName"><a>サンプルA</a></td></tr>
+</tbody></table>"""
+
+class NetkeibaCardParserTests(unittest.TestCase):
+    def test_parse(self):
+        c = parse_netkeiba_card(HTML, "2026-10-31", "東京", 1)
+        self.assertEqual([h["number"] for h in c["horses"]], [1, 2])
+        self.assertEqual(c["horses"][0]["name"], "サンプルA")
+        self.assertEqual(c["raceConditions"]["weightRule"], "定量")
+        self.assertIn("混合", c["raceConditions"]["restrictions"])
+    def test_reject_duplicate(self):
+        with self.assertRaises(ValueError):
+            parse_netkeiba_card(HTML.replace('class="Umaban">2', 'class="Umaban">1'), "2026-10-31", "東京", 1)
+    def test_missing_rows(self):
+        with self.assertRaises(ValueError):
+            parse_netkeiba_card("<html></html>", "2026-10-31", "東京", 1)
+
+if __name__ == "__main__":
+    unittest.main()
