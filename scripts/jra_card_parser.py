@@ -50,10 +50,11 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_meeting_mismatch")
     if not re.search(rf"(?<!\d){race_number}\s*レース", body):
         raise ValueError("card_race_mismatch")
-    # Limit condition parsing to the current race heading, not past performances.
-    race_match = re.search(rf"(?<!\d){race_number}\s*(?:レース|R)", body)
-    race_header = body[race_match.end():] if race_match else body
-    header = race_header.split("本賞金", 1)[0].split("枠", 1)[0][:450]
+    # Read the current race heading only; do not parse historical race conditions.
+    race_match = re.search(rf"(?<!\\d){race_number}\\s*(?:レース|R)(?!\\d)", body)
+    if race_match is None:
+        raise ValueError("card_race_mismatch")
+    header = body[race_match.end():].split("本賞金", 1)[0].split("枠", 1)[0][:450]
     conditions = parse_race_conditions(header)
     candidates = []
     for table in soup.find_all("table"):
