@@ -52,11 +52,11 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_race_mismatch")
     # The navigation contains 1R..12R before the actual race heading.
     # Anchor the heading to the meeting line, not to the first 1R link.
-    meeting = re.search(rf"\\d{{1,2}}\\s*回\\s*{re.escape(venue)}\\s*\\d{{1,2}}\\s*日", body)
+    meeting = re.search(rf"\d{{1,2}}\s*回\s*{re.escape(venue)}\s*\d{{1,2}}\s*日", body)
     if meeting is None:
         raise ValueError("card_meeting_mismatch")
     current = body[meeting.end():]
-    race_match = re.search(rf"(?<!\\d){race_number}\\s*(?:レース|R)(?!\\d)", current)
+    race_match = re.search(rf"(?<!\d){race_number}\s*(?:レース|R)(?!\d)", current)
     if race_match is None:
         raise ValueError("card_race_mismatch")
     header = current[race_match.end():].split("本賞金", 1)[0].split("詳細出馬表", 1)[0][:450]
