@@ -105,7 +105,14 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
                 continue
             raw_number = re.sub(r"\s+", "", expanded[number_col].get_text(" ", strip=True))
             if not re.fullmatch(r"\d{1,2}", raw_number):
-                continue
+                image = expanded[number_col].find("img")
+                # Only accept an explicit number in accessible alt text. Never infer
+                # numbers from row order, CSS class, or opaque image filenames.
+                alt = image.get("alt", "").strip() if image else ""
+                match = re.fullmatch(r"(?:馬番)?\s*(\d{1,2})\s*(?:番)?", alt)
+                if match is None:
+                    continue
+                raw_number = match.group(1)
             number = int(raw_number)
             if not 1 <= number <= 18:
                 continue
