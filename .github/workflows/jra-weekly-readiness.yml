@@ -69,6 +69,11 @@ jobs:
           sleep 2
           BAKEN_PRIVATE_CARDS_PATH=private-saturday-cards.json node tests/browser_smoke.cjs
           echo "PRIVATE_REAL_CARD_PURCHASE_TEST_PASSED"
+      - name: Ensure private race files are never included in uploaded diagnostics
+        if: always()
+        run: |
+          rm -f private-cards.json private-saturday-cards.json
+          echo "Private race files removed from runner before diagnostics upload."
       - name: Upload private browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
