@@ -55,6 +55,17 @@ jobs:
                       json.dump({"races":subset},out,ensure_ascii=False)
                   print("COMPLETE PRIVATE SATURDAY FIXTURE")
           PY
+      - name: Browser-check complete private Saturday fixture
+        run: |
+          if [ ! -f private-saturday-cards.json ]; then
+            echo "No complete 24-race fixture; skipping browser purchase test."
+            exit 0
+          fi
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/baken-private-server.log 2>&1 &
+          sleep 2
+          BAKEN_PRIVATE_CARDS_PATH=private-saturday-cards.json node tests/browser_smoke.cjs
       - name: Record weekly ingestion status
         run: |
           python - <<'PY'
