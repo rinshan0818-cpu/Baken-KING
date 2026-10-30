@@ -79,7 +79,8 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     race_match = re.search(rf"(?<!\d){race_number}\s*(?:レース|R)(?!\d)", current)
     if race_match is None:
         raise ValueError("card_race_mismatch")
-    header = current[race_match.end():].split("本賞金", 1)[0].split("詳細出馬表", 1)[0][:450]
+    # JRA puts 発走時刻 before the race-number heading; keep both in scope.
+    header = current[:race_match.end() + 450].split("本賞金", 1)[0].split("詳細出馬表", 1)[0][:700]
     conditions = parse_race_conditions(header)
     start_match = re.search(r"発走時刻[:：]\s*(\d{1,2})時(\d{2})分", header)
     scheduled_start = None
@@ -100,7 +101,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             name = next((i for i, label in enumerate(labels) if label.startswith("馬名")), None)
             if num is not None and name is not None and num != name:
                 header_index, number_col, name_col = row_index, num, name
-                frame_col = next((i for i, label in enumerate(labels) if label == "枠番"), None)
+                frame_col = next((i for i, label in enumerate(labels) if label in ("枠番", "枠")), None)
                 break
         if header_index is None:
             continue
