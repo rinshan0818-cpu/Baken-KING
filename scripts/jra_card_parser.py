@@ -145,7 +145,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             # A cancellation can be shown in a different column. Never interpret
             # the status cell as a horse number or infer numbers from row order.
             status_text = " ".join(cell.get_text(" ", strip=True) for cell in cells)
-            is_cancelled = bool(re.search(r"(?<!出)出走取消|(?<!\S)取消(?!\S)|競走除外", status_text))
+            is_cancelled = bool(re.search(r"出走取消|競走除外|(?<!\\S)取消(?!\\S)", status_text))
             if not re.fullmatch(r"\d{1,2}", raw_number):
                 image = expanded[number_col].find("img")
                 alt = image.get("alt", "").strip() if image else ""
