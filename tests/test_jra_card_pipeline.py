@@ -33,6 +33,15 @@ class CardPipelineTests(unittest.TestCase):
         card = parse_card(html, "2026-10-31", "東京", 11)
         self.assertEqual(card["scheduledStartAt"],"2026-10-31T14:55:00+09:00")
         self.assertEqual([h["frame"] for h in card["horses"]],[1,1,2])
+    def test_frame_image_alt_without_inference(self):
+        html = sample_html().replace('<td rowspan="2">1</td>', '<td rowspan="2"><img alt="枠1" src="waku1.png"></td>')
+        card = parse_card(html, "2026-10-31", "東京", 11)
+        self.assertEqual([h["frame"] for h in card["horses"]], [1, 1, 2])
+    def test_unreadable_frame_remains_missing(self):
+        html = sample_html().replace('<td rowspan="2">1</td>', '<td rowspan="2"><img alt="赤" src="opaque.png"></td>')
+        card = parse_card(html, "2026-10-31", "東京", 11)
+        self.assertNotIn("frame", card["horses"][0])
+        self.assertNotIn("frame", card["horses"][1])
     def test_reject_mismatched_date(self):
         with self.assertRaises(ValueError):
             parse_card(sample_html(),"2026-11-01","東京",11)
