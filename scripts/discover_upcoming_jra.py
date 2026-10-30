@@ -58,25 +58,28 @@ def main():
         target = today + timedelta(days=(5 - today.weekday()) % 7)
     if not 0 <= args.days_ahead <= 3:
         parser.error("--days-ahead must be 0..3")
-    day = target.isoformat()
-    found, errors = {}, []
-    for url in INDEX_URLS + tuple(args.index_url or []):
-        try:
-            for key, value in inspect_index(url, day).items():
-                found.setdefault(key, value)
-        except Exception as exc:
-            errors.append({"index": url, "errorType": type(exc).__name__})
-    report = {"date": day, "indexesChecked": len(INDEX_URLS) + len(args.index_url or []),
-              "foundRaceLinks": len(found), "venues": sorted({k[1] for k in found}),
-              "status": "links_found" if found else "not_yet_discovered",
-              "errors": errors}
-    # Keep discovered seed URLs in the private job only; do not upload them.
-    seeds_path = args.output + ".seeds.json"
-    with open(seeds_path, "w", encoding="utf-8") as f:
-        json.dump([found[key] for key in sorted(found)], f, ensure_ascii=False)
+    reports, seeds_by_date = [], {}
+    for offset in range(args.days_ahead + 1):
+        day = (target + timedelta(days=offset)).isoformat()
+        found, errors = {}, []
+        for url in INDEX_URLS + tuple(args.index_url or []):
+            try:
+                for key, value in inspect_index(url, day).items():
+                    found.setdefault(key, value)
+            except Exception as exc:
+                errors.append({"index": url, "errorType": type(exc).__name__})
+        reports.append({"date": day, "indexesChecked": len(INDEX_URLS) + len(args.index_url or []),
+                        "foundRaceLinks": len(found), "venues": sorted({k[1] for k in found}),
+                        "status": "links_found" if found else "not_yet_discovered",
+                        "errors": errors})
+        seeds_by_date[day] = [found[key] for key in sorted(found)]
+    report = {"dates": reports, "status": "links_found" if any(r["foundRaceLinks"] for r in reports)
+              else "not_yet_discovered"}
+    with open(args.output + ".seeds.json", "w", encoding="utf-8") as f:
+        json.dump(seeds_by_date, f, ensure_ascii=False)
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
-        f.write("\n")
+        f.write("\\n")
     print(json.dumps(report, ensure_ascii=False))
     # Absence is a legitimate state: never invent opaque race URL tokens.
 
