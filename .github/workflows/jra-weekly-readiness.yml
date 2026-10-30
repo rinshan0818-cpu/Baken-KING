@@ -40,11 +40,21 @@ jobs:
           python scripts/discover_upcoming_jra.py upcoming-discovery.json --date "$START_DATE" --days-ahead "$DAYS_AHEAD"
       - name: Validate discovered race cards privately
         run: python scripts/validate_upcoming_cards.py upcoming-discovery.json
-      - name: Run isolated browser check with private cards
-        if: ${{ always() }}
+      - name: Check private Saturday card completeness
         run: |
-          echo "Private card integration is opt-in; never publish JRA card data."
-          test -f upcoming-card-validation.json
+          python - <<'PY'
+          import json
+          from collections import Counter
+          cards=json.load(open("private-cards.json",encoding="utf-8"))["races"]
+          for day in sorted({c["date"] for c in cards}):
+              subset=[c for c in cards if c["date"]==day]
+              counts=Counter(c["venue"] for c in subset)
+              print("Private fixture",day,"races",len(subset),"venues",dict(counts))
+              if len(subset)==24 and sorted(counts.values())==[12,12]:
+                  with open("private-saturday-cards.json","w",encoding="utf-8") as out:
+                      json.dump({"races":subset},out,ensure_ascii=False)
+                  print("COMPLETE PRIVATE SATURDAY FIXTURE")
+          PY
       - name: Record weekly ingestion status
         run: |
           python - <<'PY'
