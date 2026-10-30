@@ -1,10 +1,13 @@
 name: JRA next-date card verification
 on:
+  schedule:
+    # Thursday/Friday JST: prepare the coming weekend candidate dates.
+    - cron: '15 21 * * 3,4'
   workflow_dispatch:
     inputs:
       race_date:
         description: 'Target race date (YYYY-MM-DD)'
-        required: true
+        required: false
         type: string
       official_seed_url:
         description: 'Official JRA card or index URL for that date'
@@ -21,7 +24,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install beautifulsoup4
+      - name: Identify upcoming weekend dates in JST
+        run: |
+          mkdir -p artifacts
+          python scripts/jra_candidate_dates.py --output artifacts/candidate-dates.json
       - name: Validate date and official source
+        if: github.event_name == 'workflow_dispatch'
         env:
           RACE_DATE: ${{ inputs.race_date }}
           SEED_URL: ${{ inputs.official_seed_url }}
@@ -39,6 +47,7 @@ jobs:
       - name: Run parser tests
         run: python -m unittest discover -s tests -p 'test_*.py'
       - name: Crawl and validate requested date (read only)
+        if: github.event_name == 'workflow_dispatch'
         env:
           RACE_DATE: ${{ inputs.race_date }}
           SEED_URL: ${{ inputs.official_seed_url }}
@@ -54,6 +63,9 @@ jobs:
               raise SystemExit(f'Unexpected race count: {count}; expected 12/24/36')
           print(f'Validated {count} race cards for the requested date')
           PY
+      - name: Scheduled run status
+        if: github.event_name == 'schedule'
+        run: echo 'Date candidates generated. Official index discovery and publication are NOT enabled yet.'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
