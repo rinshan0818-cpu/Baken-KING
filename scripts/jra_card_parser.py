@@ -51,7 +51,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     if not re.search(rf"(?<!\d){race_number}\s*レース", body):
         raise ValueError("card_race_mismatch")
     # Limit condition parsing to the current race heading, not past performances.
-    race_match = re.search(rf"(?<!\\d){race_number}\\s*(?:レース|R)", body)
+    race_match = re.search(rf"(?<!\d){race_number}\s*(?:レース|R)", body)
     race_header = body[race_match.end():] if race_match else body
     header = race_header.split("本賞金", 1)[0].split("枠", 1)[0][:450]
     conditions = parse_race_conditions(header)
@@ -92,8 +92,12 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("ambiguous_horse_number_tables")
     if sorted(best) != list(range(1, len(best) + 1)):
         raise ValueError("horse_numbers_not_contiguous")
+    if not all(names) or len(set(names)) != len(names):
+        raise ValueError("horse_names_missing_or_duplicate")
+    horses = [{"number": number, "name": name} for number, name in sorted(zip(best, names))]
     return {"date":day,"venue":venue,"raceNumber":race_number,
             "horseNumbers":best,
-            "horseNames":names,
+            "horseNames":[horse["name"] for horse in horses],
+            "horses":horses,
             "raceConditions":conditions,"horseNumberCount":len(best),
             "status":"parsed-not-authorized-for-publication"}
