@@ -2210,9 +2210,9 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
   list.replaceChildren();
   if(hasEntries){
    document.getElementById('preDrawRaceTitle').textContent=date.value.replaceAll('-','/')+' '+venue.value+race.value+'R '+(entry.title||'出馬表');
-   for(const horse of entry.horses){const line=document.createElement('div');line.className='line';line.textContent=horse.name+'　（馬番未確定）';list.append(line)}
+   for(const horse of entry.horses){const line=document.createElement('div');line.className='line';line.textContent=(entry.numbersConfirmed?horse.number+'番　':'')+horse.name+(horse.scratched?'　【出走取消・選択不可】':entry.numbersConfirmed?'':'　（馬番未確定）');list.append(line)}
   }
-  status.textContent=!catalog?'レース情報を読み込み中です。':numbered?'出馬表・馬番確定：投票可能':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭（馬番未確定）':' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
+  status.textContent=!catalog?'レース情報を読み込み中です。':numbered?'出馬表・馬番確定：投票可能':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭'+(entry.numbersConfirmed?'（馬番確定）':'（馬番未確定）'):' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
  }
  date.onchange=update;venue.onchange=update;race.onchange=update;
  fetch('./data/race-catalog-2026-10-31.json',{cache:'no-store'})
@@ -2235,6 +2235,7 @@ saveDraft.addEventListener('click',()=>{
  const c=window.BakenSelectedImportedRace;
  const n=({単勝:1,複勝:1,馬連:2,ワイド:2,馬単:2,三連複:3,三連単:3})[betType.value];
  const numbers=[...selected].sort((a,b)=>a-b),amount=Number(stake.value);
+ if(c && numbers.some(number=>c.horses.find(h=>h.number===number)?.scratched)){summary.textContent='出走取消馬は選択できません。';return}
  if(!c||numbers.length!==n){summary.textContent='この券種では'+n+'頭を選択してください。';return}
  if(!Number.isSafeInteger(amount)||amount<100||amount%100!==0){summary.textContent='購入額は100円単位で指定してください。';return}
  if(betType.value==='馬単'||betType.value==='三連単'){summary.textContent='着順指定が必要な券種は、まだメモ保存に対応していません。';return}
@@ -2242,7 +2243,7 @@ saveDraft.addEventListener('click',()=>{
  try{localStorage.setItem(draftKey,JSON.stringify(drafts.slice(-100)));summary.textContent='買い目メモを保存しました（残高は変わりません）。';renderDrafts()}catch{summary.textContent='保存に失敗しました。'}
 });
 renderDrafts();
-function show(){selected.clear();updateSelection();host.replaceChildren();const c=cards.find(x=>x.date===date.value&&x.venue===venue.value&&x.raceNumber===Number(race.value));window.BakenSelectedImportedRace=c||null;window.dispatchEvent(new CustomEvent('baken:race-selected',{detail:{race:c||null}}));if(!c){status.textContent=cards.length?'該当レースなし':'未読込';return}status.textContent=c.date+' '+c.venue+c.raceNumber+'R：'+c.horses.length+'頭';for(const h of c.horses.slice().sort((a,b)=>a.number-b.number)){const row=document.createElement('button');row.type='button';row.className='horse';row.style.margin='3px';row.textContent=h.number+'番　'+h.name;row.setAttribute('aria-pressed','false');row.addEventListener('click',()=>{const on=row.getAttribute('aria-pressed')==='true';row.setAttribute('aria-pressed',String(!on));row.classList.toggle('on',!on);if(on)selected.delete(h.number);else selected.add(h.number);updateSelection()});host.append(row)}}
+function show(){selected.clear();updateSelection();host.replaceChildren();const c=cards.find(x=>x.date===date.value&&x.venue===venue.value&&x.raceNumber===Number(race.value));window.BakenSelectedImportedRace=c||null;window.dispatchEvent(new CustomEvent('baken:race-selected',{detail:{race:c||null}}));if(!c){status.textContent=cards.length?'該当レースなし':'未読込';return}status.textContent=c.date+' '+c.venue+c.raceNumber+'R：'+c.horses.length+'頭';for(const h of c.horses.slice().sort((a,b)=>a.number-b.number)){const row=document.createElement('button');row.type='button';row.className='horse';row.style.margin='3px';row.textContent=h.number+'番　'+h.name+(h.scratched?'【出走取消】':'');row.disabled=h.scratched===true;row.setAttribute('aria-pressed','false');row.addEventListener('click',()=>{const on=row.getAttribute('aria-pressed')==='true';row.setAttribute('aria-pressed',String(!on));row.classList.toggle('on',!on);if(on)selected.delete(h.number);else selected.add(h.number);updateSelection()});host.append(row)}}
 file.addEventListener('change',async()=>{try{const f=file.files[0];if(!f)return;if(f.size>2000000)throw Error('ファイルが大きすぎます');const d=JSON.parse(await f.text()),races=Array.isArray(d)?d:d.races;if(!Array.isArray(races)||!races.length||races.length>36)throw Error('形式が不正です');const keys=new Set();for(const c of races){const key=c.date+'|'+c.venue+'|'+c.raceNumber;if(keys.has(key)||!/^\\d{4}-\\d{2}-\\d{2}$/.test(c.date)||typeof c.venue!=='string'||!Number.isInteger(c.raceNumber)||c.raceNumber<1||c.raceNumber>12)throw Error('レース情報が不正です');keys.add(key);if(!Array.isArray(c.horses)||!c.horses.length||c.horses.length>18)throw Error('馬情報が不正です');const nums=c.horses.map(h=>h.number).sort((a,b)=>a-b);if(nums.some((n,i)=>n!==i+1)||c.horses.some(h=>typeof h.name!=='string'||!h.name.trim())||new Set(c.horses.map(h=>h.name.trim())).size!==nums.length)throw Error('馬番・馬名が不正です')}cards=races;window.BakenImportedCards=cards;window.dispatchEvent(new CustomEvent('baken:cards-imported',{detail:{count:cards.length}}));show()}catch(e){cards=[];host.replaceChildren();status.textContent='読込エラー：'+e.message}});
 [date,venue,race].forEach(el=>el?.addEventListener('change',show));
 })();
