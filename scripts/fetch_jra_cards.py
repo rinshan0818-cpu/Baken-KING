@@ -1,0 +1,63 @@
+"""Fetch explicitly supplied JRA race-card URLs and parse them into validated JSON.
+
+Only run where access and use are permitted. No login/captcha bypass, no
+guessing opaque JRA URL tokens. Failed cards are reported and never invented.
+Usage:
+ python scripts/fetch_jra_cards.py urls.json parsed.json
+Manifest: [{"date":"2026-10-31","venue":"東京","raceNumber":1,"url":"https://sp.jra.jp/JRADB/accessD.html?CNAME=..."}]
+"""
+import argparse
+import json
+import time
+from pathlib import Path
+from urllib.parse import urlparse
+from urllib.request import Request, urlopen
+from jra_card_parser import parse_card
+from jra_card_normalizer import normalize_cards
+
+def fetch_cards(manifest, delay=1.5):
+    cards, errors = [], []
+    if not isinstance(manifest, list) or len(manifest) > 24:
+        raise ValueError("manifest_must_be_list_of_at_most_24")
+    seen = set()
+    for item in manifest:
+        key = (item["date"], item["venue"], item["raceNumber"])
+        if key in seen:
+            raise ValueError("duplicate_manifest_race")
+        seen.add(key)
+        url = item["url"]
+        parsed = urlparse(url)
+        if parsed.scheme != "https" or parsed.hostname not in ("jra.jp", "sp.jra.jp", "app.jra.jp"):
+            raise ValueError("unapproved_host")
+        try:
+            req = Request(url, headers={"User-Agent": "BakenKingCardImporter/1.0 (personal research)"})
+            with urlopen(req, timeout=15) as response:
+                if response.geturl().split("/")[2] not in ("jra.jp", "sp.jra.jp", "app.jra.jp"):
+                    raise ValueError("redirected_to_unapproved_host")
+                html = response.read(3_000_001)
+                if len(html) > 3_000_000:
+                    raise ValueError("response_too_large")
+                charset = response.headers.get_content_charset() or "utf-8"
+            cards.append(parse_card(html.decode(charset, errors="replace"), *key))
+        except Exception as exc:
+            errors.append({"date":key[0],"venue":key[1],"raceNumber":key[2],"error":str(exc)})
+        time.sleep(delay)
+    return normalize_cards(cards) if cards else {"schemaVersion":1,"races":[],"raceCount":0}, errors
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("manifest", type=Path)
+    p.add_argument("output", type=Path)
+    p.add_argument("--require-complete", action="store_true")
+    a = p.parse_args()
+    manifest = json.loads(a.manifest.read_text(encoding="utf-8"))
+    data, errors = fetch_cards(manifest)
+    if errors:
+        print(json.dumps({"failures":errors}, ensure_ascii=False, indent=2))
+    if a.require_complete and (errors or data["raceCount"] != len(manifest)):
+        raise SystemExit("Incomplete fetch: output not written")
+    a.output.write_text(json.dumps(data, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+    print("Fetched and validated", data["raceCount"], "of", len(manifest))
+
+if __name__ == "__main__":
+    main()
