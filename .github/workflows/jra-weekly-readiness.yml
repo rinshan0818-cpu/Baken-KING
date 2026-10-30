@@ -50,7 +50,9 @@ jobs:
               subset=[c for c in cards if c["date"]==day]
               counts=Counter(c["venue"] for c in subset)
               print("Private fixture",day,"races",len(subset),"venues",dict(counts))
-              if len(subset)==24 and sorted(counts.values())==[12,12]:
+              missing_times=[(c["venue"],c["raceNumber"]) for c in subset if not c.get("scheduledStartAt")]
+              print("Missing scheduled start times:",len(missing_times))
+              if len(subset)==24 and sorted(counts.values())==[12,12] and not missing_times:
                   with open("private-saturday-cards.json","w",encoding="utf-8") as out:
                       json.dump({"races":subset},out,ensure_ascii=False)
                   print("COMPLETE PRIVATE SATURDAY FIXTURE")
