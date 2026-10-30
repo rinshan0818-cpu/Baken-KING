@@ -48,12 +48,15 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("manifest", type=Path)
     p.add_argument("output", type=Path)
-    p.add_argument("--require-complete", action="store_true")\n    p.add_argument("--errors-output", type=Path, help="Write per-race failure diagnostics")
+    p.add_argument("--require-complete", action="store_true")
+    p.add_argument("--errors-output", type=Path, help="Write per-race failure diagnostics")
     a = p.parse_args()
     manifest = json.loads(a.manifest.read_text(encoding="utf-8"))
     data, errors = fetch_cards(manifest)
     if errors:
         print(json.dumps({"failures":errors}, ensure_ascii=False, indent=2))
+    if a.errors_output:
+        a.errors_output.write_text(json.dumps({"failures":errors,"succeeded":data["raceCount"],"requested":len(manifest)}, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     if a.require_complete and (errors or data["raceCount"] != len(manifest)):
         raise SystemExit("Incomplete fetch: output not written")
     a.output.write_text(json.dumps(data, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
