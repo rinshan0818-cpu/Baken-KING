@@ -62,6 +62,23 @@ class CardParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "horse_number_table_missing"):
             parse_card(html, "2026-10-31", "東京", 3)
 
+    def test_official_desktop_detail_card_layout(self):
+        # Mimics the official desktop detailed card, with horse numbers
+        # rendered as text and frame numbers represented by images.
+        html = """<html><body>
+        2026年10月31日（土曜） 4回東京10日 発走時刻：14時20分 9レース
+        <h2>オキザリス賞</h2>2歳 1勝クラス （混合）（特指） 馬齢
+        <table>
+        <tr><th>枠</th><th>馬番</th><th>馬名 / 単勝オッズ(人気)</th><th>性齢/毛色</th><th>前走</th></tr>
+        <tr><td><img alt="枠1白"></td><td>1</td><td><a href="/horse/a">マイスターシューズ</a></td><td>牡2</td><td>前走 11頭1番</td></tr>
+        <tr><td><img alt="枠1白"></td><td>2</td><td><a href="/horse/b">架空馬B</a></td><td>牡2</td><td>前走 12頭7番</td></tr>
+        </table></body></html>"""
+        result = parse_card(html, "2026-10-31", "東京", 9)
+        self.assertEqual(result["horses"][0], {"number": 1, "name": "マイスターシューズ"})
+        self.assertEqual(result["horses"][1]["number"], 2)
+        self.assertTrue(result["raceConditions"]["isMixed"])
+        self.assertEqual(result["raceConditions"]["weightRule"], "馬齢")
+
     def test_wrong_race_rejected(self):
         with self.assertRaisesRegex(ValueError,"card_race_mismatch"):
             parse_card(fixture(),"2026-10-31","東京",4)
