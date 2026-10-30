@@ -51,7 +51,9 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     if not re.search(rf"(?<!\d){race_number}\s*レース", body):
         raise ValueError("card_race_mismatch")
     # Race conditions appear above the card; ignore past-performance tables.
-    header = body.split("出馬表", 1)[0]
+    race_match = re.search(rf"(?<!\\d){race_number}\\s*(?:レース|R)", body)
+    race_header = body[race_match.start():] if race_match else body
+    header = race_header.split("出馬表", 1)[0][:900]
     conditions = parse_race_conditions(header)
     candidates = []
     for table in soup.find_all("table"):
