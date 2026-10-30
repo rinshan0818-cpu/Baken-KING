@@ -4,7 +4,7 @@ on:
     inputs:
       race_date:
         description: 'Date YYYY-MM-DD'
-        default: '2026-11-01'
+        default: '2026-10-31'
         required: true
         type: string
       venue:
@@ -14,7 +14,7 @@ on:
         type: string
       official_seed_url:
         description: 'Official JRA card URL with links to other races'
-        default: 'https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604111120261101%2FA6'
+        default: 'https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604101020261031%2F11'
         required: true
         type: string
 permissions:
