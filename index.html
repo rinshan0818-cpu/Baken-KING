@@ -2248,7 +2248,7 @@ bkTicketRaceTitle=function(b){
    document.getElementById('preDrawRaceTitle').textContent=date.value.replaceAll('-','/')+' '+venue.value+race.value+'R '+(entry.title||'出馬表');
    for(const horse of entry.horses){const line=document.createElement('div');line.className='line';line.textContent=(entry.numbersConfirmed?horse.number+'番　':'')+horse.name+(horse.scratched?'　【出走取消・選択不可】':entry.numbersConfirmed?'':'　（馬番未確定）');list.append(line)}
   }
-  status.textContent=!(catalog||window.BakenImportedCards?.length)?'レース情報を読み込み中です。':numbered?'馬番確定・出馬表取得済み：下の画面から仮想購入できます。':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭'+(entry.numbersConfirmed?'（馬番確定）':'（馬番未確定）'):' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
+  status.textContent=!(catalog||window.BakenImportedCards?.length)?'出馬表データ未登録：新しいデータの取込待ちです。':numbered?'馬番確定・出馬表取得済み：下の画面から仮想購入できます。':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭'+(entry.numbersConfirmed?'（馬番確定）':'（馬番未確定）'):' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
  }
  [date,venue,race].forEach(el=>el.addEventListener('change',update));
  window.addEventListener('baken:cards-imported',update);
