@@ -2053,7 +2053,7 @@ const bkOriginalTicketTitle=bkTicketRaceTitle;
 bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 東京11R':bkOriginalTicketTitle(b)};
 /* 2026 Tenno Sho Autumn static official-entry fixture; not an automatic scraper. */
 (()=>{
- const horses=[
+ let horses=[
  [1,1,'クロワデュノール','C.デムーロ',58],[1,2,'エルトンバローズ','松若風馬',58],
  [2,3,'レガレイラ','岩田望来',56],[2,4,'レディネス','横山典弘',58],
  [3,5,'シャンパンカラー','内田博幸',58],[3,6,'セイウンハーデス','幸英明',58],
@@ -2067,7 +2067,9 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
 
  // JRA-style frame assignment for standard flat races; official frame always takes priority.
  function bkFrameForHorse(number,total){if(!Number.isInteger(number)||number<1||number>total||total<1||total>18)return 0;if(total<=8)return number;const sizes=Array(8).fill(Math.floor(total/8));let extra=total%8;for(let i=7;extra>0;i--,extra--)sizes[i]++;let sum=0;for(let i=0;i<8;i++){sum+=sizes[i];if(number<=sum)return i+1}return 0}
- const raceId='2026-11-01-TOKYO-11',maxHorse=17;
+ let raceId='2026-11-01-TOKYO-11',maxHorse=17;
+ let currentRace=null;
+ const originalHorses=horses.map(h=>h.slice());
  const list=document.getElementById('autumnHorseList'),summary=document.getElementById('realBetSummary');
  const typeEl=document.getElementById('realBetType'),modeEl=document.getElementById('realBetMode');
  const info=document.getElementById('realMessage'),unitEl=document.getElementById('realUnit');
@@ -2075,7 +2077,27 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
  const individualStakes=new Map();const comboKey=p=>p.join('-');const amountFor=(p,base)=>individualToggle.checked?(individualStakes.get(comboKey(p))??base):base;
  const stakesPanel=document.getElementById('realIndividualStakes');const individualToggle=document.getElementById('bkIndividualStakeToggle');
  const results=()=>s.bets.filter(b=>b.realRaceId===raceId&&b.season===s.season);
- const isClosed=()=>new Date()>=new Date('2026-11-01T15:40:00+09:00');
+ const isClosed=()=>{
+  const date=currentRace?.date||'2026-11-01',time=currentRace?.startTime||'15:40';
+  return new Date()>=new Date(date+'T'+time+':00+09:00');
+ };
+ function setRace(entry){
+  if(!entry?.numbersConfirmed||!Array.isArray(entry.horses)||!entry.horses.length)return;
+  currentRace=entry;
+  raceId=entry.date+'-'+entry.venue+'-'+entry.raceNumber;
+  horses=entry.horses.map(h=>[h.frame||0,h.number,h.name,'', '',h.scratched===true]);
+  pick=[];legs=[[],[],[]];active=0;individualStakes.clear();
+  const hero=document.querySelector('#autumnFixtureCard .bk-race-hero');
+  if(hero){
+   const title=hero.querySelector('h2');if(title)title.textContent=entry.title||'出馬表';
+   const eyebrow=hero.querySelector('.bk-race-eyebrow');if(eyebrow)eyebrow.textContent=entry.date+' '+entry.venue+entry.raceNumber+'R';
+   const meta=hero.querySelector('.bk-race-meta');if(meta)meta.textContent=(entry.startTime||'時刻未登録')+'発走 · '+(entry.surface||'')+' '+(entry.distance||'')+'m · '+entry.horses.length+'頭';
+  }
+  draw();
+ }
+ window.addEventListener('baken:race-selected',e=>{if(e.detail?.race?.numbersConfirmed)setRace(e.detail.race)});
+ window.addEventListener('baken:catalog-race-selected',e=>setRace(e.detail?.race));
+
  let pick=[],legs=[[],[],[]],active=0;
  Object.keys(specs).filter(k=>k!=='枠連').forEach(k=>{const op=document.createElement('option');op.value=k;op.textContent=k;typeEl.append(op)});
  typeEl.value='馬連';
@@ -2131,23 +2153,23 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
   if(axisCount===2&&![12,13,23].includes(Number(positionEl.value)))positionEl.value='12';
   if(axisCount===1&&Number(positionEl.value)>k)positionEl.value='1';
   list.replaceChildren();
-  for(const [frame,no,name,jockey,kg] of horses){
+  for(const [frame,no,name,jockey,kg,scratched] of horses){
    const chosen=formation?legs.slice(0,k).some(x=>x.includes(no)):wheel?(legs[0].includes(no)||legs[1].includes(no)):pick.includes(no);
-   const b=document.createElement('button');b.type='button';b.className='bk-autumn-row'+(chosen?' chosen':'');b.setAttribute('aria-pressed',String(chosen));
+   const b=document.createElement('button');b.type='button';b.disabled=!!scratched;b.className='bk-autumn-row'+(chosen?' chosen':'');b.setAttribute('aria-pressed',String(chosen));
    const f=document.createElement('span');f.className='bk-autumn-frame';const displayFrame=frame||bkFrameForHorse(no,horses.length);f.textContent=no;f.style.background=colors[displayFrame-1]||'#f9fafb';f.style.color=[2,3,4,6,8].includes(displayFrame)?'#fff':'#111';
    const n=document.createElement('span');n.className='bk-autumn-no';n.textContent=no;
-   const label=document.createElement('span');label.className='bk-autumn-name';label.textContent=name;const sub=document.createElement('small');sub.textContent=jockey+' / '+kg+'kg';label.append(sub);
+   const label=document.createElement('span');label.className='bk-autumn-name';label.textContent=name;const sub=document.createElement('small');sub.textContent=scratched?'出走取消':(jockey?jockey+' / '+kg+'kg':'');label.append(sub);
    const tick=document.createElement('span');tick.className='bk-bet-choices';
    if(formation||wheel){const twoOrdered=wheel&&axisCount===2&&type==='三連単'&&!multiEl.checked;const count=twoOrdered?3:wheel?2:k;const fixedSlots=positionEl.value==='13'?[1,3]:positionEl.value==='23'?[2,3]:[1,2];for(let i=0;i<count;i++){const isAxis=wheel&&(twoOrdered?i<2:i===0);const selected=twoOrdered&&i<2?legs[0][i]===no:legs[twoOrdered&&i===2?1:i].includes(no);const btn=document.createElement('span');btn.className='bk-leg-choice'+(selected?' selected':'');btn.textContent=twoOrdered?(i<2?fixedSlots[i]+'着':'相'):wheel?(i===0?'軸':'相'):String(i+1);btn.setAttribute('aria-label',twoOrdered?(i<2?fixedSlots[i]+'着の軸馬':'相手馬'):wheel?(i===0?'軸馬':'相手馬'):i+1+'列');btn.onclick=e=>{e.stopPropagation();if(twoOrdered&&i<2){if(legs[0][i]===no){legs[0].splice(i,1)}else{legs[0][i]=no;if(legs[0][1-i]===no)legs[0].splice(1-i,1)}legs[1]=legs[1].filter(v=>!legs[0].includes(v));active=0}else{const idx=twoOrdered?1:i;const target=legs[idx];if(wheel&&idx===0){legs[0]=target.includes(no)?target.filter(v=>v!==no):target.length<Number(axisCountEl.value)?[...target,no]:[...target.slice(1),no];legs[1]=legs[1].filter(v=>!legs[0].includes(v))}else{legs[idx]=target.includes(no)?target.filter(v=>v!==no):[...target,no];if(wheel&&idx===1)legs[0]=legs[0].filter(v=>v!==no)}active=idx}draw()};tick.append(btn)}}else{const choice=document.createElement('span');choice.className='bk-single-choice'+(chosen?' selected':'');choice.textContent=chosen?'✓':'＋';choice.setAttribute('aria-label',chosen?'選択を解除':'馬を選択');tick.append(choice)}
    b.append(f,label,tick);
    b.onclick=()=>{if(formation||wheel){const target=legs[active];legs[active]=target.includes(no)?target.filter(v=>v!==no):[...target,no];if(wheel){legs[0]=legs[0].slice(-Number(axisCountEl.value));legs[1]=legs[1].filter(v=>!legs[0].includes(v))}}else if(pick.includes(no))pick=pick.filter(v=>v!==no);else if(modeEl.value!=='normal'||pick.length<k)pick.push(no);else{info.textContent='この券種の通常購入は'+k+'頭までです';return}draw()};
    list.append(b);
   }
-  const combos=build(),unit=Number(unitEl.value),total=combos.reduce((n,p)=>n+amountFor(p,unit),0);
+  const combos=build().filter(p=>p.every(n=>!horses.some(h=>h[1]===n&&h[5]))),unit=Number(unitEl.value),total=combos.reduce((n,p)=>n+amountFor(p,unit),0);
   stakesPanel.replaceChildren();stakesPanel.hidden=!individualToggle.checked;if(individualToggle.checked&&combos.length){const title=document.createElement('strong');title.textContent='買い目別の金額（100円単位）';stakesPanel.append(title);const grid=document.createElement('div');grid.className='bk-stakes-grid';for(const p of combos){const row=document.createElement('label');row.className='bk-stake-row';const name=document.createElement('span');name.textContent=p.join('－');const input=document.createElement('input');input.type='number';input.min='100';input.step='100';input.inputMode='numeric';input.value=amountFor(p,unit);input.setAttribute('aria-label',p.join('－')+' の購入金額');input.onchange=()=>{const v=Number(input.value);if(Number.isSafeInteger(v)&&v>=100&&v%100===0)individualStakes.set(comboKey(p),v);draw()};row.append(name,input);grid.append(row)}stakesPanel.append(grid)}
   summary.textContent=combos.length+'点 ／ 合計 '+(Number.isFinite(total)?stakeFormat(total):'—')+' ／ 買い目：'+(combos.length?combos.slice(0,12).map(x=>x.join('-')).join('、')+(combos.length>12?' ほか'+(combos.length-12)+'点':''):'未選択');
   document.getElementById('realBuy').disabled=isClosed()||s.seasonOver||!combos.length||combos.length>500||!Number.isSafeInteger(unit)||unit<100||unit%100!==0||total>s.balance||combos.some(p=>!Number.isSafeInteger(amountFor(p,unit))||amountFor(p,unit)<100||amountFor(p,unit)%100!==0);
-  const waiting=results().filter(b=>b.status==='pending');const status=document.getElementById('realPayoutStatus');status.textContent=waiting.length?'未精算 '+waiting.length+'件（11/1 東京11R）':'未精算の天皇賞（秋）馬券はありません。';document.getElementById('realAutoSettle').disabled=!waiting.length;
+  const waiting=results().filter(b=>b.status==='pending');const status=document.getElementById('realPayoutStatus');status.textContent=waiting.length?'未精算 '+waiting.length+'件（'+(currentRace?.venue||'東京')+(currentRace?.raceNumber||11)+'R）':'このレースの未精算馬券はありません。';document.getElementById('realAutoSettle').disabled=!waiting.length||raceId!=='2026-11-01-TOKYO-11';
 
  }
  ['bkWheelAxisCount','bkWheelPosition','bkWheelMulti'].forEach(id=>document.getElementById(id).onchange=()=>{if(id==='bkWheelAxisCount')legs=[[],[],[]];draw()});
@@ -2158,7 +2180,7 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
   const overlay=document.createElement('div');overlay.className='bk-purchase-overlay';overlay.setAttribute('role','presentation');
   const dialog=document.createElement('section');dialog.className='bk-purchase-dialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','bkPurchaseTitle');
   const title=document.createElement('h2');title.id='bkPurchaseTitle';title.textContent='購入内容の確認';dialog.append(title);
-  const subtitle=document.createElement('p');subtitle.className='bk-purchase-race';subtitle.textContent='11/1 東京11R　天皇賞（秋）';dialog.append(subtitle);
+  const subtitle=document.createElement('p');subtitle.className='bk-purchase-race';subtitle.textContent=currentRace?currentRace.date+' '+currentRace.venue+currentRace.raceNumber+'R '+(currentRace.title||''): '11/1 東京11R　天皇賞（秋）';dialog.append(subtitle);
   const meta=document.createElement('div');meta.className='bk-purchase-meta';
   for(const [label,value] of [['券種',typeEl.value],['買い方',modeEl.options[modeEl.selectedIndex]?.textContent||modeEl.value],['購入点数',combos.length+'点'],['購入金額',stakeFormat(stake)]]){const row=document.createElement('div');const dt=document.createElement('span');dt.textContent=label;const dd=document.createElement('strong');dd.textContent=value;row.append(dt,dd);meta.append(row)}dialog.append(meta);
   const label=document.createElement('h3');label.textContent='買い目・金額';dialog.append(label);
@@ -2171,7 +2193,7 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
  document.getElementById('realBuy').onclick=()=>{
   if(isClosed())return info.textContent='発走予定時刻を過ぎたため購入できません';
   if(s.seasonOver)return info.textContent='シーズンが終了しています';
-  const combos=build(),unit=Number(unitEl.value),stake=combos.reduce((n,p)=>n+amountFor(p,unit),0);
+  const combos=build().filter(p=>p.every(n=>!horses.some(h=>h[1]===n&&h[5]))),unit=Number(unitEl.value),stake=combos.reduce((n,p)=>n+amountFor(p,unit),0);
   if(!combos.length||combos.length>500||!Number.isSafeInteger(unit)||unit<100||unit%100!==0||stake>s.balance||!Number.isSafeInteger(stake)||combos.some(p=>!Number.isSafeInteger(amountFor(p,unit))||amountFor(p,unit)<100||amountFor(p,unit)%100!==0))return info.textContent='点数・金額・残高を確認してください';
   bkConfirmPurchase(combos,unit,stake,()=>{
   s.balance-=stake;s.totalStake+=stake;
@@ -2202,9 +2224,10 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
  date.value='2026-11-01';race.value='11';
  function update(){
   const entry=catalog?.races?.find(x=>x.date===date.value&&x.venue===venue.value&&x.raceNumber===Number(race.value));
-  const numbered=entry?.id==='2026-11-01-東京-11'&&entry?.numbersConfirmed===true;
+  const numbered=entry?.numbersConfirmed===true;
   const hasEntries=Array.isArray(entry?.horses)&&entry.horses.length>0;
   ten.hidden=!numbered;ten.style.display=numbered?'':'none';
+  if(numbered)window.dispatchEvent(new CustomEvent('baken:catalog-race-selected',{detail:{race:entry}}));
   pre.hidden=!hasEntries;pre.style.display=hasEntries?'':'none';
   go.hidden=true;
   list.replaceChildren();
@@ -2212,7 +2235,7 @@ bkTicketRaceTitle=function(b){return b.realRaceId==='2026-11-01-TOKYO-11'?'11/1 
    document.getElementById('preDrawRaceTitle').textContent=date.value.replaceAll('-','/')+' '+venue.value+race.value+'R '+(entry.title||'出馬表');
    for(const horse of entry.horses){const line=document.createElement('div');line.className='line';line.textContent=(entry.numbersConfirmed?horse.number+'番　':'')+horse.name+(horse.scratched?'　【出走取消・選択不可】':entry.numbersConfirmed?'':'　（馬番未確定）');list.append(line)}
   }
-  status.textContent=!catalog?'レース情報を読み込み中です。':numbered?'出馬表・馬番確定：投票可能':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭'+(entry.numbersConfirmed?'（馬番確定）':'（馬番未確定）'):' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
+  status.textContent=!catalog?'レース情報を読み込み中です。':numbered?'出馬表・馬番確定：仮想購入可能':entry?.title?((entry.grade?entry.grade+' ｜ ':'')+entry.title+' ｜ '+entry.startTime+'発走 ｜ '+entry.surface+entry.distance+'m'+(hasEntries?' ｜ '+entry.horses.length+'頭'+(entry.numbersConfirmed?'（馬番確定）':'（馬番未確定）'):' ｜ 出馬表取込待ち')):'レース情報を未取得です。';
  }
  date.onchange=update;venue.onchange=update;race.onchange=update;
  fetch('./data/race-catalog-2026-10-31.json',{cache:'no-store'})
