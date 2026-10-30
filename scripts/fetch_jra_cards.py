@@ -11,7 +11,7 @@ import json
 import re
 import time
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 from urllib.request import Request, urlopen
 from jra_card_parser import parse_card
 from jra_card_normalizer import normalize_cards
@@ -92,7 +92,7 @@ def fetch_cards(manifest, delay=1.5):
                         "date": key[0], "venue": key[1], "raceNumber": key[2],
                         "issue": "horse_number_table_missing",
                         "requestedUrlPath": parsed.path,
-                        "requestedCnamePrefix": __import__("urllib.parse", fromlist=["parse_qs"]).parse_qs(parsed.query).get("CNAME", [""])[0][:10],
+                        "requestedCnamePrefix": parse_qs(parsed.query).get("CNAME", [""])[0][:10],
                         "finalHost": final_url.hostname, "finalPath": final_url.path,
                         "htmlBytes": len(html), "htmlSha256": sha256(html).hexdigest(),
                         "title": page.title.get_text(" ", strip=True)[:100] if page.title else "",
