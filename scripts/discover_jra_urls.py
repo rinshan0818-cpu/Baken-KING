@@ -18,7 +18,7 @@ def race_key(url, date):
     query = parse_qs(urlparse(url).query)
     token = query.get("CNAME", [""])[0]
     # JRA tokens vary by presentation; validate embedded meeting/venue/race/date.
-    match = re.search(r"01(05|08)\d{4}(\d{2})(\d{8})", token)
+    match = re.search(r"01(05|08)\d{8}(\d{2})(\d{8})", token)
     if not match or match.group(3) != date.replace("-", ""):
         return None
     venue = next((v for v, c in VENUE_CODES.items() if c == match.group(1)), None)
