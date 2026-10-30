@@ -11,7 +11,7 @@ from urllib.parse import urljoin, urlparse, parse_qs
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 
-HOSTS = {"jra.jp", "sp.jra.jp", "app.jra.jp"}
+HOSTS = {"jra.jp", "www.jra.go.jp", "sp.jra.jp", "app.jra.jp"}
 VENUE_CODES = {"札幌": "01", "函館": "02", "福島": "03", "新潟": "04", "東京": "05", "中山": "06", "中京": "07", "京都": "08", "阪神": "09", "小倉": "10"}
 
 def race_key(url, date):
