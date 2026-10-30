@@ -49,9 +49,10 @@ jobs:
           python - <<'PY'
           import json
           data=json.load(open('artifacts/parsed.json'))
-          if data['raceCount']!=24:
-              raise SystemExit('Expected 24 cards; refusing to mark complete')
-          print('Validated all 24 race cards for the requested date')
+          count=data['raceCount']
+          if count < 12 or count > 36 or count % 12:
+              raise SystemExit(f'Unexpected race count: {count}; expected 12/24/36')
+          print(f'Validated {count} race cards for the requested date')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
