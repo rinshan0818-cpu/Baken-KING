@@ -23,8 +23,10 @@ def parse_netkeiba_card(html, day, venue, race_number):
     for row in rows:
         number = row.select_one(".Umaban, td[class~=Umaban]")
         name = row.select_one(".HorseName a, .HorseName, a[href*=\'/horse/\']")
-        if number is None or name is None:
+        if number is None and name is None:
             continue
+        if number is None or name is None:
+            raise ValueError("incomplete_horse_row")
         num_text = number.get_text(" ", strip=True)
         if not re.fullmatch(r"\d{1,2}", num_text):
             raise ValueError("ambiguous_horse_number")
