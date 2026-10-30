@@ -79,6 +79,28 @@ class CardParserTests(unittest.TestCase):
         self.assertTrue(result["raceConditions"]["isMixed"])
         self.assertEqual(result["raceConditions"]["weightRule"], "馬齢")
 
+    def test_jra_desktop_style_numbered_card(self):
+        # Structure modeled on JRA's numbered desktop card, not copied race data.
+        html = """<html><body>
+        出馬表 2026年10月31日（土曜）4回東京10日 発走時刻：9時50分
+        1レース 2歳未勝利 2歳 未勝利 （混合）［指定］ 馬齢
+        コース：1,600メートル（ダート・左）
+        <table><tr><th>枠</th><th>馬番</th>
+        <th>馬名 / 単勝オッズ(人気) 戦績 / 総賞金 / 馬体重</th>
+        <th>前走</th></tr>
+        <tr><td rowspan="2"><img alt="枠1白"></td><td>1</td>
+        <td><a href="/horse/a">架空馬A</a> (0.0.0.1)</td>
+        <td>2026年10月3日 東京 15頭 7番</td></tr>
+        <tr><td>2</td><td><a href="/horse/b">架空馬B</a></td>
+        <td>2026年9月6日 中山 16頭 12番</td></tr>
+        </table></body></html>"""
+        data = parse_card(html, "2026-10-31", "東京", 1)
+        self.assertEqual(data["horses"], [
+            {"number": 1, "name": "架空馬A"},
+            {"number": 2, "name": "架空馬B"}])
+        self.assertEqual(data["raceConditions"]["weightRule"], "馬齢")
+        self.assertTrue(data["raceConditions"]["isMixed"])
+
     def test_wrong_race_rejected(self):
         with self.assertRaisesRegex(ValueError,"card_race_mismatch"):
             parse_card(fixture(),"2026-10-31","東京",4)
