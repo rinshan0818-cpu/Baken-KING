@@ -31,12 +31,16 @@ jobs:
           from pathlib import Path
           import json
           now=datetime.now(timezone.utc)
+          validation=json.loads(Path("upcoming-card-validation.json").read_text(encoding="utf-8"))
           result={
               "checkedAtUtc":now.isoformat(),
               "offlineTests":"passed",
-              "liveJraCards":"not_attempted",
-              "reason":"Future-date official seed URL discovery not yet verified; do not reuse a historical CNAME or invent one.",
-              "nextStep":"Implement and validate future-date official race-card discovery before enabling scheduled ingestion."
+              "liveJraCards":"validated_private" if validation["parsed"] else "not_available",
+              "discovered":validation["discovered"],
+              "parsed":validation["parsed"],
+              "venues":validation.get("venues", []),
+              "publication":"disabled",
+              "nextStep":"Verify all scheduled venues and authorized publication before enabling app import."
           }
           Path("readiness.json").write_text(json.dumps(result,indent=2)+"\n")
           print(json.dumps(result))
