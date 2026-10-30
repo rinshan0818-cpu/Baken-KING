@@ -33,7 +33,17 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
         names = [h.get("name") for h in horses]
         if any(type(n) is not int for n in numbers):
             raise ValueError("invalid_horse_number")
-        if sorted(numbers) != list(range(1, len(numbers) + 1)) or len(numbers) > 18:
+        unavailable = card.get("unavailableHorseNumbers", [])
+        unresolved = card.get("unresolvedCancelledHorses", [])
+        if not isinstance(unavailable, list) or not isinstance(unresolved, list):
+            raise ValueError("invalid_unresolved_cancellations")
+        if len(unavailable) != len(unresolved) or any(type(n) is not int for n in unavailable):
+            raise ValueError("invalid_unresolved_cancellations")
+        if any(not isinstance(name, str) or not name.strip() for name in unresolved):
+            raise ValueError("invalid_unresolved_cancellations")
+        all_numbers = sorted(numbers + unavailable)
+        if (len(set(all_numbers)) != len(all_numbers) or
+                all_numbers != list(range(1, len(all_numbers) + 1)) or len(all_numbers) > 18):
             raise ValueError("invalid_horse_number_sequence")
         if any(not isinstance(n, str) or not n.strip() for n in names):
             raise ValueError("horse_name_missing")
@@ -68,6 +78,7 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
             "date": day, "venue": venue, "raceNumber": race,
             "horses": sorted(({"number": h["number"], "name": h["name"].strip(), **({"frame":h["frame"]} if "frame" in h else {}), **({"scratched": True} if h.get("scratched") is True else {})} for h in horses), key=lambda h: h["number"]),
             "horseCount": len(horses),
+            **({"unavailableHorseNumbers": sorted(unavailable), "unresolvedCancelledHorses": unresolved} if unavailable else {}),
             **({"scheduledStartAt":start} if start else {}),
             "raceConditions": {"restrictions": restrictions, "weightRule": rule,
                 "isMixed": "混合" in restrictions,
