@@ -16,6 +16,16 @@ class ImportTests(unittest.TestCase):
         self.assertEqual(race_key(KYOTO, DATE), (DATE, "京都", 12))
         self.assertIsNone(race_key(TOKYO, "2026-11-01"))
 
+    def test_all_ten_jra_venues(self):
+        codes = {"札幌":"01","函館":"02","福島":"03","新潟":"04",
+                 "東京":"05","中山":"06","中京":"07","京都":"08",
+                 "阪神":"09","小倉":"10"}
+        for venue, code in codes.items():
+            with self.subTest(venue=venue):
+                url = ("https://sp.jra.jp/JRADB/accessD.html?CNAME="
+                       "sw01ddd01" + code + "202604100120261031%2F3B")
+                self.assertEqual(race_key(url, DATE), (DATE, venue, 1))
+
     def test_discover_only_official_links(self):
         html = '<a href="'+TOKYO+'">1R</a><a href="'+KYOTO+'">12R</a><a href="https://example.com/JRADB/accessD.html?CNAME=sw01ddd0105202604100120261031">bad</a>'
         found = discover(html, "https://sp.jra.jp/", DATE)
