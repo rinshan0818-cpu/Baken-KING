@@ -32,7 +32,7 @@ jobs:
           python scripts/crawl_jra_cards.py artifacts/manifest.json "https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01ddd0105202604100120261031%2F3B" "https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01ddd0108202604101220261031%2F20" \
             ${JRA_INDEX_URL:+"$JRA_INDEX_URL"} || true
           if [ -s artifacts/manifest.json ]; then
-            python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json || true
+            python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json --errors-output artifacts/fetch-errors.json || true
           fi
           if [ -s artifacts/parsed.json ]; then
             python scripts/merge_verified_cards.py data/race-catalog-2026-10-31.json artifacts/parsed.json artifacts/merged-catalog.json || true
