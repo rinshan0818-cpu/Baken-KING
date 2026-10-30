@@ -52,7 +52,7 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
             raise ValueError("invalid_restrictions")
         output.append({
             "date": day, "venue": venue, "raceNumber": race,
-            "horses": sorted(({"number": h["number"], "name": h["name"].strip(), "scratched": h.get("scratched", False) is True} for h in horses), key=lambda h: h["number"]),
+            "horses": sorted(({"number": h["number"], "name": h["name"].strip(), **({"scratched": True} if h.get("scratched") is True else {})} for h in horses), key=lambda h: h["number"]),
             "horseCount": len(horses),
             "raceConditions": {"restrictions": restrictions, "weightRule": rule,
                 "isMixed": "混合" in restrictions,
