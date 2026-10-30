@@ -28,6 +28,11 @@ class CardPipelineTests(unittest.TestCase):
         self.assertEqual(race["scheduledStartAt"],"2026-10-31T14:55:00+09:00")
         self.assertEqual(race["raceConditions"]["distanceMeters"],1600)
         self.assertNotIn("direction",race["raceConditions"])
+    def test_actual_jra_header_order_and_waku_column(self):
+        html = sample_html().replace("<h2>11R</h2>", "<p>発走時刻：14時55分</p><h2>11レース</h2>").replace("<th>枠番</th>","<th>枠</th>")
+        card = parse_card(html, "2026-10-31", "東京", 11)
+        self.assertEqual(card["scheduledStartAt"],"2026-10-31T14:55:00+09:00")
+        self.assertEqual([h["frame"] for h in card["horses"]],[1,1,2])
     def test_reject_mismatched_date(self):
         with self.assertRaises(ValueError):
             parse_card(sample_html(),"2026-11-01","東京",11)
