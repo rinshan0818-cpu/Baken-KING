@@ -63,9 +63,22 @@ jobs:
               raise SystemExit(f'Unexpected race count: {count}; expected 12/24/36')
           print(f'Validated {count} race cards for the requested date')
           PY
+      - name: Discover scheduled venues from official JRA program pages
+        if: github.event_name == 'schedule'
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          dates=json.load(open('artifacts/candidate-dates.json'))['candidateDates']
+          subprocess.run(['python','scripts/jra_program_schedule.py',*dates,
+                          '--output','artifacts/provisional-schedule.json'],check=True)
+          result=json.load(open('artifacts/provisional-schedule.json'))
+          for day in result['days']:
+              print(day['date'], day['status'], ','.join(day['venues']))
+          PY
       - name: Scheduled run status
         if: github.event_name == 'schedule'
-        run: echo 'Date candidates generated. Official index discovery and publication are NOT enabled yet.'
+        run: echo 'Official provisional venues discovered. Confirmed cards and publication are NOT enabled yet.'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
