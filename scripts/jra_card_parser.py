@@ -81,11 +81,18 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_race_mismatch")
     header = current[race_match.end():].split("本賞金", 1)[0].split("詳細出馬表", 1)[0][:450]
     conditions = parse_race_conditions(header)
+    start_match = re.search(r"発走時刻[:：]\\s*(\\d{1,2})時(\\d{2})分", header)
+    scheduled_start = None
+    if start_match:
+        hour, minute = map(int, start_match.groups())
+        if not (0 <= hour <= 23 and 0 <= minute <= 59):
+            raise ValueError("invalid_start_time")
+        scheduled_start = f"{day}T{hour:02d}:{minute:02d}:00+09:00"
     candidates = []
     for table in soup.find_all("table"):
         rows = table.find_all("tr")
         header_index = None
-        number_col = name_col = None
+        number_col = name_col = frame_col = None
         for row_index, tr in enumerate(rows[:12]):
             cells = tr.find_all(["th", "td"], recursive=False)
             labels = [re.sub(r"\s+", "", c.get_text(" ", strip=True)) for c in cells]
@@ -93,10 +100,11 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             name = next((i for i, label in enumerate(labels) if label.startswith("馬名")), None)
             if num is not None and name is not None and num != name:
                 header_index, number_col, name_col = row_index, num, name
+                frame_col = next((i for i, label in enumerate(labels) if label == "枠番"), None)
                 break
         if header_index is None:
             continue
-        numbers, horse_names, cancelled_names = [], [], []
+        numbers, horse_names, cancelled_names, frames = [], [], [], {}
         # Expand rowspans so a shared frame-number cell cannot shift the horse-number column.
         pending = {}
         for tr in rows[header_index + 1:]:
@@ -155,17 +163,21 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
                 horse_name = next((x.strip() for x in name_cell.stripped_strings), "")
             if not horse_name:
                 continue
+            if frame_col is not None and len(expanded) > frame_col and number is not None:
+                frame_text = re.sub(r"\\s+", "", expanded[frame_col].get_text(" ", strip=True))
+                if re.fullmatch(r"[1-8]", frame_text):
+                    frames[number] = int(frame_text)
             if is_cancelled:
                 cancelled_names.append(horse_name)
             else:
                 numbers.append(number)
                 horse_names.append(horse_name)
         if len(numbers) >= 2:
-            candidates.append((numbers, horse_names, cancelled_names))
+            candidates.append((numbers, horse_names, cancelled_names, frames))
     if not candidates:
         raise ValueError("horse_number_table_missing")
     candidates.sort(key=lambda item: len(item[0]), reverse=True)
-    best, names, cancelled = candidates[0]
+    best, names, cancelled, frames = candidates[0]
     if len(best) != len(set(best)) or len(best) > 18:
         raise ValueError("horse_number_duplicate_or_excess")
     if len(candidates) > 1 and len(candidates[1][0]) == len(best) and candidates[1][0] != best:
@@ -180,10 +192,11 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("unmatched_cancelled_horse:" + repr(cancelled))
     if not all(names) or len(set(names)) != len(names):
         raise ValueError("horse_names_missing_or_duplicate")
-    horses = [{"number": number, "name": name, **({"scratched": True} if name in cancelled else {})} for number, name in sorted(zip(best, names))]
+    horses = [{"number": number, "name": name, **({"frame": frames[number]} if number in frames else {}), **({"scratched": True} if name in cancelled else {})} for number, name in sorted(zip(best, names))]
     return {"date":day,"venue":venue,"raceNumber":race_number,
             "horseNumbers":best,
             "horseNames":[horse["name"] for horse in horses],
             "horses":horses,
             "raceConditions":conditions,"horseNumberCount":len(best),
+            **({"scheduledStartAt":scheduled_start} if scheduled_start else {}),
             "status":"parsed-not-authorized-for-publication"}
