@@ -142,18 +142,19 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             if len(expanded) <= max(number_col, name_col):
                 continue
             raw_number = re.sub(r"\s+", "", expanded[number_col].get_text(" ", strip=True))
-            is_cancelled = raw_number in ("取消", "出走取消")
-            if not re.fullmatch(r"\d{1,2}", raw_number) and not is_cancelled:
+            # A cancellation can be shown in a different column. Never interpret
+            # the status cell as a horse number or infer numbers from row order.
+            status_text = " ".join(cell.get_text(" ", strip=True) for cell in cells)
+            is_cancelled = bool(re.search(r"(?<!出)出走取消|(?<!\S)取消(?!\S)|競走除外", status_text))
+            if not re.fullmatch(r"\d{1,2}", raw_number):
                 image = expanded[number_col].find("img")
-                # Only accept an explicit number in accessible alt text. Never infer
-                # numbers from row order, CSS class, or opaque image filenames.
                 alt = image.get("alt", "").strip() if image else ""
                 match = re.fullmatch(r"(?:馬番)?\s*(\d{1,2})\s*(?:番)?", alt)
                 if match is None:
                     continue
                 raw_number = match.group(1)
-            number = None if is_cancelled else int(raw_number)
-            if number is not None and not 1 <= number <= 18:
+            number = int(raw_number)
+            if not 1 <= number <= 18:
                 continue
             name_cell = expanded[name_col]
             name_span = name_cell.select_one(".bamei")
@@ -174,11 +175,10 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
                         frame_text = frame_match.group(1)
                 if re.fullmatch(r"[1-8]", frame_text):
                     frames[number] = int(frame_text)
+            numbers.append(number)
+            horse_names.append(horse_name)
             if is_cancelled:
                 cancelled_names.append(horse_name)
-            else:
-                numbers.append(number)
-                horse_names.append(horse_name)
         if len(numbers) >= 2:
             candidates.append((numbers, horse_names, cancelled_names, frames))
     if not candidates:
@@ -191,12 +191,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("ambiguous_horse_number_tables")
     missing = sorted(set(range(1, max(best) + 1)) - set(best))
     if missing:
-        if len(missing) != 1 or len(cancelled) != 1 or len(best) + 1 > 18:
-            raise ValueError("horse_numbers_not_contiguous:" + repr(sorted(best)) + ";cancelled=" + repr(cancelled))
-        best.append(missing[0])
-        names.append(cancelled[0])
-    elif cancelled:
-        raise ValueError("unmatched_cancelled_horse:" + repr(cancelled))
+        raise ValueError("horse_numbers_not_contiguous:" + repr(sorted(best)))
     if not all(names) or len(set(names)) != len(names):
         raise ValueError("horse_names_missing_or_duplicate")
     horses = [{"number": number, "name": name, **({"frame": frames[number]} if number in frames else {}), **({"scratched": True} if name in cancelled else {})} for number, name in sorted(zip(best, names))]
