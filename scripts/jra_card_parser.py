@@ -11,20 +11,21 @@ from datetime import datetime
 VENUES = ("札幌","函館","福島","新潟","東京","中山","中京","京都","阪神","小倉")
 
 def parse_race_conditions(text: str) -> dict:
-    """Extract JRA race restrictions and weight rules without guessing missing data."""
-    compact = re.sub(r"\s+", "", text).replace("［", "[").replace("］", "]").replace("（", "(").replace("）", ")")
-    # Only the race header should be passed in; historical form can contain other race types.
+    """Parse only the race header; never infer missing weight conditions."""
+    compact = re.sub(r"\s+", "", text).translate(str.maketrans("（）［］", "()[]"))
     restrictions = []
-    if re.search(r"\\(混合\\)|\\(混\\)", compact):
+    if "(混合)" in compact or "(混)" in compact:
         restrictions.append("混合")
-    if re.search(r"\\(牝\\)|牝馬限定", compact):
+    if "(牝)" in compact or "牝馬限定" in compact or re.search(r"(?<![一-龥])牝(?=\(指定\)|\(特指\)|馬齢|定量)", compact):
         restrictions.append("牝馬限定")
-    if re.search(r"\\(牡・せん\\)|牡・せん限定", compact):
+    if "(牡・せん)" in compact or "牡・せん限定" in compact:
         restrictions.append("牡・せん限定")
-    if re.search(r"\\[指定\\]", compact):
+    if "[指定]" in compact or "(指定)" in compact:
         restrictions.append("指定")
-    if re.search(r"\\[特指\\]|\\[特別指定\\]", compact):
+    if any(tag in compact for tag in ("[特指]", "(特指)", "[特別指定]", "(特別指定)")):
         restrictions.append("特別指定")
+    if "(国際)" in compact:
+        restrictions.append("国際")
     if "若手騎手" in compact:
         restrictions.append("若手騎手")
     weights = [w for w in ("ハンデ", "別定", "定量", "馬齢") if w in compact]
@@ -34,7 +35,6 @@ def parse_race_conditions(text: str) -> dict:
             "isMixed": "混合" in restrictions,
             "isFemaleOnly": "牝馬限定" in restrictions,
             "isHandicap": weights == ["ハンデ"]}
-
 
 def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     dt = datetime.strptime(day, "%Y-%m-%d")
