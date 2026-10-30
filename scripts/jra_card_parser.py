@@ -71,18 +71,44 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         if header_index is None:
             continue
         numbers, horse_names = [], []
+        # Expand rowspans so a shared frame-number cell cannot shift the horse-number column.
+        pending = {}
         for tr in rows[header_index + 1:]:
             cells = tr.find_all(["td", "th"], recursive=False)
-            if len(cells) <= max(number_col, name_col):
+            if not cells:
                 continue
-            raw_number = re.sub(r"\\s+", "", cells[number_col].get_text(" ", strip=True))
+            expanded = []
+            position = 0
+            def fill_pending():
+                nonlocal position
+                while position in pending:
+                    cell, remaining = pending[position]
+                    expanded.append(cell)
+                    if remaining <= 1:
+                        del pending[position]
+                    else:
+                        pending[position] = (cell, remaining - 1)
+                    position += 1
+            fill_pending()
+            for cell in cells:
+                fill_pending()
+                colspan = int(cell.get("colspan", 1))
+                rowspan = int(cell.get("rowspan", 1))
+                for _ in range(colspan):
+                    expanded.append(cell)
+                    if rowspan > 1:
+                        pending[position] = (cell, rowspan - 1)
+                    position += 1
+            fill_pending()
+            if len(expanded) <= max(number_col, name_col):
+                continue
+            raw_number = re.sub(r"\\s+", "", expanded[number_col].get_text(" ", strip=True))
             if not re.fullmatch(r"\\d{1,2}", raw_number):
                 continue
             number = int(raw_number)
             if not 1 <= number <= 18:
                 continue
-            name_cell = cells[name_col]
-            # Horse name is the first visible line, not the trainer/pedigree.
+            name_cell = expanded[name_col]
             link = name_cell.find("a")
             if link and link.get_text(" ", strip=True):
                 horse_name = link.get_text(" ", strip=True).strip()
