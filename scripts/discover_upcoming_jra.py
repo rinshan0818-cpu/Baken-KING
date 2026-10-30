@@ -46,6 +46,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("output")
     parser.add_argument("--date", help="YYYY-MM-DD; defaults to upcoming Saturday in Japan")
+    parser.add_argument("--days-ahead", type=int, default=0, help="Additional dates to scan after target, up to 3")
     parser.add_argument("--index-url", action="append", help="Optional additional official index")
     args = parser.parse_args()
     if args.date:
@@ -55,6 +56,8 @@ def main():
         from zoneinfo import ZoneInfo
         today = datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Tokyo")).date()
         target = today + timedelta(days=(5 - today.weekday()) % 7)
+    if not 0 <= args.days_ahead <= 3:
+        parser.error("--days-ahead must be 0..3")
     day = target.isoformat()
     found, errors = {}, []
     for url in INDEX_URLS + tuple(args.index_url or []):
