@@ -30,7 +30,16 @@ def main():
                      "error": f["error"][:120]} for f in failures
                 ]
             summary["crawlErrorCount"] = len(crawl_errors)
-            summary["status"] = "complete" if entries and not summary["failures"] and not crawl_errors else "partial"
+            summary["pendingPublication"] = sum(
+                1 for failure in summary["failures"]
+                if failure["error"] == "horse_number_table_missing"
+            )
+            summary["status"] = (
+                "complete" if entries and not summary["failures"] and not crawl_errors
+                else "awaiting_card_publication"
+                if summary["failures"] and summary["pendingPublication"] == len(summary["failures"]) and not crawl_errors
+                else "partial"
+            )
         daily.append(summary)
     summary = {"dates": daily, "discovered": sum(d["discovered"] for d in daily),
                "parsed": sum(d["parsed"] for d in daily),
