@@ -23,6 +23,24 @@ class NormalizerTests(unittest.TestCase):
         card["horses"][1]["number"]=3
         with self.assertRaisesRegex(ValueError,"invalid_horse_number_sequence"):
             normalize_cards([card])
+    def test_cancelled_unnumbered_horse_is_not_guessed(self):
+        card = sample()
+        card["horses"][0]["number"] = 3
+        card["unavailableHorseNumbers"] = [2]
+        card["unresolvedCancelledHorses"] = ["取消馬"]
+        result = normalize_cards([card])
+        race = result["races"][0]
+        self.assertEqual([h["number"] for h in race["horses"]], [1, 3])
+        self.assertEqual(race["unavailableHorseNumbers"], [2])
+        self.assertEqual(race["unresolvedCancelledHorses"], ["取消馬"])
+
+    def test_cancelled_number_cannot_overlap_active_horse(self):
+        card = sample()
+        card["unavailableHorseNumbers"] = [2]
+        card["unresolvedCancelledHorses"] = ["取消馬"]
+        with self.assertRaisesRegex(ValueError, "invalid_horse_number_sequence"):
+            normalize_cards([card])
+
     def test_missing_name(self):
         card=sample()
         card["horses"][0]["name"]=""
