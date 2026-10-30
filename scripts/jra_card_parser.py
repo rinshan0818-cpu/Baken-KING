@@ -10,6 +10,32 @@ from datetime import datetime
 
 VENUES = ("札幌","函館","福島","新潟","東京","中山","中京","京都","阪神","小倉")
 
+def parse_race_conditions(text: str) -> dict:
+    """Extract JRA race restrictions and weight rules without guessing missing data."""
+    compact = re.sub(r"\\s+", "", text).replace("［", "[").replace("］", "]").replace("（", "(").replace("）", ")")
+    # Only the race header should be passed in; historical form can contain other race types.
+    restrictions = []
+    if re.search(r"\\(混合\\)|\\(混\\)", compact):
+        restrictions.append("混合")
+    if re.search(r"\\(牝\\)|牝馬限定", compact):
+        restrictions.append("牝馬限定")
+    if re.search(r"\\(牡・せん\\)|牡・せん限定", compact):
+        restrictions.append("牡・せん限定")
+    if re.search(r"\\[指定\\]", compact):
+        restrictions.append("指定")
+    if re.search(r"\\[特指\\]|\\[特別指定\\]", compact):
+        restrictions.append("特別指定")
+    if "若手騎手" in compact:
+        restrictions.append("若手騎手")
+    weights = [w for w in ("ハンデ", "別定", "定量", "馬齢") if w in compact]
+    if len(weights) > 1:
+        raise ValueError("ambiguous_weight_conditions")
+    return {"restrictions": restrictions, "weightRule": weights[0] if weights else None,
+            "isMixed": "混合" in restrictions,
+            "isFemaleOnly": "牝馬限定" in restrictions,
+            "isHandicap": weights == ["ハンデ"]}
+
+
 def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     dt = datetime.strptime(day, "%Y-%m-%d")
     if venue not in VENUES or not 1 <= race_number <= 12:
@@ -24,6 +50,9 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_meeting_mismatch")
     if not re.search(rf"(?<!\d){race_number}\s*レース", body):
         raise ValueError("card_race_mismatch")
+    # Race conditions appear above the card; ignore past-performance tables.
+    header = body.split("出馬表", 1)[0]
+    conditions = parse_race_conditions(header)
     candidates = []
     for table in soup.find_all("table"):
         head = table.get_text(" ", strip=True)[:700]
@@ -63,5 +92,6 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("horse_numbers_not_contiguous")
     return {"date":day,"venue":venue,"raceNumber":race_number,
             "horseNumbers":best,
-            "horseNames":names,"horseNumberCount":len(best),
+            "horseNames":names,
+            "raceConditions":conditions,"horseNumberCount":len(best),
             "status":"parsed-not-authorized-for-publication"}
