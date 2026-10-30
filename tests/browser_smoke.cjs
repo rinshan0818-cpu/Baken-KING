@@ -25,6 +25,15 @@ const assert=require('node:assert/strict');
   await page.locator('#weekDate').selectOption('2026-11-08');
   assert.equal(await page.locator('#weekRace').inputValue(),'3');
   assert.equal(await page.locator('#autumnHorseList .bk-autumn-row').nth(7).isDisabled(),true,'Scratched horse must not be selectable');
+  const controlState=await page.locator('#realBetType').evaluate(el=>{
+    const parent=el.closest('#autumnFixtureCard');
+    return {selectedTab:document.querySelector('[data-nav].active')?.dataset.nav,
+      cardHidden:parent?.hidden,cardDisplay:getComputedStyle(parent).display,
+      selectDisplay:getComputedStyle(el).display,
+      parentDisplay:getComputedStyle(el.parentElement).display,
+      rect:el.getBoundingClientRect().toJSON()};
+  });
+  console.log('Purchase control diagnostics:',JSON.stringify(controlState));
   await page.locator('#realBetType').selectOption('馬連');
   await page.locator('#realBetMode').selectOption('normal');
   await page.locator('#autumnHorseList .bk-autumn-row').nth(0).click();
