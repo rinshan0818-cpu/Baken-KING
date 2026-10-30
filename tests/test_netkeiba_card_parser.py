@@ -17,6 +17,17 @@ class NetkeibaCardParserTests(unittest.TestCase):
         self.assertEqual(c["horses"][0]["name"], "サンプルA")
         self.assertEqual(c["raceConditions"]["weightRule"], "定量")
         self.assertIn("混合", c["raceConditions"]["restrictions"])
+    def test_abbreviated_conditions(self):
+        html = HTML.replace("(混合)", "(混)").replace("(混)", "(混)[指]")
+        card = parse_netkeiba_card(html, "2026-10-31", "東京", 10)
+        self.assertIn("混合", card["raceConditions"]["restrictions"])
+        self.assertIn("指定", card["raceConditions"]["restrictions"])
+
+    def test_provisional_card_rejected(self):
+        html = HTML + "<p>出走想定は仮想の出馬表です。</p>"
+        with self.assertRaisesRegex(ValueError, "provisional_race_card"):
+            parse_netkeiba_card(html, "2026-10-31", "東京", 4)
+
     def test_reject_duplicate(self):
         with self.assertRaises(ValueError):
             parse_netkeiba_card(HTML.replace('class="Umaban">2', 'class="Umaban">1'), "2026-10-31", "東京", 1)
