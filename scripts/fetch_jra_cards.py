@@ -16,6 +16,20 @@ from urllib.request import Request, urlopen
 from jra_card_parser import parse_card
 from jra_card_normalizer import normalize_cards
 
+def decode_jra_html(raw, declared_charset=None):
+    """Decode JRA HTML strictly, using HTTP or HTML-declared charset."""
+    head = raw[:8192]
+    meta = re.search(rb"<meta[^>]+charset\s*=\s*[^a-zA-Z0-9]*([a-zA-Z0-9_-]+)", head, re.I)
+    charset = declared_charset or (meta.group(1).decode("ascii") if meta else None)
+    if charset:
+        if charset.lower().replace("_", "-") in ("shift-jis", "sjis", "windows-31j", "x-sjis"):
+            charset = "cp932"
+        return raw.decode(charset, errors="strict"), charset
+    try:
+        return raw.decode("utf-8", errors="strict"), "utf-8"
+    except UnicodeDecodeError:
+        return raw.decode("cp932", errors="strict"), "cp932"
+
 def fetch_cards(manifest, delay=1.5):
     cards, errors, diagnostics = [], [], []
     if not isinstance(manifest, list) or len(manifest) > 36:
@@ -39,22 +53,7 @@ def fetch_cards(manifest, delay=1.5):
                 if len(html) > 3_000_000:
                     raise ValueError("response_too_large")
                 declared_charset = response.headers.get_content_charset()
-            # JRA's JRADB pages commonly use Shift_JIS/Windows-31J without an
-            # HTTP charset. Inspect HTML's own declaration before falling back.
-            head = html[:8192]
-            meta = re.search(rb"<meta[^>]+charset\s*=\s*[^a-zA-Z0-9]*([a-zA-Z0-9_-]+)", head, re.I)
-            charset = declared_charset or (meta.group(1).decode("ascii") if meta else None)
-            if charset:
-                if charset.lower().replace("_", "-") in ("shift-jis", "shift_jis", "sjis", "windows-31j", "x-sjis"):
-                    charset = "cp932"
-                decoded = html.decode(charset, errors="strict")
-            else:
-                try:
-                    decoded = html.decode("utf-8", errors="strict")
-                    charset = "utf-8"
-                except UnicodeDecodeError:
-                    decoded = html.decode("cp932", errors="strict")
-                    charset = "cp932"
+            decoded, charset = decode_jra_html(html, declared_charset)
             try:
                 cards.append(parse_card(decoded, *key))
             except ValueError as exc:
