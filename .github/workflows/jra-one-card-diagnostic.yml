@@ -4,18 +4,22 @@ on:
     inputs:
       race_date:
         description: 'Race date YYYY-MM-DD'
+        default: '2026-11-01'
         required: true
         type: string
       venue:
         description: 'JRA venue in Japanese, e.g. 東京'
+        default: '東京'
         required: true
         type: string
       race_number:
         description: 'Race number 1-12'
+        default: '11'
         required: true
         type: string
       official_card_url:
         description: 'Explicit official JRA card URL (no guessed tokens)'
+        default: 'https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604111120261101%2FA6'
         required: true
         type: string
 permissions:
