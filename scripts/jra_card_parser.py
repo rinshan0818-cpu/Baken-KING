@@ -31,10 +31,25 @@ def parse_race_conditions(text: str) -> dict:
     weights = [w for w in ("ハンデ", "別定", "定量", "馬齢") if w in compact]
     if len(weights) > 1:
         raise ValueError("ambiguous_weight_conditions")
+    age_match = re.search(r"(?<!\\d)([234])歳以上", compact)
+    if not age_match:
+        age_match = re.search(r"(?<!\\d)([23])歳(?!以上)", compact)
+    age_condition = age_match.group(0) if age_match else None
+    class_match = re.search(r"(?:未勝利|新馬|[123]勝クラス|オープン)", compact)
+    class_condition = class_match.group(0) if class_match else None
+    grade_match = re.search(r"(?:G[ⅠⅡⅢ]|G[123]|リステッド|\\(L\\))", compact)
+    grade = grade_match.group(0) if grade_match else None
+    surface_match = re.search(r"(?:芝|ダート|障害)\\s*(\\d{3,4})\\s*(?:m|ｍ|メートル)", compact)
+    surface = surface_match.group(0)[:surface_match.group(0).find(surface_match.group(1))] if surface_match else None
+    distance = int(surface_match.group(1)) if surface_match else None
     return {"restrictions": restrictions, "weightRule": weights[0] if weights else None,
             "isMixed": "混合" in restrictions,
             "isFemaleOnly": "牝馬限定" in restrictions,
-            "isHandicap": weights == ["ハンデ"]}
+            "isHandicap": weights == ["ハンデ"],
+            **({"ageCondition":age_condition} if age_condition else {}),
+            **({"classCondition":class_condition} if class_condition else {}),
+            **({"grade":grade} if grade else {}),
+            **({"surface":surface,"distanceMeters":distance} if surface else {})}
 
 def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     dt = datetime.strptime(day, "%Y-%m-%d")
