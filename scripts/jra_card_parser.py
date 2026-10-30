@@ -166,6 +166,12 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
                 continue
             if frame_col is not None and len(expanded) > frame_col and number is not None:
                 frame_text = re.sub(r"\s+", "", expanded[frame_col].get_text(" ", strip=True))
+                if not re.fullmatch(r"[1-8]", frame_text):
+                    image = expanded[frame_col].find("img")
+                    alt = image.get("alt", "") if image else ""
+                    frame_match = re.fullmatch(r"(?:枠番?|枠)\\s*([1-8])\\s*(?:枠)?", alt.strip())
+                    if frame_match:
+                        frame_text = frame_match.group(1)
                 if re.fullmatch(r"[1-8]", frame_text):
                     frames[number] = int(frame_text)
             if is_cancelled:
