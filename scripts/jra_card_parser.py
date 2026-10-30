@@ -16,7 +16,7 @@ def parse_race_conditions(text: str) -> dict:
     restrictions = []
     if "(混合)" in compact or "(混)" in compact:
         restrictions.append("混合")
-    if "(牝)" in compact or "牝馬限定" in compact or re.search(r"(?<![一-龥])牝(?=\(指定\)|\(特指\)|馬齢|定量)", compact):
+    if "(牝)" in compact or "牝馬限定" in compact or re.search(r"(?<![一-龥])牝(?=\[指定\]|\(指定\)|\[特指\]|\(特指\)|馬齢|定量)", compact):
         restrictions.append("牝馬限定")
     if "(牡・せん)" in compact or "牡・せん限定" in compact:
         restrictions.append("牡・せん限定")
@@ -48,7 +48,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_date_mismatch")
     if not re.search(rf"\d{{1,2}}\s*回\s*{re.escape(venue)}\s*\d{{1,2}}\s*日", body):
         raise ValueError("card_meeting_mismatch")
-    if not re.search(rf"(?<!\d){race_number}\s*レース", body):
+    if not re.search(rf"(?<!\d){race_number}\s*(?:レース|R)(?!\d)", body):
         raise ValueError("card_race_mismatch")
     # Read the current race heading only; do not parse historical race conditions.
     race_match = re.search(rf"(?<!\d){race_number}\s*(?:レース|R)(?!\d)", body)
