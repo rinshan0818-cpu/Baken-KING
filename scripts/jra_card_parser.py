@@ -57,29 +57,41 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     conditions = parse_race_conditions(header)
     candidates = []
     for table in soup.find_all("table"):
-        head = table.get_text(" ", strip=True)[:700]
-        if "馬番" not in head or "馬名" not in head:
+        rows = table.find_all("tr")
+        header_index = None
+        number_col = name_col = None
+        for row_index, tr in enumerate(rows[:12]):
+            cells = tr.find_all(["th", "td"], recursive=False)
+            labels = [re.sub(r"\\s+", "", c.get_text(" ", strip=True)) for c in cells]
+            num = next((i for i, label in enumerate(labels) if label == "馬番"), None)
+            name = next((i for i, label in enumerate(labels) if label.startswith("馬名")), None)
+            if num is not None and name is not None and num != name:
+                header_index, number_col, name_col = row_index, num, name
+                break
+        if header_index is None:
             continue
-        numbers = []
-        horse_names = []
-        # JRA layouts may contain rowspans in the frame-number column.
-        # Select the horse-number cell by class/header where possible,
-        # otherwise accept the numeric cell immediately before the horse name.
-        for tr in table.find_all("tr"):
+        numbers, horse_names = [], []
+        for tr in rows[header_index + 1:]:
             cells = tr.find_all(["td", "th"], recursive=False)
-            if len(cells) < 2 or any(c.name == "th" for c in cells):
+            if len(cells) <= max(number_col, name_col):
                 continue
-            labels = [re.sub(r"\s+", "", c.get_text(" ", strip=True)) for c in cells]
-            possible = []
-            for i, raw in enumerate(labels[:-1]):
-                if not re.fullmatch(r"\d{1,2}", raw) or not 1 <= int(raw) <= 18:
-                    continue
-                following = labels[i + 1]
-                if following and not re.fullmatch(r"\d{1,2}", following):
-                    possible.append(int(raw))
-            if possible:
-                numbers.append(possible[-1])
-                horse_names.append(next((a.get_text(" ", strip=True) for a in tr.find_all("a") if a.get_text(" ", strip=True)), ""))
+            raw_number = re.sub(r"\\s+", "", cells[number_col].get_text(" ", strip=True))
+            if not re.fullmatch(r"\\d{1,2}", raw_number):
+                continue
+            number = int(raw_number)
+            if not 1 <= number <= 18:
+                continue
+            name_cell = cells[name_col]
+            # Horse name is the first visible line, not the trainer/pedigree.
+            link = name_cell.find("a")
+            if link and link.get_text(" ", strip=True):
+                horse_name = link.get_text(" ", strip=True).strip()
+            else:
+                horse_name = next((x.strip() for x in name_cell.stripped_strings), "")
+            if not horse_name:
+                continue
+            numbers.append(number)
+            horse_names.append(horse_name)
         if len(numbers) >= 2:
             candidates.append((numbers, horse_names))
     if not candidates:
