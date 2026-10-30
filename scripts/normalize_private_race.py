@@ -3,7 +3,6 @@
 This module performs NO network requests. Feed records exported with permission.
 """
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 VENUES = {"札幌","函館","福島","新潟","東京","中山","中京","京都","阪神","小倉"}
 BET_TYPES = {"win","show","bracket","quinella","wide","exacta","trio","trifecta"}
@@ -37,6 +36,8 @@ def normalize_race(record):
         horses.append({"number":n,"name":name,"frame":frame,"status":status})
     if not horses:
         raise ValueError("empty_card")
+    if len(horses)>18:
+        raise ValueError("too_many_horses")
     result = record.get("result")
     if result is not None:
         if result.get("status")!="official-final":
@@ -46,10 +47,10 @@ def normalize_race(record):
             kind=item["type"]
             nums=item["numbers"]
             yen=item["yenPer100"]
-            if kind not in BET_TYPES or len(nums)!=SIZE[kind] or len(set(nums))!=len(nums) or not all(isinstance(n,int) and not isinstance(n,bool) and 1<=n<=(8 if kind=="bracket" else 18) for n in nums):
-                # bracket quinella permits same-frame combination.
-                if not (kind=="bracket" and len(nums)==2 and nums[0]==nums[1] and all(isinstance(n,int) and 1<=n<=8 for n in nums)):
-                    raise ValueError("invalid_payout_combination")
+            if kind not in BET_TYPES or not isinstance(nums,list) or len(nums)!=SIZE.get(kind) or not all(isinstance(n,int) and not isinstance(n,bool) and 1<=n<=(8 if kind=="bracket" else 18) for n in nums):
+                raise ValueError("invalid_payout_combination")
+            if len(set(nums))!=len(nums) and not (kind=="bracket" and len(nums)==2 and nums[0]==nums[1]):
+                raise ValueError("invalid_payout_combination")
             if not isinstance(yen,int) or isinstance(yen,bool) or yen<0:
                 raise ValueError("invalid_payout_amount")
             payouts.append({"type":kind,"numbers":nums if kind in ORDERED else sorted(nums),"yenPer100":yen})
@@ -70,6 +71,8 @@ def payout_for_ticket(ticket, result):
     stake=ticket["stakeYen"]
     if kind not in BET_TYPES or len(numbers)!=SIZE[kind] or not isinstance(stake,int) or isinstance(stake,bool) or stake<=0 or stake%100:
         raise ValueError("invalid_ticket")
+    if not isinstance(numbers,list) or not all(isinstance(n,int) and not isinstance(n,bool) for n in numbers):
+        raise ValueError("invalid_ticket_numbers")
     key=tuple(numbers if kind in ORDERED else sorted(numbers))
     for p in result["payouts"]:
         if p["type"]==kind and tuple(p["numbers"] if kind in ORDERED else sorted(p["numbers"]))==key:
