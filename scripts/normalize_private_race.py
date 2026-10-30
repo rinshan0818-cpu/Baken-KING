@@ -12,6 +12,8 @@ SIZE = {"win":1,"show":1,"bracket":2,"quinella":2,"wide":2,"exacta":2,"trio":3,"
 def normalize_race(record):
     """Input: normalized provider-neutral mapping; no guesses for missing fields."""
     date = record["date"]
+    if not isinstance(date,str):
+        raise ValueError("invalid_date")
     venue = record["venue"]
     number = record["raceNumber"]
     if venue not in VENUES or not isinstance(number,int) or isinstance(number,bool) or not 1<=number<=12:
@@ -42,6 +44,9 @@ def normalize_race(record):
     if result is not None:
         if result.get("status")!="official-final":
             raise ValueError("not_final")
+        finish=result.get("finish")
+        if not isinstance(finish,list) or any(not isinstance(n,int) or isinstance(n,bool) or n not in seen for n in finish) or len(finish)!=len(set(finish)):
+            raise ValueError("invalid_finish")
         payouts=[]
         for item in result["payouts"]:
             kind=item["type"]
@@ -78,7 +83,7 @@ def payout_for_ticket(ticket, result):
     kind=ticket["type"]
     numbers=ticket["numbers"]
     stake=ticket["stakeYen"]
-    if kind not in BET_TYPES or len(numbers)!=SIZE[kind] or not isinstance(stake,int) or isinstance(stake,bool) or stake<=0 or stake%100:
+    if kind not in BET_TYPES or not isinstance(numbers,list) or len(numbers)!=SIZE[kind] or not isinstance(stake,int) or isinstance(stake,bool) or stake<=0 or stake%100:
         raise ValueError("invalid_ticket")
     if not isinstance(numbers,list) or not all(isinstance(n,int) and not isinstance(n,bool) for n in numbers):
         raise ValueError("invalid_ticket_numbers")
