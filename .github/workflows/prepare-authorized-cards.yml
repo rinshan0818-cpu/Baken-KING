@@ -1,0 +1,48 @@
+name: Prepare authorized race-card artifact
+on:
+  workflow_dispatch:
+    inputs:
+      feed_path:
+        description: "Path to separately authorized race-card JSON in repository"
+        required: true
+        type: string
+      permission_path:
+        description: "Path to written permission metadata JSON in repository"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate permission and prepare candidate
+        env:
+          FEED_PATH: ${{ inputs.feed_path }}
+          PERMISSION_PATH: ${{ inputs.permission_path }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.prepare_authorized_feed import prepare
+          root = Path.cwd().resolve()
+          def checked(name):
+              path = (root / os.environ[name]).resolve()
+              if not path.is_relative_to(root) or not path.is_file() or path.suffix != ".json":
+                  raise ValueError(f"Invalid input: {name}")
+              if path.is_relative_to(root / "data") and path.name.startswith("jra-"):
+                  raise ValueError("JRA-derived source cannot be auto-published")
+              return path
+          count = prepare(checked("FEED_PATH"), checked("PERMISSION_PATH"),
+                          Path("authorized-output/authorized-race-cards.json"))
+          print(f"Prepared {count} races for review; NOT deployed")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: authorized-race-cards-candidate
+          path: authorized-output/authorized-race-cards.json
+          retention-days: 7
