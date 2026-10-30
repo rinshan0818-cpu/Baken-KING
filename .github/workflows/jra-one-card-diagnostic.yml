@@ -1,0 +1,72 @@
+name: Verify one JRA card (private diagnostic)
+on:
+  workflow_dispatch:
+    inputs:
+      race_date:
+        description: 'Race date YYYY-MM-DD'
+        required: true
+        type: string
+      venue:
+        description: 'JRA venue in Japanese, e.g. 東京'
+        required: true
+        type: string
+      race_number:
+        description: 'Race number 1-12'
+        required: true
+        type: string
+      official_card_url:
+        description: 'Explicit official JRA card URL (no guessed tokens)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install beautifulsoup4
+      - run: mkdir -p artifacts
+      - name: Fetch and inspect one race without publishing
+        env:
+          RACE_DATE: ${{ inputs.race_date }}
+          VENUE: ${{ inputs.venue }}
+          RACE_NUMBER: ${{ inputs.race_number }}
+          CARD_URL: ${{ inputs.official_card_url }}
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from datetime import date
+          from urllib.parse import urlparse
+          sys.path.insert(0, 'scripts')
+          from jra_card_parser import VENUES
+          d = date.fromisoformat(os.environ['RACE_DATE'])
+          n = int(os.environ['RACE_NUMBER'])
+          u = urlparse(os.environ['CARD_URL'])
+          if d.isoformat() != os.environ['RACE_DATE'] or os.environ['VENUE'] not in VENUES or not 1 <= n <= 12:
+              raise SystemExit('Invalid race identity')
+          if u.scheme != 'https' or u.hostname not in ('jra.jp','sp.jra.jp','app.jra.jp') or u.path != '/JRADB/accessD.html':
+              raise SystemExit('Invalid official card URL')
+          json.dump([{'date':d.isoformat(),'venue':os.environ['VENUE'],'raceNumber':n,'url':os.environ['CARD_URL']}],open('artifacts/manifest.json','w'),ensure_ascii=False)
+          PY
+          python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json --errors-output artifacts/fetch-errors.json --require-complete
+          python - <<'PY'
+          import json
+          d=json.load(open('artifacts/parsed.json'))
+          r=d['races'][0]
+          h=r['horses']
+          print('Validated',r['date'],r['venue'],r['raceNumber'],'horses:',len(h),'frames:',sum('frame' in x for x in h),'start:',r.get('scheduledStartAt'))
+          if len(h)<2 or any('frame' not in x for x in h) or not r.get('scheduledStartAt'):
+              raise SystemExit('Incomplete required card fields')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: one-card-private-diagnostics
+          path: artifacts/
+          retention-days: 1
+          if-no-files-found: warn
