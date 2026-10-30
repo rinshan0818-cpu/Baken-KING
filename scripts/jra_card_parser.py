@@ -81,7 +81,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("card_race_mismatch")
     header = current[race_match.end():].split("本賞金", 1)[0].split("詳細出馬表", 1)[0][:450]
     conditions = parse_race_conditions(header)
-    start_match = re.search(r"発走時刻[:：]\\s*(\\d{1,2})時(\\d{2})分", header)
+    start_match = re.search(r"発走時刻[:：]\s*(\d{1,2})時(\d{2})分", header)
     scheduled_start = None
     if start_match:
         hour, minute = map(int, start_match.groups())
@@ -164,7 +164,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             if not horse_name:
                 continue
             if frame_col is not None and len(expanded) > frame_col and number is not None:
-                frame_text = re.sub(r"\\s+", "", expanded[frame_col].get_text(" ", strip=True))
+                frame_text = re.sub(r"\s+", "", expanded[frame_col].get_text(" ", strip=True))
                 if re.fullmatch(r"[1-8]", frame_text):
                     frames[number] = int(frame_text)
             if is_cancelled:
