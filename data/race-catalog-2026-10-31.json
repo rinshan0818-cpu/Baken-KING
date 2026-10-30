@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-29",
+  "updatedAt": "2026-10-30",
   "source": "JRA公式出馬表（公開状況の確認）",
-  "note": "馬番未確定のレースは購入不可。各レースの出走馬データは未取り込み。",
+  "note": "東京1Rの馬番・馬名はJRA公式出馬表で確認済み。その他の未確認レースは購入不可。",
   "dates": [
     "2026-10-31",
     "2026-11-01"
@@ -17,98 +17,98 @@
       "date": "2026-10-31",
       "venue": "東京",
       "raceNumber": 1,
-      "status": "entries_unassigned",
+      "status": "numbers_confirmed",
       "horsesLoaded": true,
-      "numbersConfirmed": false,
+      "numbersConfirmed": true,
       "title": "2歳未勝利",
       "startTime": "09:50",
       "surface": "ダート",
       "distance": 1600,
       "horses": [
         {
-          "name": "アークレイリ",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "イントゥーザブルー",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "ウスズミザクラ",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "サイボーグ",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "サクラトップオメガ",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "チャリンコリン",
-          "number": null,
-          "frame": null
-        },
-        {
           "name": "トルタネーラ",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "ドーンオブホープ",
-          "number": null,
-          "frame": null
+          "number": 1,
+          "frame": 1
         },
         {
           "name": "ニシノツムジカゼ",
-          "number": null,
-          "frame": null
+          "number": 2,
+          "frame": 1
         },
         {
-          "name": "ハイファイネスト",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "パレスラン",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "フィックスユー",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "フジサンインフレ",
-          "number": null,
-          "frame": null
-        },
-        {
-          "name": "ホウオウシュウ",
-          "number": null,
-          "frame": null
+          "name": "ドーンオブホープ",
+          "number": 3,
+          "frame": 2
         },
         {
           "name": "ボディビルダー",
-          "number": null,
-          "frame": null
+          "number": 4,
+          "frame": 2
+        },
+        {
+          "name": "ハイファイネスト",
+          "number": 5,
+          "frame": 3
+        },
+        {
+          "name": "イントゥーザブルー",
+          "number": 6,
+          "frame": 3
+        },
+        {
+          "name": "フジサンインフレ",
+          "number": 7,
+          "frame": 4
+        },
+        {
+          "name": "フィックスユー",
+          "number": 8,
+          "frame": 4
+        },
+        {
+          "name": "サイボーグ",
+          "number": 9,
+          "frame": 5
+        },
+        {
+          "name": "サクラトップオメガ",
+          "number": 10,
+          "frame": 5
         },
         {
           "name": "ランフェザー",
-          "number": null,
-          "frame": null
+          "number": 11,
+          "frame": 6
+        },
+        {
+          "name": "ホウオウシュウ",
+          "number": 12,
+          "frame": 6
+        },
+        {
+          "name": "チャリンコリン",
+          "number": 13,
+          "frame": 7
+        },
+        {
+          "name": "パレスラン",
+          "number": 14,
+          "frame": 7
+        },
+        {
+          "name": "アークレイリ",
+          "number": 15,
+          "frame": 8
+        },
+        {
+          "name": "ウスズミザクラ",
+          "number": 16,
+          "frame": 8
         }
       ],
       "grade": null,
-      "metadataSource": "JRA 2026-10-31 racing program (scheduled)",
-      "metadataStatus": "scheduled"
+      "metadataSource": "JRA公式出馬表 2026-10-31 東京1R",
+      "metadataStatus": "verified"
     },
     {
       "id": "2026-10-31-東京-2",
