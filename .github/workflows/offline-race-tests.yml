@@ -1,0 +1,25 @@
+name: Offline race data checks
+on:
+  push:
+    paths:
+      - 'scripts/normalize_private_race.py'
+      - 'scripts/import_private_race.py'
+      - 'tests/test_private_race_refunds.py'
+      - 'tests/test_normalize_private_race.py'
+      - 'tests/test_import_private_race.py'
+      - '.github/workflows/offline-race-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline normalization and settlement tests
+        run: |
+          python -m unittest discover -s tests -p 'test_*private_race*.py' -v
+          python -m unittest discover -s tests -p 'test_import_private_race.py' -v
