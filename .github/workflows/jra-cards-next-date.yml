@@ -1,0 +1,62 @@
+name: JRA next-date card verification
+on:
+  workflow_dispatch:
+    inputs:
+      race_date:
+        description: 'Target race date (YYYY-MM-DD)'
+        required: true
+        type: string
+      official_seed_url:
+        description: 'Official JRA card or index URL for that date'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install beautifulsoup4
+      - name: Validate date and official source
+        env:
+          RACE_DATE: ${{ inputs.race_date }}
+          SEED_URL: ${{ inputs.official_seed_url }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import date
+          from urllib.parse import urlparse
+          d = date.fromisoformat(os.environ['RACE_DATE'])
+          assert d.isoformat() == os.environ['RACE_DATE']
+          p = urlparse(os.environ['SEED_URL'])
+          assert p.scheme == 'https' and p.hostname in {'jra.jp','sp.jra.jp','app.jra.jp'}
+          assert p.path == '/JRADB/accessD.html'
+          PY
+      - name: Run parser tests
+        run: python -m unittest discover -s tests -p 'test_*.py'
+      - name: Crawl and validate requested date (read only)
+        env:
+          RACE_DATE: ${{ inputs.race_date }}
+          SEED_URL: ${{ inputs.official_seed_url }}
+        run: |
+          mkdir -p artifacts
+          python scripts/crawl_jra_cards.py artifacts/manifest.json "$SEED_URL" --date "$RACE_DATE"
+          python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json --errors-output artifacts/fetch-errors.json --require-complete
+          python - <<'PY'
+          import json
+          data=json.load(open('artifacts/parsed.json'))
+          if data['raceCount']!=24:
+              raise SystemExit('Expected 24 cards; refusing to mark complete')
+          print('Validated all 24 race cards for the requested date')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: next-date-cards
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 3
