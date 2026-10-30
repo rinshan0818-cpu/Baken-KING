@@ -1,0 +1,15 @@
+name: UI smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'index.html'
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check inline scripts
+        run: python3 scripts/check_inline_scripts.py
