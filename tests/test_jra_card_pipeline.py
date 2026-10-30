@@ -51,8 +51,13 @@ class CardPipelineTests(unittest.TestCase):
         self.assertTrue(normalized["races"][0]["horses"][1]["scratched"])
     def test_missing_number_is_not_inferred(self):
         html = sample_html().replace('<td>2</td><td><a>テストホースB</a></td>', '<td>取消</td><td><a>テストホースB</a></td>')
-        with self.assertRaisesRegex(ValueError,"horse_numbers_not_contiguous"):
-            parse_card(html,"2026-10-31","東京",11)
+        card = parse_card(html,"2026-10-31","東京",11)
+        self.assertEqual([h["number"] for h in card["horses"]], [1, 3])
+        self.assertEqual(card["unavailableHorseNumbers"], [2])
+        self.assertEqual(card["unresolvedCancelledHorses"], ["テストホースB"])
+        normalized = normalize_cards([card])
+        self.assertEqual(normalized["races"][0]["unavailableHorseNumbers"], [2])
+        self.assertNotIn(2, [h["number"] for h in normalized["races"][0]["horses"]])
     def test_cancelled_status_in_separate_cell(self):
         html = sample_html().replace("<th>馬名</th>", "<th>馬名</th><th>状態</th>").replace("<a>テストホースA</a></td>", "<a>テストホースA</a></td><td>出走取消</td>").replace("<a>テストホースB</a></td>", "<a>テストホースB</a></td><td></td>").replace("<a>テストホースC</a></td>", "<a>テストホースC</a></td><td></td>")
         card = parse_card(html, "2026-10-31", "東京", 11)
