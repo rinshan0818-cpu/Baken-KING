@@ -46,7 +46,7 @@ def parse_netkeiba_card(html, day, venue, race_number):
     restrictions = [s for s in ("混合", "牝馬限定", "国際", "特指", "指定") if s in header]
     if re.search(r"[（(]混[）)]", header) and "混合" not in restrictions:
         restrictions.append("混合")
-    if re.search(r"[\\[［]指[\\]］]", header) and "指定" not in restrictions:
+    if re.search(r"(?:\[指\]|［指］)", header) and "指定" not in restrictions:
         restrictions.append("指定")
     if "牝" in header and "牝馬限定" not in restrictions:
         restrictions.append("牝馬限定")
