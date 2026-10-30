@@ -17,6 +17,8 @@ def parse_netkeiba_card(html, day, venue, race_number):
     rows = soup.select("tr.HorseList")
     if not rows:
         rows = soup.select("table.Shutuba_Table tr, table.RaceTable01 tr")
+    if "出走想定" in soup.get_text(" ", strip=True) and "仮想の出馬表" in soup.get_text(" ", strip=True):
+        raise ValueError("provisional_race_card")
     horses = []
     for row in rows:
         number = row.select_one(".Umaban, td[class~=Umaban]")
@@ -40,6 +42,10 @@ def parse_netkeiba_card(html, day, venue, race_number):
     ))
     weight_rule = next((s for s in ("ハンデ", "別定", "定量", "馬齢") if s in header), None)
     restrictions = [s for s in ("混合", "牝馬限定", "国際", "特指", "指定") if s in header]
+    if re.search(r"[（(]混[）)]", header) and "混合" not in restrictions:
+        restrictions.append("混合")
+    if re.search(r"[\\[［]指[\\]］]", header) and "指定" not in restrictions:
+        restrictions.append("指定")
     if "牝" in header and "牝馬限定" not in restrictions:
         restrictions.append("牝馬限定")
     return {
