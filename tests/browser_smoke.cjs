@@ -1,5 +1,6 @@
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
+const fs=require('node:fs');
 (async()=>{
  const browser=await chromium.launch();
  try{
@@ -34,6 +35,12 @@ const assert=require('node:assert/strict');
       rect:el.getBoundingClientRect().toJSON()};
   });
   console.log('Purchase control diagnostics:',JSON.stringify(controlState));
+  if(!await page.locator('#realBetType').isVisible()){
+    fs.mkdirSync('test-results',{recursive:true});
+    await page.screenshot({path:'test-results/purchase-selector-hidden.png',fullPage:true});
+    fs.writeFileSync('test-results/purchase-selector-state.json',JSON.stringify(controlState,null,2));
+    throw new Error('Purchase selector hidden: '+JSON.stringify(controlState));
+  }
   await page.locator('#realBetType').selectOption('馬連');
   await page.locator('#realBetMode').selectOption('normal');
   await page.locator('#autumnHorseList .bk-autumn-row').nth(0).click();
