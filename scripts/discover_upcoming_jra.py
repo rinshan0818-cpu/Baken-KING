@@ -79,7 +79,7 @@ def main():
         json.dump(seeds_by_date, f, ensure_ascii=False)
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
-        f.write("\\n")
+        f.write("\n")
     print(json.dumps(report, ensure_ascii=False))
     # Absence is a legitimate state: never invent opaque race URL tokens.
 
