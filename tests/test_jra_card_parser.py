@@ -96,8 +96,8 @@ class CardParserTests(unittest.TestCase):
         </table></body></html>"""
         data = parse_card(html, "2026-10-31", "東京", 1)
         self.assertEqual(data["horses"], [
-            {"number": 1, "name": "架空馬A"},
-            {"number": 2, "name": "架空馬B"}])
+            {"number": 1, "name": "架空馬A", "frame": 1},
+            {"number": 2, "name": "架空馬B", "frame": 1}])
         self.assertEqual(data["raceConditions"]["weightRule"], "馬齢")
         self.assertTrue(data["raceConditions"]["isMixed"])
 
