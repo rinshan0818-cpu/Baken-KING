@@ -37,7 +37,9 @@ def parse_netkeiba_card(html, day, venue, race_number):
     numbers = [h["number"] for h in horses]
     if len(numbers) > 18 or len(numbers) != len(set(numbers)) or sorted(numbers) != list(range(1, len(numbers) + 1)):
         raise ValueError("invalid_horse_numbers")
-    if len({h["name"] for h in horses}) != len(horses):\n        raise ValueError("duplicate_horse_names")\n    header = " ".join(e.get_text(" ", strip=True) for e in soup.select(
+    if len({h["name"] for h in horses}) != len(horses):
+        raise ValueError("duplicate_horse_names")
+    header = " ".join(e.get_text(" ", strip=True) for e in soup.select(
         ".RaceData01, .RaceData02, .RaceName, .RaceData, .RaceList_Item02"
     ))
     weight_rule = next((s for s in ("ハンデ", "別定", "定量", "馬齢") if s in header), None)
