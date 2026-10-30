@@ -101,6 +101,24 @@ class CardParserTests(unittest.TestCase):
         self.assertEqual(data["raceConditions"]["weightRule"], "馬齢")
         self.assertTrue(data["raceConditions"]["isMixed"])
 
+    def test_missing_number_is_not_inferred(self):
+        html = fixture().replace(
+            '<td>2</td><td><a href="/horse/2">架空馬2</a>',
+            '<td>取消</td><td><a href="/horse/2">架空馬2</a>'
+        )
+        result = parse_card(html, "2026-10-31", "東京", 3)
+        self.assertEqual([h["number"] for h in result["horses"]], [1, 3])
+        self.assertEqual(result["unavailableHorseNumbers"], [2])
+        self.assertEqual(result["unresolvedCancelledHorses"], ["架空馬2"])
+
+    def test_missing_number_without_cancellation_still_rejected(self):
+        html = fixture().replace(
+            '<td>2</td><td><a href="/horse/2">架空馬2</a>',
+            '<td>不明</td><td><a href="/horse/2">架空馬2</a>'
+        )
+        with self.assertRaisesRegex(ValueError, "horse_numbers_not_contiguous"):
+            parse_card(html, "2026-10-31", "東京", 3)
+
     def test_wrong_race_rejected(self):
         with self.assertRaisesRegex(ValueError,"card_race_mismatch"):
             parse_card(fixture(),"2026-10-31","東京",4)
