@@ -14,6 +14,15 @@ class CardParserTests(unittest.TestCase):
         for day,venue,race in [("2026-10-31","東京",3),("2026-11-01","京都",11)]:
             data=parse_card(fixture(day,venue,race),day,venue,race)
             self.assertEqual(data["horseNumbers"],[1,2,3])
+    def test_rowspan_frame_column(self):
+        html = fixture().replace(
+            '<tr><td>1</td><td>1</td><td>架空馬1</td></tr><tr><td>1</td><td>2</td><td>架空馬2</td></tr>',
+            '<tr><td rowspan="2">1</td><td>1</td><td>架空馬1</td></tr><tr><td>2</td><td>架空馬2</td></tr>'
+        )
+        self.assertEqual(parse_card(html,"2026-10-31","東京",3)["horseNumbers"],[1,2,3])
+    def test_whitespace_in_horse_number(self):
+        html = fixture().replace("<td>2</td><td>架空馬2", "<td> 2 </td><td>架空馬2")
+        self.assertEqual(parse_card(html,"2026-10-31","東京",3)["horseNumbers"],[1,2,3])
     def test_wrong_race_rejected(self):
         with self.assertRaisesRegex(ValueError,"card_race_mismatch"):
             parse_card(fixture(),"2026-10-31","東京",4)
