@@ -53,7 +53,7 @@ const fs=require('node:fs');
     await saturdayPage.locator('#realBuy').click();
     await saturdayPage.getByRole('button',{name:'この内容で購入'}).click();
     const saturdaySaved=await saturdayPage.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')));
-    assert(saturdaySaved.bets.some(b=>b.raceDate==='2026-11-07'&&b.raceVenue==='京都'&&b.raceNumber===12&&b.status==='pending'),
+    assert(saturdaySaved.bets.some(b=>b.raceDate===fullSaturday[0].date&&b.raceVenue==='京都'&&b.raceNumber===12&&b.status==='pending'),
       'Full Saturday fixture purchase not saved');
   }finally{await saturdayPage.close()}
   await page.route('**/data/authorized-race-cards.json*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races})}));
