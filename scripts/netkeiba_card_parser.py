@@ -14,13 +14,13 @@ def parse_netkeiba_card(html, day, venue, race_number):
     if not isinstance(race_number, int) or not 1 <= race_number <= 12:
         raise ValueError("invalid_race_number")
     soup = BeautifulSoup(html, "html.parser")
-    rows = soup.select("tr.HorseList, tr[class~=HorseList], tr[class~=HorseList]")
+    rows = soup.select("tr.HorseList")
     if not rows:
-        rows = soup.select("table.Shutuba_Table tbody tr")
+        rows = soup.select("table.Shutuba_Table tr, table.RaceTable01 tr")
     horses = []
     for row in rows:
         number = row.select_one(".Umaban, td[class~=Umaban]")
-        name = row.select_one(".HorseName a, .HorseName")
+        name = row.select_one(".HorseName a, .HorseName, a[href*=\'/horse/\']")
         if number is None or name is None:
             continue
         num_text = number.get_text(" ", strip=True)
@@ -33,9 +33,9 @@ def parse_netkeiba_card(html, day, venue, race_number):
     if not horses:
         raise ValueError("no_horses_found")
     numbers = [h["number"] for h in horses]
-    if len(numbers) != len(set(numbers)) or sorted(numbers) != list(range(1, len(numbers) + 1)):
+    if len(numbers) > 18 or len(numbers) != len(set(numbers)) or sorted(numbers) != list(range(1, len(numbers) + 1)):
         raise ValueError("invalid_horse_numbers")
-    header = " ".join(e.get_text(" ", strip=True) for e in soup.select(
+    if len({h["name"] for h in horses}) != len(horses):\n        raise ValueError("duplicate_horse_names")\n    header = " ".join(e.get_text(" ", strip=True) for e in soup.select(
         ".RaceData01, .RaceData02, .RaceName, .RaceData, .RaceList_Item02"
     ))
     weight_rule = next((s for s in ("ハンデ", "別定", "定量", "馬齢") if s in header), None)
