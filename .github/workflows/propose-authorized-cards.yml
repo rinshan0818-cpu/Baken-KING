@@ -1,0 +1,57 @@
+name: Propose authorized race-card update
+on:
+  workflow_dispatch:
+    inputs:
+      feed_path:
+        description: "Approved race-card JSON under authorized-input/"
+        required: true
+        type: string
+      permission_path:
+        description: "Permission evidence JSON under authorized-input/"
+        required: true
+        type: string
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  propose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate and stage authorized data
+        env:
+          FEED_PATH: ${{ inputs.feed_path }}
+          PERMISSION_PATH: ${{ inputs.permission_path }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.stage_authorized_feed import stage
+          root=Path.cwd().resolve()
+          allowed=(root/"authorized-input").resolve()
+          def checked(name):
+              value=os.environ[name]
+              path=(root/value).resolve()
+              if not path.is_relative_to(allowed) or not path.is_file() or path.suffix != ".json":
+                  raise ValueError(f"{name} must be an existing JSON file under authorized-input/")
+              return path
+          count=stage(checked("FEED_PATH"),checked("PERMISSION_PATH"),
+                      root/"data"/"authorized-race-cards.json")
+          print(f"Validated {count} races; proposing a pull request, NOT publishing directly")
+          PY
+      - name: Open pull request for human review
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: data/authorized-race-cards.json
+          branch: automation/authorized-race-cards
+          delete-branch: true
+          commit-message: "Propose validated authorized race cards"
+          title: "Review: update authorized race cards"
+          body: |
+            This PR contains only an explicitly authorized, validated race-card feed.
+            **Review the source and redistribution permission before merging.**
+            Do not merge if the source is JRA-derived without confirmed redistribution rights.
+            Merging into the Pages deployment branch will make this file public.
