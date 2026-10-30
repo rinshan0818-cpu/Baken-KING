@@ -51,7 +51,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     if not re.search(rf"(?<!\d){race_number}\s*レース", body):
         raise ValueError("card_race_mismatch")
     # Read the current race heading only; do not parse historical race conditions.
-    race_match = re.search(rf"(?<!\\d){race_number}\\s*(?:レース|R)(?!\\d)", body)
+    race_match = re.search(rf"(?<!\d){race_number}\s*(?:レース|R)(?!\d)", body)
     if race_match is None:
         raise ValueError("card_race_mismatch")
     header = body[race_match.end():].split("本賞金", 1)[0].split("枠", 1)[0][:450]
@@ -63,7 +63,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         number_col = name_col = None
         for row_index, tr in enumerate(rows[:12]):
             cells = tr.find_all(["th", "td"], recursive=False)
-            labels = [re.sub(r"\\s+", "", c.get_text(" ", strip=True)) for c in cells]
+            labels = [re.sub(r"\s+", "", c.get_text(" ", strip=True)) for c in cells]
             num = next((i for i, label in enumerate(labels) if label == "馬番"), None)
             name = next((i for i, label in enumerate(labels) if label.startswith("馬名")), None)
             if num is not None and name is not None and num != name:
@@ -103,8 +103,8 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             fill_pending()
             if len(expanded) <= max(number_col, name_col):
                 continue
-            raw_number = re.sub(r"\\s+", "", expanded[number_col].get_text(" ", strip=True))
-            if not re.fullmatch(r"\\d{1,2}", raw_number):
+            raw_number = re.sub(r"\s+", "", expanded[number_col].get_text(" ", strip=True))
+            if not re.fullmatch(r"\d{1,2}", raw_number):
                 continue
             number = int(raw_number)
             if not 1 <= number <= 18:
