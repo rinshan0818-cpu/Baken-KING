@@ -42,7 +42,7 @@ def fetch_cards(manifest, delay=1.5):
             # JRA's JRADB pages commonly use Shift_JIS/Windows-31J without an
             # HTTP charset. Inspect HTML's own declaration before falling back.
             head = html[:8192]
-            meta = re.search(rb"<meta[^>]+charset\\s*=\\s*[^a-zA-Z0-9]*([a-zA-Z0-9_-]+)", head, re.I)
+            meta = re.search(rb"<meta[^>]+charset\s*=\s*[^a-zA-Z0-9]*([a-zA-Z0-9_-]+)", head, re.I)
             charset = declared_charset or (meta.group(1).decode("ascii") if meta else None)
             if charset:
                 if charset.lower().replace("_", "-") in ("shift-jis", "shift_jis", "sjis", "windows-31j", "x-sjis"):
@@ -68,7 +68,7 @@ def fetch_cards(manifest, delay=1.5):
                             continue
                         labels = [c.get_text(" ", strip=True)[:65] for c in cells]
                         # Record candidate rows around the missing horse number.
-                        if any(re.search(r"(?<!\\d)13(?!\\d)|取消|除外|出走取消", x) for x in labels):
+                        if any(re.search(r"(?<!\d)13(?!\d)|取消|除外|出走取消", x) for x in labels):
                             rows.append({"class":tr.get("class", []),
                                          "cells":labels[:15],
                                          "images":[{"alt":im.get("alt", ""),
