@@ -51,6 +51,22 @@ def normalize_race(record):
         if not isinstance(restrictions,list) or any(not isinstance(x,str) or not x.strip() for x in restrictions):
             raise ValueError("invalid_restrictions")
         conditions={"weightRule":weight,"restrictions":restrictions}
+        for field in ("ageCondition","classCondition","grade"):
+            value=record["raceConditions"].get(field)
+            if value is not None:
+                if not isinstance(value,str) or not value.strip() or len(value)>80:
+                    raise ValueError("invalid_"+field)
+                conditions[field]=value.strip()
+        surface=record["raceConditions"].get("surface")
+        if surface is not None:
+            if surface not in ("芝","ダート","障害"):
+                raise ValueError("invalid_surface")
+            conditions["surface"]=surface
+        distance=record["raceConditions"].get("distanceMeters")
+        if distance is not None:
+            if type(distance) is not int or not 100<=distance<=5000:
+                raise ValueError("invalid_distance")
+            conditions["distanceMeters"]=distance
     result = record.get("result")
     if result is not None:
         if result.get("status")!="official-final":
