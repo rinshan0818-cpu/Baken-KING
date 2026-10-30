@@ -14,6 +14,12 @@ const fs=require('node:fs');
    {date:'2026-11-07',venue:'京都',raceNumber:2,scheduledStartAt:'2026-11-07T10:30:00+09:00',horses},
    {date:'2026-11-08',venue:'東京',raceNumber:3,scheduledStartAt:'2026-11-08T11:00:00+09:00',horses:scratchedHorses}
   ];
+  // Exercise a complete two-venue Saturday card (24 races) without publishing source data.
+  const fullSaturday=Array.from({length:24},(_,i)=>({
+    date:'2026-11-07',venue:i<12?'東京':'京都',
+    raceNumber:i%12+1,scheduledStartAt:'2026-11-07T15:40:00+09:00',horses
+  }));
+  assert.equal(fullSaturday.length,24);
   await page.route('**/data/authorized-race-cards.json*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races})}));
   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.BakenImportedCards?.length===3);
