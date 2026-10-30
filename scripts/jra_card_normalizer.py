@@ -20,7 +20,7 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
             raise ValueError("date_mismatch")
         if expected_venues and venue not in expected_venues:
             raise ValueError("venue_mismatch")
-        if not isinstance(race, int) or not 1 <= race <= 12:
+        if type(race) is not int or not 1 <= race <= 12:
             raise ValueError("invalid_race_number")
         key = (day, venue, race)
         if key in seen:
@@ -50,6 +50,11 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
         restrictions = conditions.get("restrictions", [])
         if not isinstance(restrictions, list) or any(not isinstance(x, str) for x in restrictions):
             raise ValueError("invalid_restrictions")
+        optional = {field:conditions[field] for field in ("ageCondition","classCondition","grade","surface","distanceMeters") if field in conditions}
+        if "surface" in optional and optional["surface"] not in ("芝","ダート","障害"):
+            raise ValueError("invalid_surface")
+        if "distanceMeters" in optional and (type(optional["distanceMeters"]) is not int or not 100<=optional["distanceMeters"]<=5000):
+            raise ValueError("invalid_distance")
         output.append({
             "date": day, "venue": venue, "raceNumber": race,
             "horses": sorted(({"number": h["number"], "name": h["name"].strip(), **({"scratched": True} if h.get("scratched") is True else {})} for h in horses), key=lambda h: h["number"]),
@@ -58,7 +63,7 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
                 "isMixed": "混合" in restrictions,
                 "isFemaleOnly": "牝馬限定" in restrictions,
                 "isHandicap": rule == "ハンデ",
-                **{field:conditions[field] for field in ("ageCondition","classCondition","grade","surface","distanceMeters") if field in conditions}}
+                **optional}
         })
     return {"schemaVersion": 1, "races": sorted(output, key=lambda r: (r["date"], r["venue"], r["raceNumber"])),
             "raceCount": len(output)}
