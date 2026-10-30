@@ -1,0 +1,51 @@
+name: Review authorized race-card deployment
+on:
+  workflow_dispatch:
+    inputs:
+      feed_path:
+        description: "Authorized input JSON committed in repository"
+        required: true
+        type: string
+      permission_path:
+        description: "Permission metadata JSON committed in repository"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    environment: authorized-race-cards-review
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare reviewed deployment candidate
+        env:
+          FEED_PATH: ${{ inputs.feed_path }}
+          PERMISSION_PATH: ${{ inputs.permission_path }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.stage_authorized_feed import stage
+          root=Path.cwd().resolve()
+          def source(name):
+              value=os.environ[name]
+              path=(root/value).resolve()
+              if not path.is_relative_to(root) or not path.is_file() or path.suffix != ".json":
+                  raise ValueError("Invalid input path")
+              if path.is_relative_to(root/"data") and path.name.startswith("jra-"):
+                  raise ValueError("JRA-derived feed cannot be automatically approved")
+              return path
+          count=stage(source("FEED_PATH"),source("PERMISSION_PATH"),
+                      Path("deploy-review/authorized-race-cards.json"))
+          print(f"Reviewed candidate: {count} races. No publication performed.")
+          PY
+      - name: Upload reviewed candidate for manual release
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-authorized-race-cards
+          path: deploy-review/authorized-race-cards.json
+          retention-days: 7
