@@ -169,7 +169,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
                 if not re.fullmatch(r"[1-8]", frame_text):
                     image = expanded[frame_col].find("img")
                     alt = image.get("alt", "") if image else ""
-                    frame_match = re.fullmatch(r"(?:枠番?|枠)\\s*([1-8])\\s*(?:枠)?", alt.strip())
+                    frame_match = re.fullmatch(r"枠(?:番)?\s*([1-8])\s*(?:枠)?(?:白|黒|赤|青|黄|緑|橙|桃)?", alt.strip())
                     if frame_match:
                         frame_text = frame_match.group(1)
                 if re.fullmatch(r"[1-8]", frame_text):
