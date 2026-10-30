@@ -32,6 +32,17 @@ const fs=require('node:fs');
     await saturdayPage.locator('#weekVenue').selectOption('京都');
     assert.equal(await saturdayPage.locator('#weekRace option').count(),12);
     assert.equal(await saturdayPage.locator('#autumnFixtureCard').isVisible(),true);
+    await saturdayPage.locator('#weekRace').selectOption('12');
+    await saturdayPage.locator('#realBetType').selectOption('馬連');
+    await saturdayPage.locator('#realBetMode').selectOption('normal');
+    await saturdayPage.locator('#autumnHorseList .bk-autumn-row').nth(0).click();
+    await saturdayPage.locator('#autumnHorseList .bk-autumn-row').nth(1).click();
+    assert.equal(await saturdayPage.locator('#realBuy').isDisabled(),false);
+    await saturdayPage.locator('#realBuy').click();
+    await saturdayPage.getByRole('button',{name:'この内容で購入'}).click();
+    const saturdaySaved=await saturdayPage.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')));
+    assert(saturdaySaved.bets.some(b=>b.raceDate==='2026-11-07'&&b.raceVenue==='京都'&&b.raceNumber===12&&b.status==='pending'),
+      'Full Saturday fixture purchase not saved');
   }finally{await saturdayPage.close()}
   await page.route('**/data/authorized-race-cards.json*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races})}));
   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
