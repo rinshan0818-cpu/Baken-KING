@@ -3,7 +3,9 @@ on:
   push:
     paths:
       - "scripts/jra_card_*.py"
+      - "scripts/race_card_adapter.py"
       - "tests/test_jra_card_*.py"
+      - "tests/test_race_card_adapter.py"
       - ".github/workflows/jra-card-tests.yml"
   workflow_dispatch:
 jobs:
@@ -17,4 +19,4 @@ jobs:
       - name: Install parser dependency
         run: python -m pip install beautifulsoup4
       - name: Run offline tests
-        run: python -m unittest discover -s tests -p 'test_jra_card_*.py' -v
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
