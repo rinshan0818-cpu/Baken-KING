@@ -107,7 +107,7 @@ def main():
     if errors:
         print(json.dumps({"failures":errors}, ensure_ascii=False, indent=2))
     if a.errors_output:
-        a.errors_output.write_text(json.dumps({"failures":errors,"succeeded":data["raceCount"],"requested":len(manifest),"dateMismatchDiagnostics":diagnostics}, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+        a.errors_output.write_text(json.dumps({"failures":errors,"succeeded":data["raceCount"],"requested":len(manifest),"pageDiagnostics":diagnostics}, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     if a.require_complete and (errors or data["raceCount"] != len(manifest)):
         raise SystemExit("Incomplete fetch: output not written")
     a.output.write_text(json.dumps(data, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
