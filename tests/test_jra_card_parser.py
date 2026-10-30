@@ -30,15 +30,15 @@ class CardParserTests(unittest.TestCase):
         </table></body></html>"""
         data = parse_card(html, "2026-10-31", "東京", 5)
         self.assertEqual(data["horses"], [
-            {"number": 1, "name": "架空馬A"},
-            {"number": 2, "name": "架空馬B"}])
+            {"number": 1, "name": "架空馬A", "frame": 1},
+            {"number": 2, "name": "架空馬B", "frame": 2}])
         self.assertEqual(data["raceConditions"]["weightRule"], "馬齢")
 
     def test_multiple_races(self):
         for day,venue,race in [("2026-10-31","東京",3),("2026-11-01","京都",11)]:
             data=parse_card(fixture(day,venue,race),day,venue,race)
             self.assertEqual(data["horseNumbers"],[1,2,3])
-            self.assertEqual(data["horses"][1],{"number":2,"name":"架空馬2"})
+            self.assertEqual(data["horses"][1],{"number":2,"name":"架空馬2","frame":1})
     def test_rowspan_frame_column(self):
         html = fixture().replace(
             '<tr><td>1</td><td>1</td><td><a href="/horse/1">架空馬1</a></td></tr><tr><td>1</td><td>2</td><td><a href="/horse/2">架空馬2</a></td></tr>',
@@ -74,7 +74,7 @@ class CardParserTests(unittest.TestCase):
         <tr><td><img alt="枠1白"></td><td>2</td><td><a href="/horse/b">架空馬B</a></td><td>牡2</td><td>前走 12頭7番</td></tr>
         </table></body></html>"""
         result = parse_card(html, "2026-10-31", "東京", 9)
-        self.assertEqual(result["horses"][0], {"number": 1, "name": "マイスターシューズ"})
+        self.assertEqual(result["horses"][0], {"number": 1, "name": "マイスターシューズ", "frame": 1})
         self.assertEqual(result["horses"][1]["number"], 2)
         self.assertTrue(result["raceConditions"]["isMixed"])
         self.assertEqual(result["raceConditions"]["weightRule"], "馬齢")
