@@ -13,6 +13,9 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 from urllib.request import Request, urlopen
+from urllib.error import URLError
+import ssl
+import socket
 from jra_card_parser import parse_card
 from jra_card_normalizer import normalize_cards
 
@@ -46,14 +49,21 @@ def fetch_cards(manifest, delay=1.5):
             raise ValueError("unapproved_host")
         try:
             req = Request(url, headers={"User-Agent": "BakenKingCardImporter/1.0 (personal research)"})
-            with urlopen(req, timeout=15) as response:
-                final_url = urlparse(response.geturl())
-                if final_url.scheme != "https" or final_url.hostname not in ("jra.jp", "www.jra.go.jp", "sp.jra.jp", "app.jra.jp"):
-                    raise ValueError("redirected_to_unapproved_host:" + (final_url.hostname or "unknown"))
-                html = response.read(3_000_001)
-                if len(html) > 3_000_000:
-                    raise ValueError("response_too_large")
-                declared_charset = response.headers.get_content_charset()
+            for attempt in range(3):
+                try:
+                    with urlopen(req, timeout=20) as response:
+                        final_url = urlparse(response.geturl())
+                        if final_url.scheme != "https" or final_url.hostname not in ("jra.jp", "www.jra.go.jp", "sp.jra.jp", "app.jra.jp"):
+                            raise ValueError("redirected_to_unapproved_host:" + (final_url.hostname or "unknown"))
+                        html = response.read(3_000_001)
+                        if len(html) > 3_000_000:
+                            raise ValueError("response_too_large")
+                        declared_charset = response.headers.get_content_charset()
+                    break
+                except (TimeoutError, socket.timeout, ssl.SSLError, URLError) as exc:
+                    if attempt == 2:
+                        raise
+                    time.sleep(2 * (attempt + 1))
             decoded, charset = decode_jra_html(html, declared_charset)
             try:
                 cards.append(parse_card(decoded, *key))
