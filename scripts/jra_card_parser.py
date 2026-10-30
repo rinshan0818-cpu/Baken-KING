@@ -40,7 +40,7 @@ def parse_race_conditions(text: str) -> dict:
     grade_match = re.search(r"(?:G[ⅠⅡⅢ]|G[123]|リステッド|\\(L\\))", compact)
     grade = grade_match.group(0) if grade_match else None
     surface_match = re.search(r"(?:芝|ダート|障害)\\s*(\\d{3,4})\\s*(?:m|ｍ|メートル)", compact)
-    surface = surface_match.group(0)[:surface_match.group(0).find(surface_match.group(1))] if surface_match else None
+    surface = re.match(r"(?:芝|ダート|障害)",surface_match.group(0)).group(0) if surface_match else None
     distance = int(surface_match.group(1)) if surface_match else None
     return {"restrictions": restrictions, "weightRule": weights[0] if weights else None,
             "isMixed": "混合" in restrictions,
