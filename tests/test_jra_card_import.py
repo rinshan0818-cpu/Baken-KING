@@ -19,6 +19,16 @@ class ImportTests(unittest.TestCase):
             bundle, failures = import_directory(Path(d), "2026-10-31", ["東京", "京都"])
             self.assertFalse(bundle["complete"])
             self.assertEqual(len(failures), 24)
+    def test_cp932_saved_html(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            for race in range(1, 13):
+                (folder / f"東京_{race:02d}.html").write_bytes(
+                    html("東京", race).encode("cp932"))
+            bundle, failures = import_directory(folder, "2026-10-31", ["東京"])
+            self.assertTrue(bundle["complete"])
+            self.assertEqual(failures, [])
+
     def test_all_24_html_complete(self):
         with tempfile.TemporaryDirectory() as d:
             folder=Path(d)
