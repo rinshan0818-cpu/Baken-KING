@@ -1,0 +1,90 @@
+name: Verify 12 JRA cards (private diagnostic)
+on:
+  workflow_dispatch:
+    inputs:
+      race_date:
+        description: 'Date YYYY-MM-DD'
+        default: '2026-11-01'
+        required: true
+        type: string
+      venue:
+        description: 'Target venue'
+        default: '東京'
+        required: true
+        type: string
+      official_seed_url:
+        description: 'Official JRA card URL with links to other races'
+        default: 'https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604111120261101%2FA6'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install beautifulsoup4
+      - name: Discover official links and validate cards (no publication)
+        env:
+          RACE_DATE: ${{ inputs.race_date }}
+          VENUE: ${{ inputs.venue }}
+          SEED_URL: ${{ inputs.official_seed_url }}
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import os,sys
+          from datetime import date
+          from urllib.parse import urlparse
+          sys.path.insert(0,'scripts')
+          from jra_card_parser import VENUES
+          d=date.fromisoformat(os.environ['RACE_DATE'])
+          u=urlparse(os.environ['SEED_URL'])
+          if d.isoformat()!=os.environ['RACE_DATE'] or os.environ['VENUE'] not in VENUES:
+              raise SystemExit('Invalid race date or venue')
+          if u.scheme!='https' or u.hostname not in ('jra.jp','www.jra.go.jp','sp.jra.jp','app.jra.jp') or u.path!='/JRADB/accessD.html':
+              raise SystemExit('Invalid official seed URL')
+          PY
+          python scripts/crawl_jra_cards.py artifacts/discovered.json "$SEED_URL" --date "$RACE_DATE"
+          python - <<'PY'
+          import json,os
+          entries=json.load(open('artifacts/discovered.json'))
+          venue=os.environ['VENUE']
+          target=[e for e in entries if e['venue']==venue]
+          json.dump(target,open('artifacts/manifest.json','w'),ensure_ascii=False)
+          found={e['raceNumber'] for e in target}
+          missing=sorted(set(range(1,13))-found)
+          json.dump({'date':os.environ['RACE_DATE'],'venue':venue,'discovered':len(target),'missingRaceNumbers':missing},open('artifacts/coverage.json','w'),ensure_ascii=False,indent=2)
+          print('Discovered',len(target),'of 12',venue,'races; missing:',missing)
+          if not target:
+              raise SystemExit('No official card links for selected venue')
+          PY
+          python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json --errors-output artifacts/fetch-errors.json
+          python - <<'PY'
+          import json,os
+          coverage=json.load(open('artifacts/coverage.json'))
+          errors=json.load(open('artifacts/fetch-errors.json'))
+          count=errors['succeeded']
+          report={'date':os.environ['RACE_DATE'],'venue':os.environ['VENUE'],'discovered':coverage['discovered'],'parsed':count,'missingRaceNumbers':coverage['missingRaceNumbers'],'failures':errors['failures']}
+          if os.path.exists('artifacts/parsed.json'):
+              races=json.load(open('artifacts/parsed.json'))['races']
+              report['missingRequiredFields']=[{'raceNumber':r['raceNumber'],'horseCount':len(r['horses']),'missingFrames':sum('frame' not in h for h in r['horses']),'missingStart':not bool(r.get('scheduledStartAt'))} for r in races if any('frame' not in h for h in r['horses']) or not r.get('scheduledStartAt')]
+          json.dump(report,open('artifacts/summary.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps(report,ensure_ascii=False))
+          if count!=12 or report['missingRequiredFields'] or report['failures']:
+              raise SystemExit('Not all 12 cards validated; see summary artifact')
+          PY
+      - name: Remove raw race records before artifact upload
+        if: always()
+        run: rm -f artifacts/discovered.json artifacts/manifest.json artifacts/parsed.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: twelve-card-private-diagnostics
+          path: artifacts/
+          retention-days: 1
+          if-no-files-found: warn
