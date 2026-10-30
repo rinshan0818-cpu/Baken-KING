@@ -66,6 +66,16 @@ jobs:
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/baken-private-server.log 2>&1 &
           sleep 2
           BAKEN_PRIVATE_CARDS_PATH=private-saturday-cards.json node tests/browser_smoke.cjs
+      - name: Upload private browser diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-browser-diagnostics
+          path: |
+            /tmp/baken-private-server.log
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 1
       - name: Record weekly ingestion status
         run: |
           python - <<'PY'
