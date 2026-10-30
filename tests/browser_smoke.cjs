@@ -5,6 +5,7 @@ const fs=require('node:fs');
  const browser=await chromium.launch();
  try{
   const page=await browser.newPage();
+  await page.clock.install({time:new Date('2026-10-30T00:00:00Z')});
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
   const horses=Array.from({length:8},(_,i)=>({number:i+1,name:'テスト馬'+(i+1),frame:i+1}));
@@ -33,6 +34,7 @@ const fs=require('node:fs');
       Array.from({length:12},(_,i)=>i+1),'Venue must have races 1-12');
   }
   const saturdayPage=await browser.newPage();
+  await saturdayPage.clock.install({time:new Date('2026-10-30T00:00:00Z')});
   try{
     await saturdayPage.route('**/data/authorized-race-cards.json*',route=>
       route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races:fullSaturday})}));
