@@ -160,7 +160,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         raise ValueError("unmatched_cancelled_horse:" + repr(cancelled))
     if not all(names) or len(set(names)) != len(names):
         raise ValueError("horse_names_missing_or_duplicate")
-    horses = [{"number": number, "name": name, "scratched": name in cancelled} for number, name in sorted(zip(best, names))]
+    horses = [{"number": number, "name": name, **({"scratched": True} if name in cancelled else {})} for number, name in sorted(zip(best, names))]
     return {"date":day,"venue":venue,"raceNumber":race_number,
             "horseNumbers":best,
             "horseNames":[horse["name"] for horse in horses],
