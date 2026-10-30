@@ -19,6 +19,11 @@ class HeaderConditionTests(unittest.TestCase):
         self.assertEqual(r["grade"],"GⅢ")
         self.assertEqual(r["weightRule"],"別定")
         self.assertEqual(r["surface"],"ダート")
+    def test_listed_and_age(self):
+        r=parse_race_conditions("3歳以上 オープン (L) 定量 芝1400m")
+        self.assertEqual(r["grade"],"(L)")
+        self.assertEqual(r["ageCondition"],"3歳以上")
+        self.assertEqual(r["distanceMeters"],1400)
     def test_no_guessed_values(self):
         r=parse_race_conditions("2歳 新馬 馬齢")
         self.assertNotIn("distanceMeters",r)
