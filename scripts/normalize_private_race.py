@@ -40,6 +40,17 @@ def normalize_race(record):
         raise ValueError("empty_card")
     if len(horses)>18:
         raise ValueError("too_many_horses")
+    conditions=record.get("raceConditions")
+    if conditions is not None:
+        if not isinstance(conditions,dict):
+            raise ValueError("invalid_race_conditions")
+        weight=conditions.get("weightRule")
+        if weight not in (None,"ハンデ","別定","定量","馬齢"):
+            raise ValueError("invalid_weight_rule")
+        restrictions=conditions.get("restrictions",[])
+        if not isinstance(restrictions,list) or any(not isinstance(x,str) or not x.strip() for x in restrictions):
+            raise ValueError("invalid_restrictions")
+        conditions={"weightRule":weight,"restrictions":restrictions}
     result = record.get("result")
     if result is not None:
         if result.get("status")!="official-final":
@@ -74,6 +85,7 @@ def normalize_race(record):
             "upstreamRaceId":str(record["upstreamRaceId"]),
             "horses":sorted(horses,key=lambda h:h["number"]),
             "source":{"kind":"user-provided","label":record.get("sourceLabel","Private provider export")},
+            **({"raceConditions":conditions} if conditions is not None else {}),
             **({"result":result} if result is not None else {})}
 
 def payout_for_ticket(ticket, result):
