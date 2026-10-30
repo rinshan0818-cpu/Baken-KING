@@ -51,6 +51,10 @@ const fs=require('node:fs');
   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')));
   assert(saved.bets.some(b=>b.raceDate==='2026-11-08'&&b.raceVenue==='東京'&&b.raceNumber===3&&b.status==='pending'),'Purchase not saved');
   assert.equal(saved.bets.filter(b=>b.raceDate==='2026-11-08'&&b.raceVenue==='東京'&&b.raceNumber===3).length,1,'Exactly one ticket should be saved');
+  const unknownTime={date:'2026-11-09',venue:'東京',raceNumber:4,horses};
+  await page.evaluate(race=>window.dispatchEvent(new CustomEvent('baken:race-selected',{detail:{race:{...race,numbersConfirmed:true,title:'時刻未設定テスト'}}})),unknownTime);
+  await page.locator('#realBuy').click();
+  assert.match(await page.locator('#realMessage').innerText(),/発走予定時刻を過ぎたため購入できません/);
   assert.deepEqual(errors,[]);
   console.log('PASS: race selection and virtual purchase persistence');
  }finally{await browser.close()}
