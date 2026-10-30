@@ -9,6 +9,15 @@ from pathlib import Path
 from jra_card_parser import parse_card
 from jra_card_normalizer import normalize_cards
 
+def decode_jra_html(raw):
+    """Decode JRA HTML files saved in UTF-8 or Japanese legacy encodings."""
+    for encoding in ("utf-8-sig", "cp932", "euc_jp"):
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    raise ValueError("html_encoding_unsupported")
+
 def import_directory(directory, day, venues):
     parsed, failures = [], []
     for venue in venues:
@@ -18,7 +27,7 @@ def import_directory(directory, day, venues):
                 failures.append({"venue": venue, "raceNumber": race, "error": "html_missing"})
                 continue
             try:
-                parsed.append(parse_card(path.read_text(encoding="utf-8"), day, venue, race))
+                parsed.append(parse_card(decode_jra_html(path.read_bytes()), day, venue, race))
             except (ValueError, UnicodeError) as exc:
                 failures.append({"venue": venue, "raceNumber": race, "error": str(exc)})
     bundle = normalize_cards(parsed, day, venues)
