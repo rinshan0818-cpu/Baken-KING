@@ -25,12 +25,13 @@ jobs:
       - name: Test parsers and import pipeline
         run: python -m unittest discover -s tests -p 'test_*.py'
       - name: Discover and fetch official cards (manual only)
-        if: github.event_name == 'workflow_dispatch' && inputs.official_index_url != ''
+        if: github.event_name == 'workflow_dispatch'
         env:
           JRA_INDEX_URL: ${{ inputs.official_index_url }}
         run: |
           mkdir -p artifacts
-          python scripts/discover_jra_urls.py "$JRA_INDEX_URL" artifacts/manifest.json || true
+          python scripts/crawl_jra_cards.py artifacts/manifest.json "https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0105202604100120261031%2F3B" "https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0108202604100120261031%2FDF" \
+            \${JRA_INDEX_URL:+"$JRA_INDEX_URL"} || true
           if [ -s artifacts/manifest.json ]; then
             python scripts/fetch_jra_cards.py artifacts/manifest.json artifacts/parsed.json
           fi
