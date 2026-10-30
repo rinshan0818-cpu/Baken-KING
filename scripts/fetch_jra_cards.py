@@ -18,8 +18,8 @@ from jra_card_normalizer import normalize_cards
 
 def fetch_cards(manifest, delay=1.5):
     cards, errors, diagnostics = [], [], []
-    if not isinstance(manifest, list) or len(manifest) > 24:
-        raise ValueError("manifest_must_be_list_of_at_most_24")
+    if not isinstance(manifest, list) or len(manifest) > 36:
+        raise ValueError("manifest_must_be_list_of_at_most_36")
     seen = set()
     for item in manifest:
         key = (item["date"], item["venue"], item["raceNumber"])
