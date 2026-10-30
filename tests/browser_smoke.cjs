@@ -22,7 +22,16 @@ const assert=require('node:assert/strict');
   assert.equal(await page.locator('#weekRace').inputValue(),'2');
   await page.locator('#weekDate').selectOption('2026-11-08');
   assert.equal(await page.locator('#weekRace').inputValue(),'3');
+  await page.locator('#realBetType').selectOption('馬連');
+  await page.locator('#realBetMode').selectOption('normal');
+  await page.locator('#autumnHorseList .bk-autumn-row').nth(0).click();
+  await page.locator('#autumnHorseList .bk-autumn-row').nth(1).click();
+  assert.equal(await page.locator('#realBuy').isDisabled(),false);
+  await page.locator('#realBuy').click();
+  await page.getByRole('button',{name:'この内容で購入'}).click();
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')));
+  assert(saved.bets.some(b=>b.raceDate==='2026-11-08'&&b.raceVenue==='東京'&&b.raceNumber===3&&b.status==='pending'),'Purchase not saved');
   assert.deepEqual(errors,[]);
-  console.log('PASS: race selection browser smoke');
+  console.log('PASS: race selection and virtual purchase persistence');
  }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exitCode=1});
