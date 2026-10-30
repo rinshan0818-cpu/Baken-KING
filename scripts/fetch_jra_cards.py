@@ -78,6 +78,33 @@ def fetch_cards(manifest, delay=1.5):
                                         "raceNumber":key[2],
                                         "issue":"horse_numbers_not_contiguous",
                                         "matchingRows":rows[:35]})
+                if str(exc).startswith("horse_numbers_not_contiguous"):
+                    from bs4 import BeautifulSoup
+                    page = BeautifulSoup(decoded, "html.parser")
+                    cancelled_row_structure = []
+                    for tr in page.find_all("tr"):
+                        cells = tr.find_all(["td", "th"], recursive=False)
+                        if not cells:
+                            continue
+                        texts = [cell.get_text(" ", strip=True) for cell in cells]
+                        if any(t.strip() == "取消" for t in texts[:3]):
+                            cancelled_row_structure.append({
+                                "rowAttributes": {k: str(v)[:90] for k, v in tr.attrs.items() if k in ("id", "class", "data-umaban", "data-horse-number")},
+                                "firstCellAttributes": [
+                                    {k: str(v)[:90] for k, v in cell.attrs.items() if k in ("id", "class", "data-umaban", "data-horse-number", "title")}
+                                    for cell in cells[:3]
+                                ],
+                                "firstCellImageAlts": [
+                                    [im.get("alt", "")[:50] for im in cell.find_all("img")[:3]]
+                                    for cell in cells[:3]
+                                ],
+                                "numberColumnText": texts[1][:20] if len(texts) > 1 else "",
+                            })
+                    diagnostics.append({
+                        "date": key[0], "venue": key[1], "raceNumber": key[2],
+                        "issue": "cancelled_horse_number_hidden",
+                        "cancelledRowStructure": cancelled_row_structure[:4],
+                    })
                 if str(exc) == "horse_number_table_missing":
                     from bs4 import BeautifulSoup
                     from hashlib import sha256
