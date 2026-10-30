@@ -12,7 +12,7 @@ on:
         required: false
         type: string
 permissions:
-  contents: read
+  contents: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -36,6 +36,37 @@ jobs:
           fi
           if [ -s artifacts/parsed.json ]; then
             python scripts/merge_verified_cards.py data/race-catalog-2026-10-31.json artifacts/parsed.json artifacts/merged-catalog.json || true
+          fi
+      - name: Publish validated race cards to app catalog
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          parsed = Path("artifacts/parsed.json")
+          merged = Path("artifacts/merged-catalog.json")
+          if not parsed.exists() or not merged.exists():
+              raise SystemExit("No parsed/merged catalog; refusing to publish")
+          count = json.loads(parsed.read_text(encoding="utf-8")).get("raceCount", 0)
+          if count < 23:
+              raise SystemExit(f"Only {count} races validated; refusing to publish")
+          catalog = json.loads(merged.read_text(encoding="utf-8"))
+          expected = {(venue, race) for venue in ("東京", "京都") for race in range(1, 13)}
+          confirmed = {(r["venue"], r["raceNumber"]) for r in catalog["races"]
+                       if r["date"] == "2026-10-31" and r.get("numbersConfirmed")
+                       and r.get("horses")}
+          if len(confirmed & expected) < 23:
+              raise SystemExit("Catalog confirmation count does not match; refusing to publish")
+          Path("data/race-catalog-2026-10-31.json").write_text(
+              json.dumps(catalog, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+          print(f"Publishing {len(confirmed & expected)} confirmed race cards")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/race-catalog-2026-10-31.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Import validated JRA race cards for 2026-10-31"
+            git push
           fi
       - uses: actions/upload-artifact@v4
         with:
