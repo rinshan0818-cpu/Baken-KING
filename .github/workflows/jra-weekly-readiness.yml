@@ -42,5 +42,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: weekly-jra-readiness
-          path: |\n            readiness.json\n            upcoming-discovery.json
+          path: |
+            readiness.json
+            upcoming-discovery.json
           retention-days: 7
