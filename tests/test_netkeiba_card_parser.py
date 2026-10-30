@@ -31,6 +31,23 @@ class NetkeibaCardParserTests(unittest.TestCase):
     def test_reject_duplicate(self):
         with self.assertRaises(ValueError):
             parse_netkeiba_card(HTML.replace('class="Umaban">2', 'class="Umaban">1'), "2026-10-31", "東京", 1)
+    def test_horse_number_name_pairs(self):
+        card = parse_netkeiba_card(HTML, "2026-10-31", "東京", 1)
+        self.assertEqual(card["horses"], [
+            {"number": 1, "name": "サンプルA"},
+            {"number": 2, "name": "サンプルB"},
+        ])
+
+    def test_missing_horse_number(self):
+        html = HTML.replace('class="Umaban">2', 'class="Umaban">3')
+        with self.assertRaisesRegex(ValueError, "invalid_horse_numbers"):
+            parse_netkeiba_card(html, "2026-10-31", "東京", 1)
+
+    def test_duplicate_horse_name(self):
+        html = HTML.replace("サンプルB", "サンプルA")
+        with self.assertRaisesRegex(ValueError, "duplicate_horse_names"):
+            parse_netkeiba_card(html, "2026-10-31", "東京", 1)
+
     def test_missing_rows(self):
         with self.assertRaises(ValueError):
             parse_netkeiba_card("<html></html>", "2026-10-31", "東京", 1)
