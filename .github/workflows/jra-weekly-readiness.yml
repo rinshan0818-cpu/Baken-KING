@@ -52,7 +52,7 @@ jobs:
               print("Private fixture",day,"races",len(subset),"venues",dict(counts))
               missing_times=[(c["venue"],c["raceNumber"]) for c in subset if not c.get("scheduledStartAt")]
               print("Missing scheduled start times:",len(missing_times))
-              if len(subset)==24 and sorted(counts.values())==[12,12] and not missing_times:
+              if day=="2026-10-31" and len(subset)==24 and sorted(counts.values())==[12,12] and not missing_times:
                   with open("private-saturday-cards.json","w",encoding="utf-8") as out:
                       json.dump({"races":subset},out,ensure_ascii=False)
                   print("COMPLETE PRIVATE SATURDAY FIXTURE")
@@ -60,14 +60,15 @@ jobs:
       - name: Browser-check complete private Saturday fixture
         run: |
           if [ ! -f private-saturday-cards.json ]; then
-            echo "No complete 24-race fixture; skipping browser purchase test."
-            exit 0
+            echo "::error::No complete 24-race fixture; real-card browser test was NOT executed."
+            exit 1
           fi
           npm install --no-save playwright@1.58.2
           npx playwright install --with-deps chromium
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/baken-private-server.log 2>&1 &
           sleep 2
           BAKEN_PRIVATE_CARDS_PATH=private-saturday-cards.json node tests/browser_smoke.cjs
+          echo "PRIVATE_REAL_CARD_PURCHASE_TEST_PASSED"
       - name: Upload private browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
