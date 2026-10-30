@@ -25,7 +25,6 @@ jobs:
       - name: Test parsers and import pipeline
         run: python -m unittest discover -s tests -p 'test_*.py'
       - name: Discover and fetch official cards (manual only)
-        if: github.event_name == 'workflow_dispatch'
         env:
           JRA_INDEX_URL: ${{ inputs.official_index_url }}
         run: |
@@ -39,7 +38,6 @@ jobs:
             python scripts/merge_verified_cards.py data/race-catalog-2026-10-31.json artifacts/parsed.json artifacts/merged-catalog.json || true
           fi
       - uses: actions/upload-artifact@v4
-        if: github.event_name == 'workflow_dispatch'
         with:
           name: jra-cards-validation
           path: artifacts/
