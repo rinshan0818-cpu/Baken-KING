@@ -23,7 +23,7 @@ def merge_catalog(catalog, parsed_cards):
             if existing != incoming:
                 raise ValueError("confirmed_card_conflict:" + repr(key))
         entry["horses"] = [
-            {"number": h["number"], "name": h["name"], "frame": None, "scratched": h.get("scratched", False)}
+            {"number": h["number"], "name": h["name"], "frame": None, **({"scratched": True} if h.get("scratched") is True else {})}
             for h in card["horses"]
         ]
         entry["numbersConfirmed"] = True
