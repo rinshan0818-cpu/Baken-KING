@@ -16,6 +16,7 @@ const assert=require('node:assert/strict');
   await page.route('**/data/authorized-race-cards.json*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races})}));
   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.BakenImportedCards?.length===3);
+  await page.locator('[data-nav="predict"]').click();
   assert.equal(await page.locator('#weekDate option').count(),2);
   assert.equal(await page.locator('#weekVenue option').count(),2);
   assert.equal(await page.locator('#autumnFixtureCard').isVisible(),true);
