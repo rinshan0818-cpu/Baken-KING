@@ -99,6 +99,21 @@ def fetch_cards(manifest, delay=1.5):
                         "visibleTextSample": visible[:180],
                         "tableHeaders": table_headers[:8],
                         "tableCount": len(page.find_all("table")),
+                        "firstTableRows": [
+                            {
+                                "cellTags": [cell.name for cell in tr.find_all(["th", "td"], recursive=False)[:10]],
+                                "cellCount": len(tr.find_all(["th", "td"], recursive=False)),
+                                "rowClass": tr.get("class", [])[:4],
+                                "spans": [{"colspan": cell.get("colspan"), "rowspan": cell.get("rowspan")}
+                                          for cell in tr.find_all(["th", "td"], recursive=False)[:10]],
+                                "numberCandidates": [
+                                    cell.get_text(" ", strip=True)[:12]
+                                    for cell in tr.find_all(["th", "td"], recursive=False)[:4]
+                                    if cell.get_text(" ", strip=True).isdigit()
+                                ],
+                            }
+                            for tr in (page.find("table").find_all("tr")[:6] if page.find("table") else [])
+                        ],
                     })
                 if str(exc) == "card_date_mismatch":
                     from bs4 import BeautifulSoup
