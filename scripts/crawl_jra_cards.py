@@ -30,7 +30,8 @@ def crawl(seeds, day="2026-10-31", max_pages=75):
                 raw = res.read(3_000_001)
                 if len(raw) > 3_000_000:
                     raise ValueError("response_too_large")
-                html = raw.decode(res.headers.get_content_charset() or "utf-8", errors="replace")
+                from fetch_jra_cards import decode_jra_html
+                html, _ = decode_jra_html(raw, res.headers.get_content_charset())
             for entry in discover(html, url, day):
                 key = entry["date"], entry["venue"], entry["raceNumber"]
                 races.setdefault(key, entry)
