@@ -21,6 +21,19 @@ class CardParserTests(unittest.TestCase):
         self.assertTrue(parse_race_conditions("（混合）［指定］ 定量")["isMixed"])
         self.assertIsNone(parse_race_conditions("2歳未勝利")["weightRule"])
 
+    def test_horse_name_without_link_and_prior_race_numbers(self):
+        html = """<html><body>2026年10月31日 4回東京10日 5R
+        2歳 新馬 [指定] 馬齢
+        <table><tr><th>枠</th><th>馬番</th><th>馬名 / 性齢</th><th>前走</th></tr>
+        <tr><td>1</td><td>1</td><td>架空馬A<br>牝2</td><td>前走 12番</td></tr>
+        <tr><td>2</td><td>2</td><td>架空馬B<br>牡2</td><td>前走 3番</td></tr>
+        </table></body></html>"""
+        data = parse_card(html, "2026-10-31", "東京", 5)
+        self.assertEqual(data["horses"], [
+            {"number": 1, "name": "架空馬A"},
+            {"number": 2, "name": "架空馬B"}])
+        self.assertEqual(data["raceConditions"]["weightRule"], "馬齢")
+
     def test_multiple_races(self):
         for day,venue,race in [("2026-10-31","東京",3),("2026-11-01","京都",11)]:
             data=parse_card(fixture(day,venue,race),day,venue,race)
