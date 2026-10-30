@@ -55,10 +55,20 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
             raise ValueError("invalid_surface")
         if "distanceMeters" in optional and (type(optional["distanceMeters"]) is not int or not 100<=optional["distanceMeters"]<=5000):
             raise ValueError("invalid_distance")
+        for horse in horses:
+            if "frame" in horse and (type(horse["frame"]) is not int or not 1 <= horse["frame"] <= 8):
+                raise ValueError("invalid_frame")
+        start = card.get("scheduledStartAt")
+        if start is not None:
+            from datetime import datetime
+            parsed = datetime.fromisoformat(start)
+            if parsed.utcoffset() is None or parsed.utcoffset().total_seconds() != 9*3600 or parsed.date().isoformat() != day:
+                raise ValueError("invalid_scheduled_start")
         output.append({
             "date": day, "venue": venue, "raceNumber": race,
-            "horses": sorted(({"number": h["number"], "name": h["name"].strip(), **({"scratched": True} if h.get("scratched") is True else {})} for h in horses), key=lambda h: h["number"]),
+            "horses": sorted(({"number": h["number"], "name": h["name"].strip(), **({"frame":h["frame"]} if "frame" in h else {}), **({"scratched": True} if h.get("scratched") is True else {})} for h in horses), key=lambda h: h["number"]),
             "horseCount": len(horses),
+            **({"scheduledStartAt":start} if start else {}),
             "raceConditions": {"restrictions": restrictions, "weightRule": rule,
                 "isMixed": "混合" in restrictions,
                 "isFemaleOnly": "牝馬限定" in restrictions,
