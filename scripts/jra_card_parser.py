@@ -106,6 +106,7 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
         if header_index is None:
             continue
         numbers, horse_names, cancelled_names, frames = [], [], [], {}
+        unnumbered_cancelled = []
         # Expand rowspans so a shared frame-number cell cannot shift the horse-number column.
         pending = {}
         for tr in rows[header_index + 1:]:
@@ -151,6 +152,13 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
                 alt = image.get("alt", "").strip() if image else ""
                 match = re.fullmatch(r"(?:馬番)?\s*(\d{1,2})\s*(?:番)?", alt)
                 if match is None:
+                    if is_cancelled:
+                        name_cell = expanded[name_col]
+                        name_span = name_cell.select_one(".bamei")
+                        link = name_span or name_cell.find("a")
+                        cancelled_name = link.get_text(" ", strip=True).strip() if link else next(iter(name_cell.stripped_strings), "")
+                        if cancelled_name:
+                            unnumbered_cancelled.append(cancelled_name)
                     continue
                 raw_number = match.group(1)
             number = int(raw_number)
@@ -180,25 +188,29 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
             if is_cancelled:
                 cancelled_names.append(horse_name)
         if len(numbers) >= 2:
-            candidates.append((numbers, horse_names, cancelled_names, frames))
+            candidates.append((numbers, horse_names, cancelled_names, frames, unnumbered_cancelled))
     if not candidates:
         raise ValueError("horse_number_table_missing")
     candidates.sort(key=lambda item: len(item[0]), reverse=True)
-    best, names, cancelled, frames = candidates[0]
+    best, names, cancelled, frames, unnumbered_cancelled = candidates[0]
     if len(best) != len(set(best)) or len(best) > 18:
         raise ValueError("horse_number_duplicate_or_excess")
     if len(candidates) > 1 and len(candidates[1][0]) == len(best) and candidates[1][0] != best:
         raise ValueError("ambiguous_horse_number_tables")
     missing = sorted(set(range(1, max(best) + 1)) - set(best))
-    if missing:
+    if missing and (len(missing) != len(unnumbered_cancelled) or not unnumbered_cancelled):
         raise ValueError("horse_numbers_not_contiguous:" + repr(sorted(best)))
     if not all(names) or len(set(names)) != len(names):
         raise ValueError("horse_names_missing_or_duplicate")
     horses = [{"number": number, "name": name, **({"frame": frames[number]} if number in frames else {}), **({"scratched": True} if name in cancelled else {})} for number, name in sorted(zip(best, names))]
+    # Do not assign a guessed number to a cancelled horse whose number is hidden.
+    # The missing numbers are unavailable for selection, but cannot be associated
+    # with a name unless the official source supplies that association.
     return {"date":day,"venue":venue,"raceNumber":race_number,
             "horseNumbers":best,
             "horseNames":[horse["name"] for horse in horses],
             "horses":horses,
+            **({"unresolvedCancelledHorses": unnumbered_cancelled, "unavailableHorseNumbers": missing} if missing else {}),
             "raceConditions":conditions,"horseNumberCount":len(best),
             **({"scheduledStartAt":scheduled_start} if scheduled_start else {}),
             "status":"parsed-not-authorized-for-publication"}
