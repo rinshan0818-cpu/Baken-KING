@@ -9,25 +9,32 @@ from fetch_jra_cards import fetch_cards
 def main():
     report_path = Path(sys.argv[1])
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    seeds = json.loads(Path(str(report_path) + ".seeds.json").read_text(encoding="utf-8"))
-    summary = {"date": report["date"], "seedCount": len(seeds),
-               "discovered": 0, "parsed": 0, "failures": [],
-               "status": "no_official_seed" if not seeds else "pending"}
-    if seeds:
-        # Bounded crawl of verified official links; no CNAME guessing.
-        entries, crawl_errors = crawl(seeds[:3], day=report["date"], max_pages=45)
-        entries = [e for e in entries if e["date"] == report["date"]]
-        summary["discovered"] = len(entries)
-        summary["venues"] = sorted({e["venue"] for e in entries})
-        if entries:
-            cards, failures, diagnostics = fetch_cards(entries)
-            summary["parsed"] = cards["raceCount"]
-            summary["failures"] = [
-                {"venue": f["venue"], "raceNumber": f["raceNumber"],
-                 "error": f["error"][:120]} for f in failures
-            ]
-        summary["crawlErrorCount"] = len(crawl_errors)
-        summary["status"] = "complete" if entries and not summary["failures"] and not crawl_errors else "partial"
+    seeds_by_date = json.loads(Path(str(report_path) + ".seeds.json").read_text(encoding="utf-8"))
+    daily = []
+    for date_report in report["dates"]:
+        day = date_report["date"]
+        seeds = seeds_by_date.get(day, [])
+        summary = {"date": day, "seedCount": len(seeds),
+                   "discovered": 0, "parsed": 0, "failures": [],
+                   "status": "no_official_seed" if not seeds else "pending"}
+        if seeds:
+            entries, crawl_errors = crawl(seeds[:3], day=day, max_pages=45)
+            entries = [e for e in entries if e["date"] == day]
+            summary["discovered"] = len(entries)
+            summary["venues"] = sorted({e["venue"] for e in entries})
+            if entries:
+                cards, failures, _ = fetch_cards(entries)
+                summary["parsed"] = cards["raceCount"]
+                summary["failures"] = [
+                    {"venue": f["venue"], "raceNumber": f["raceNumber"],
+                     "error": f["error"][:120]} for f in failures
+                ]
+            summary["crawlErrorCount"] = len(crawl_errors)
+            summary["status"] = "complete" if entries and not summary["failures"] and not crawl_errors else "partial"
+        daily.append(summary)
+    summary = {"dates": daily, "discovered": sum(d["discovered"] for d in daily),
+               "parsed": sum(d["parsed"] for d in daily),
+               "venues": sorted({v for d in daily for v in d.get("venues", [])})}
     Path("upcoming-card-validation.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False))
