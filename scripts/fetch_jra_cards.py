@@ -8,6 +8,7 @@ Manifest: [{"date":"2026-10-31","venue":"東京","raceNumber":1,"url":"https://s
 """
 import argparse
 import json
+import re
 import time
 from pathlib import Path
 from urllib.parse import urlparse
@@ -37,8 +38,23 @@ def fetch_cards(manifest, delay=1.5):
                 html = response.read(3_000_001)
                 if len(html) > 3_000_000:
                     raise ValueError("response_too_large")
-                charset = response.headers.get_content_charset() or "utf-8"
-            decoded = html.decode(charset, errors="replace")
+                declared_charset = response.headers.get_content_charset()
+            # JRA's JRADB pages commonly use Shift_JIS/Windows-31J without an
+            # HTTP charset. Inspect HTML's own declaration before falling back.
+            head = html[:8192]
+            meta = re.search(rb'<meta[^>]+charset\\s*=\\s*["\\']?([a-zA-Z0-9_-]+)', head, re.I)
+            charset = declared_charset or (meta.group(1).decode("ascii") if meta else None)
+            if charset:
+                if charset.lower().replace("_", "-") in ("shift-jis", "shift_jis", "sjis", "windows-31j", "x-sjis"):
+                    charset = "cp932"
+                decoded = html.decode(charset, errors="strict")
+            else:
+                try:
+                    decoded = html.decode("utf-8", errors="strict")
+                    charset = "utf-8"
+                except UnicodeDecodeError:
+                    decoded = html.decode("cp932", errors="strict")
+                    charset = "cp932"
             try:
                 cards.append(parse_card(decoded, *key))
             except ValueError as exc:
