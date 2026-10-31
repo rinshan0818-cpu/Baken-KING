@@ -1,0 +1,39 @@
+name: Validate Baken-KING JavaScript
+on:
+  push:
+    paths:
+      - 'index.html'
+      - '*.js'
+      - 'scripts/**'
+      - '.github/workflows/validate-js.yml'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check standalone JavaScript files
+        run: |
+          find . -path './.git' -prune -o -name '*.js' -type f -print0 | xargs -0 -r -n 1 node --check
+      - name: Check inline JavaScript in HTML
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const vm=require('vm');
+          const html=fs.readFileSync('index.html','utf8');
+          const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)];
+          let checked=0;
+          for(const [,attrs,body] of scripts){
+            if(/\bsrc\s*=/.test(attrs)||!body.trim()||/\btype\s*=\s*["'](?:application\/json|importmap)["']/.test(attrs))continue;
+            try{new vm.Script(body,{filename:'index.html:inline-'+(++checked)});}
+            catch(e){console.error(e.stack);process.exitCode=1;}
+          }
+          if(!checked){console.error('No inline scripts found');process.exitCode=1;}
+          console.log('Checked '+checked+' inline scripts');
+          NODE
