@@ -5,16 +5,8 @@
  'use strict';
  const SETTINGS='baken-monitor-sync-config-v1';
  const status=document.getElementById('bkCardImportStatus');
- const settingsPanel=document.querySelector('[data-tab="settings"]');
- const probe=document.createElement('section');
- probe.className='card';probe.style.marginTop='16px';
- const heading=document.createElement('h3');heading.textContent='出馬表の自動取得';
- const message=document.createElement('p');message.className='muted';
- message.textContent='接続設定を確認しています。';
- const check=document.createElement('button');
- check.type='button';check.className='outline';check.textContent='出馬表の接続を確認';
- probe.append(heading,message,check);
- if(settingsPanel)settingsPanel.append(probe);
+ const message=document.getElementById('bkPrivateCardMessage');
+ const check=document.getElementById('bkPrivateCardCheck');
  let loading=false,lastSignature='';
  function config(){try{return JSON.parse(localStorage.getItem(SETTINGS)||'null')}catch{return null}}
  async function refresh(){
@@ -45,7 +37,7 @@
      }
      if(!response.ok){
        const detail=await response.json().catch(()=>({}));
-       throw Error('HTTP '+response.status+(detail.error?' / '+String(detail.error).slice(0,90):''));
+       throw Error('HTTP '+response.status+(detail.stage?' / 処理段階: '+String(detail.stage).slice(0,50):'')+(detail.error?' / '+String(detail.error).slice(0,60):''));
      }
      const document=await response.json();
      const races=Array.isArray(document?.races)?document.races:[];
