@@ -65,9 +65,24 @@
      sync(true);
    }catch(e){status.textContent='有効化できません：'+e.message}
  };
- off.onclick=()=>{
-   localStorage.removeItem(SETTINGS);token.value='';lastFingerprint='';
-   status.textContent='この端末からの送信を停止しました。サーバー側の既存対象は自動削除されません。';
+ off.onclick=async()=>{
+   const c=config();
+   if(!c?.enabled){status.textContent='自動同期は停止しています。';return}
+   if(inflight){status.textContent='同期処理中です。完了後にもう一度停止してください。';return}
+   inflight=true;off.disabled=true;
+   status.textContent='サーバー側の監視対象を解除中…';
+   try{
+     const response=await fetch(c.endpoint,{method:'POST',mode:'cors',cache:'no-store',
+       headers:{'Content-Type':'application/json',Authorization:'Bearer '+c.token},
+       body:JSON.stringify({schemaVersion:1,kind:'baken-monitor-targets',targets:[]})});
+     if(!response.ok)throw Error('HTTP '+response.status);
+     const data=await response.json();
+     if(data.ok!==true||data.registered!==0)throw Error('解除の受付確認が一致しません');
+     localStorage.removeItem(SETTINGS);token.value='';lastFingerprint='';
+     status.textContent='サーバー側の監視対象を解除し、自動同期を停止しました。';
+   }catch(e){
+     status.textContent='監視対象の解除に失敗しました：'+e.message+'。接続設定は保持しています。';
+   }finally{inflight=false;off.disabled=false}
  };
  check.onclick=()=>{if(!config()?.enabled){status.textContent='先に接続設定を有効化してください';return}sync(true)};
  const label1=document.createElement('p');label1.className='muted';label1.textContent='中継APIのURL';
