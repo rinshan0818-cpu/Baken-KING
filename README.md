@@ -1,5 +1,37 @@
 # 🏇 Baken-KING
 
+## 2026-11-01 最新引き継ぎ：出馬表の自動取得・配信を実機で確認（旧記述より優先）
+
+**判定：出馬表機能の開発は一区切り（取得→非公開一時保存→認証付き配信→iPhone表示の実証成功）。ただし定期トリガーによる無人運用は未検証であり、「毎週の完全自動運用が安定稼働」とはまだ言わない。**
+
+### 実機で確認できた事実
+- 2026-11-01（日）、Private repo の Actions `Personal race-card import` を**手動実行**して成功。ログ上は東京・京都 **24/24レース**発見・解析、解析失敗0、出馬表検証成功、`personal-race-cards` Actions成果物保存成功（保持1日）。
+- iPhoneのBaken-KINGで**JSONファイルを手動選択せず**に、11/1東京11Rなど実際の馬番・馬名を表示。出馬表の自動受信経路が実機で通ったことを確認。
+- 最初にVercel APIの `GET /api/race-cards` が HTTP 503。Vercel実行ログから原因は `actions_list / GitHub Actions list HTTP 403` と特定。Private repo限定のGitHub fine-grained PATに `Actions: Read-only` を追加し、既存 `Contents: Read and write` と `Metadata: Read-only` を維持したところ、iPhoneで実データが表示された。
+- **2026-11-01 8:00の定期トリガーは起動を確認できず**。ワークフローへのスケジュール登録と修正が当日の7:52〜7:55 JSTで、直後だったことや毎時0分のActions遅延・欠落が原因候補だが、GitHub内部の確定原因は不明。手動実行は8:15 JST頃に成功。
+- 次回 **2026-11-07（土）・11-08（日）** に `Scheduled` イベントで起動するかを確認。毎時0分に起動しない場合、6:05などへ変更検討。
+
+### 現行の出馬表フロー（2026-11-01確定）
+1. Private repo `.github/workflows/personal-race-import.yml`: 土日**日本時間 06:00 / 06:30 / 07:00**の3回を予定。GitHub Actions cronはUTCで設定し、実行時に対象日をJSTで算出。 `workflow_dispatch` の手動実行も可能（入力日付が空なら実行当日のJST）。
+2. `scripts/discover_upcoming_jra.py` → `scripts/validate_upcoming_cards.py` → `scripts/check_personal_json.py`。解析失敗や部分的な取得を検出した場合は配信用成果物を公開しない。
+3. `selected-race-cards.json` を**Private Actions artifactに1日だけ保持**。実レースJSONはPublic/PrivateいずれのGit履歴にもコミットしない。
+4. Vercel `baken-king-monitor-bridge.vercel.app/api/race-cards` が、共通の端末認証トークンでGitHub Actions成果物を取得・検証して配信。GitHubのトークンはVercelのみ、Public JSには入れない。公開GitHub Pagesで実データJSONを直接公開しない。
+5. Public `race-card-auto-sync.js` が設定済みの監視API接続情報を**出馬表にも流用**し、APIから出馬表を受信して既存の `window.BakenImportAuthorizedCards` に渡す。アプリ起動/復帰時と開いたまま5分間隔でチェック。端末 `baken-king-personal-cards-v1` に保存。購入・残高・精算履歴の `keiba-demo-v1` は変更しない。設定タブ「出馬表の自動取得」→「出馬表の接続を確認」で接続診断可能。
+6. 配信失敗時も従来の出馬表JSON手動読み込みは残す。
+
+### 次の課題
+- **出馬表**：次週の定期トリガー成功を確認。曜日・時差・GitHub Actionsの遅延、3場開催、取消・変更、月曜等の変則開催を運用確認。アプリ側の受信は本番で実証済みだが毎週の無人運用は未確認。
+- **結果・払戻金**：こちらは別パイプラインで、公式結果URL発見は土日09:50〜10:30・5分間隔、対象レース結果監視は09:50〜19:00前・5分間隔。公式結果を**独立検証して保存→アプリへ自動反映**する完成・実運用確認が残る。**自動精算は行わず、ユーザーによる手動精算を維持**。
+- 利用データの許諾/利用条件の確認は継続。GitHub非公開であることは利用許諾の代替にはならない。
+
+### 引き継ぎ時に最初に見るファイル
+Public: `index.html`, `race-card-auto-sync.js`, `monitor-auto-sync.js`, `monitor-target-export.js`, `sw.js`。
+Private: `.github/workflows/personal-race-import.yml`, `scripts/discover_upcoming_jra.py`, `scripts/validate_upcoming_cards.py`, `scripts/check_personal_json.py`, `monitor-bridge/api/race-cards.js`。
+以下の2026-10-31以前の内容は履歴として残すが、現在の稼働状況はこのセクションを優先する。
+
+--- 
+
+
 ## 2026-10-31 最新引き継ぎ：v4.42（旧v2.x記述より優先）
 
 - 公開URL https://rinshan0818-cpu.github.io/Baken-KING/ 。Public repo はアプリ本体、Private repo `rinshan0818-cpu/Baken-KING-private-data` は個人用データ処理。iPhoneのみ、非商用、仮想馬券。
