@@ -40,5 +40,7 @@
  window.addEventListener('focus',refresh);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
  window.addEventListener('baken:monitor-config-updated',refresh);
+ // Refresh while the PWA stays open through the weekly publication window.
+ setInterval(refresh,5*60*1000);
  refresh();
 })();
