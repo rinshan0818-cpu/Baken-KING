@@ -61,6 +61,7 @@
      if(key.length<24)throw Error('端末認証トークンを確認してください');
      localStorage.setItem(SETTINGS,JSON.stringify({endpoint:url,token:key,enabled:true}));
      lastFingerprint='';
+     window.dispatchEvent(new Event('baken:monitor-config-updated'));
      status.textContent='自動同期を有効化しました。接続先への送信を試みます。';
      sync(true);
    }catch(e){status.textContent='有効化できません：'+e.message}
