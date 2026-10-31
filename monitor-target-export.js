@@ -8,7 +8,7 @@
   function read(key){
     try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}
   }
-  function extractTargets(bets,cards,now=Date.now()){
+  function extractTargets(bets,cards){
     if(!Array.isArray(bets)||!Array.isArray(cards))return [];
     const starts=new Map();
     for(const c of cards){
@@ -29,7 +29,7 @@
       if(number<1||number>12)continue;
       const key=b.raceDate+'|'+b.raceVenue+'|'+number;
       const start=starts.get(key);
-      if(!Number.isFinite(start)||now<start)continue;
+      if(!Number.isFinite(start))continue;
       result.set(key,{date:b.raceDate,venue:b.raceVenue,raceNumber:number});
     }
     return [...result.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.venue.localeCompare(b.venue,'ja')||a.raceNumber-b.raceNumber);
@@ -43,7 +43,7 @@
   const heading=document.createElement('h3');
   heading.textContent='結果監視の対象レース';
   const note=document.createElement('p');note.className='muted';
-  note.textContent='発走済み・未精算のレースだけを抽出します。出馬表に発走時刻がないレースは除外します。買い目・金額・残高は出力しません。自動送信や精算はしません。';
+  note.textContent='購入済み・未精算のレースを購入直後から監視予約します。発走時刻付き出馬表が必要です。買い目・金額・残高は出力しません。自動送信や精算はしません。';
   const button=document.createElement('button');
   button.type='button';button.textContent='監視対象をJSONで保存';
   const msg=document.createElement('p');msg.className='muted';
@@ -53,7 +53,7 @@
       const stored=read(CARDS_KEY);
       const cards=Array.isArray(stored)?stored:stored?.races;
       const targets=extractTargets(state?.bets,cards);
-      if(!targets.length){msg.textContent='対象レースなし。発走時刻付きの出馬表と未精算馬券を確認してください。';return}
+      if(!targets.length){msg.textContent='対象レースなし。発走時刻付きの出馬表と購入済み・未精算馬券を確認してください。';return}
       const payload={schemaVersion:1,kind:'baken-monitor-targets',targets};
       const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
       const link=document.createElement('a');link.href=url;link.download='baken-monitor-targets.json';
