@@ -1,5 +1,17 @@
 # 🏇 Baken-KING
 
+## 2026-10-31 最新引き継ぎ：v4.42（旧v2.x記述より優先）
+
+- 公開URL https://rinshan0818-cpu.github.io/Baken-KING/ 。Public repo はアプリ本体、Private repo `rinshan0818-cpu/Baken-KING-private-data` は個人用データ処理。iPhoneのみ、非商用、仮想馬券。
+- 10/31東京・京都24レースの出馬表JSONをPrivate Actionsで作成し、ユーザーがiPhoneでダウンロード、設定タブから読み込み、実馬名で購入を確認。Private運用はデータの利用許諾を保証しないため、利用条件を引き続き確認。公開リポジトリに実レースデータを置かない。
+- v4.42で予想タブの日付・競馬場・R、出馬表、購入画面が復旧。京都1R「2歳未勝利」、馬番・馬名・発走時刻・距離・頭数の表示をユーザーが確認済み。
+- 設定タブにJSON読み込み、予想タブの重複出馬表・買い目メモは非表示。出馬表は `baken-king-personal-cards-v1` に保存、購入済み馬券と残高は維持。馬券の単勝馬名とレース名表示も修正済み。
+- v4.41の障害：別のscript内にある `bkImportedRaceLabel` を呼び出してReferenceErrorになり、予想画面が消えた。v4.42コミット `fb5613feb29e189d0175188e2d7804426cefd40d` で解消。script間参照に注意。
+- Private側では `jra_card_parser.py` と `jra_card_normalizer.py` で固有レース名・一般競走条件名を処理。馬番欠番は `unavailableHorseNumbers` を考慮。
+- **次の最優先課題：レース確定結果・券種別払戻金の個人用取得、結果JSONの検証、購入済み馬券との突合、二重精算防止を伴う仮想精算。** まず架空fixtureでオフラインテストし、実データの公開配信はしない。確定前に精算しない。購入・残高・精算履歴を絶対に初期化しない。
+- 後回し課題：馬券一覧が時々東京11Rになる、馬券画像が初回一瞬崩れる。iPhone利用を前提に、index.html変更時は必ずバージョン更新・GitHubコミット。旧READMEのv2.x記述は歴史情報であり現状ではない。
+
+
 [![Race data offline tests](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/validate-race-data.yml/badge.svg)](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/validate-race-data.yml) [![jra-scr Linux test](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml/badge.svg)](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-jra-scr-offline.yml) [![MIT scraper Linux test](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-keiba-scraping-offline.yml/badge.svg)](https://github.com/rinshan0818-cpu/Baken-KING/actions/workflows/check-keiba-scraping-offline.yml)
 
 
