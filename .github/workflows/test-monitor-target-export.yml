@@ -7,6 +7,7 @@ on:
       - 'monitor-target-export.test.cjs'
       - 'monitor-lifecycle.js'
       - 'monitor-lifecycle.test.cjs'
+      - 'monitor-auto-sync.js'
       - '.github/workflows/test-monitor-target-export.yml'
   workflow_dispatch:
 permissions:
@@ -24,6 +25,7 @@ jobs:
         run: |
           node --check monitor-target-export.js
           node --check monitor-lifecycle.js
+          node --check monitor-auto-sync.js
       - name: Run selector tests
         run: |
           node --test monitor-target-export.test.cjs
