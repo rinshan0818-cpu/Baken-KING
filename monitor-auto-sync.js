@@ -7,7 +7,7 @@
  const settings=document.querySelector('[data-tab="settings"]');
  if(!settings)return;
  const panel=document.createElement('section');panel.className='card';panel.style.marginTop='16px';
- const title=document.createElement('h3');title.textContent='結果監視の自動同期（準備中）';
+ const title=document.createElement('h3');title.textContent='結果監視の自動同期';
  const explain=document.createElement('p');explain.className='muted';
  explain.textContent='専用の非公開中継APIへ、対象レースの識別情報だけを同期します。認証済みAPIを設定し、明示的に有効化するまで送信しません。購入情報・金額・残高は送信しません。';
  const endpoint=document.createElement('input');endpoint.type='url';endpoint.placeholder='https://（専用APIのURL）';
@@ -36,9 +36,10 @@
    if(parsed.hostname==='rinshan0818-cpu.github.io')throw Error('GitHub Pagesは中継APIではありません');
    return parsed.href;
  }
- let inflight=false,lastFingerprint='';
+ let inflight=false,lastFingerprint='',resyncNeeded=false;
  async function sync(force=false){
-   const c=config();if(!c?.enabled||inflight||document.visibilityState==='hidden')return;
+   const c=config();if(!c?.enabled||document.visibilityState==='hidden')return;
+   if(inflight){resyncNeeded=true;return;}
    const selected=targets(),payload={schemaVersion:1,kind:'baken-monitor-targets',targets:selected};
    const fingerprint=JSON.stringify(payload);
    if(!force&&fingerprint===lastFingerprint)return;
@@ -53,7 +54,7 @@
      lastFingerprint=fingerprint;
      status.textContent='監視対象 '+selected.length+'レースの同期完了（精算はしていません）';
    }catch(e){status.textContent='自動同期できません：'+e.message+'。接続設定を確認してください。'}
-   finally{inflight=false}
+   finally{inflight=false;if(resyncNeeded){resyncNeeded=false;queueMicrotask(()=>sync())}}
  }
  button.onclick=()=>{
    try{
@@ -92,7 +93,6 @@
  settings.append(panel);
  window.addEventListener('baken:wagers-updated',()=>sync());
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync()});
- // Poll race start transitions and keep devices that remain open in sync.
- setInterval(()=>sync(),60000);
+ // Purchase and settlement events send immediately; foreground refresh is a fallback.
  if(config()?.enabled)sync();
 })();
