@@ -31,6 +31,7 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
   assert.equal(settled.balance,100050,'First settlement must credit exactly 450 yen');
   assert.equal(settled.totalPaid,450);
   assert.equal(settled.bets.filter(b=>b.status==='settled').length,1);
+  console.log('PASS: first settlement credited once');
 
   // Repeat read of the same ticket. Even when invoked directly, accounting must not pay twice.
   await page.evaluate(id=>{machineSelectedId=id;machineRender();document.getElementById('machineRead').click()},ticketId);
@@ -39,14 +40,16 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
   assert.equal(repeat.balance,settled.balance,'Second read paid same ticket twice');
   assert.equal(repeat.totalPaid,settled.totalPaid,'Second read duplicated payout');
   assert.equal(repeat.bets.find(b=>b.id===ticketId).paid,450);
+  console.log('PASS: repeated settlement did not duplicate payout');
 
   // Export actual v2 JSON through the Settings UI, and restore it through the file input.
   await page.locator('.bk-settings-trigger[data-nav="settings"]').click();
   await page.waitForFunction(()=>document.querySelector('#bkSettingsSurface')?.hidden===false);
   const dataFold=page.locator('#bkSettingsSurface details.bk-settings-fold').filter({has:page.locator('#backup')});
   assert.equal(await dataFold.count(),1,'Backup button must belong to one settings fold');
-  await dataFold.locator('summary').click();
-  await page.locator('#backup').waitFor({state:'visible'});
+  if(!(await dataFold.evaluate(el=>el.open)))await dataFold.locator('summary').click();
+  await page.locator('#backup').waitFor({state:'visible',timeout:10000});
+  console.log('PASS: settings data-management panel opened');
   const [download]=await Promise.all([page.waitForEvent('download'),page.locator('#backup').click()]);
   const file=await download.createReadStream();
   const chunks=[];for await(const chunk of file)chunks.push(chunk);
@@ -55,6 +58,7 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
   assert.equal(backup.format,'BAKEN_KING_BACKUP');
   assert.equal(backup.schemaVersion,2);
   assert.deepEqual(backup.state,repeat,'Backup state differs from stored state');
+  console.log('PASS: v2 backup exported and matched saved state');
 
   // Deliberately change only test storage; restore should return to the exported snapshot.
   await page.evaluate(key=>{
@@ -65,11 +69,13 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
   await page.waitForFunction(([key,balance])=>JSON.parse(localStorage.getItem(key)).balance===balance,[TEST,repeat.balance]);
   const restored=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),TEST);
   assert.deepEqual(restored,repeat,'Restored ticket state is not identical to backup');
+  console.log('PASS: backup restored wallet and tickets');
 
   // Reject malformed versions without modifying the saved records.
   await page.locator('#restore').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...backup,schemaVersion:999}))});
   await page.waitForTimeout(200);
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),TEST),repeat,'Invalid backup modified saved data');
+  console.log('PASS: unsupported backup rejected without state modification');
   assert.equal(await page.evaluate(key=>localStorage.getItem(key)),null,'Test operations wrote to production storage');
   assert.deepEqual(errors,[],'Unexpected app error during settlement or backup');
   console.log('PASS: one-time settlement, v2 backup round trip, invalid version rejected, production untouched');
