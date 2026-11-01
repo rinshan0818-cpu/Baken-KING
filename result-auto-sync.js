@@ -1,6 +1,8 @@
 /* Private verified-result delivery. No wagers leave the iPhone; never settles. */
 (()=>{
  'use strict';
+ // The beta sandbox never contacts or alters live result-monitoring services.
+ if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const CONFIG='baken-monitor-sync-config-v1';
  const section=document.querySelector('[data-tab="settings"]');
  const panel=document.createElement('section');panel.className='card';panel.style.marginTop='16px';
