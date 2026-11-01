@@ -10,7 +10,42 @@
  const enable=document.createElement('button');enable.type='button';enable.textContent='通知を有効にする';enable.disabled=true;
  const disable=document.createElement('button');disable.type='button';disable.className='outline';disable.style.marginLeft='8px';disable.textContent='通知を停止';
  const status=document.createElement('p');status.className='muted';status.setAttribute('aria-live','polite');status.textContent='通知の利用環境を確認中…';
- panel.append(title,desc,enable,disable,status);SECTION.append(panel);
+ const CHIME_KEY='baken-king-settlement-chime-v1';
+ const chimeLabel=document.createElement('label');chimeLabel.style.display='flex';chimeLabel.style.alignItems='center';chimeLabel.style.gap='9px';chimeLabel.style.margin='15px 0 8px';
+ const chime=document.createElement('input');chime.type='checkbox';chime.checked=localStorage.getItem(CHIME_KEY)==='on';
+ const chimeText=document.createElement('span');chimeText.textContent='アプリを開いている間、精算準備のチャイムを鳴らす';
+ chimeLabel.append(chime,chimeText);
+ const tryChime=document.createElement('button');tryChime.type='button';tryChime.className='outline';tryChime.textContent='チャイムを試聴';
+ const chimeNote=document.createElement('p');chimeNote.className='muted';chimeNote.textContent='Baken-KINGオリジナル音。iPhoneのマナーモード・音量設定やブラウザの再生制限によって鳴らない場合があります。ロック画面の通知音はiOS側で管理されます。';
+ const audioStatus=document.createElement('p');audioStatus.className='muted';
+ let audio=null;
+ function playChime(){
+  try{
+   const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+   if(!AudioContextClass)return false;
+   if(!audio)audio=new AudioContextClass();
+   if(audio.state!=='running')audio.resume().catch(()=>{});
+   const base=audio.currentTime+0.02;
+   // Original two-note alert composed for Baken-KING, not a JRA audio sample.
+   const notes=[{at:0,duration:.15,hz:523.25},{at:.18,duration:.32,hz:783.99}];
+   for(const note of notes){
+    const osc=audio.createOscillator(),gain=audio.createGain();
+    osc.type='sine';osc.frequency.setValueAtTime(note.hz,base+note.at);
+    gain.gain.setValueAtTime(0.0001,base+note.at);
+    gain.gain.exponentialRampToValueAtTime(0.18,base+note.at+0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001,base+note.at+note.duration);
+    osc.connect(gain).connect(audio.destination);
+    osc.start(base+note.at);osc.stop(base+note.at+note.duration+0.02);
+   }
+   return true;
+  }catch(e){return false}
+ }
+ chime.addEventListener('change',()=>{localStorage.setItem(CHIME_KEY,chime.checked?'on':'off');if(chime.checked)playChime()});
+ tryChime.addEventListener('click',()=>{audioStatus.textContent=playChime()?'チャイムを再生しました。':'音声を再生できない環境です。'});
+ window.addEventListener('baken:new-settlement-ready',event=>{
+  if(localStorage.getItem(CHIME_KEY)==='on'&&document.visibilityState==='visible'&&Number(event.detail?.count)>0)playChime();
+ });
+ panel.append(title,desc,enable,disable,status,chimeLabel,tryChime,chimeNote,audioStatus);SECTION.append(panel);
  let registration=null,serverUrl='',publicKey='',token='',busy=false;
  function config(){try{return JSON.parse(localStorage.getItem(CONFIG_KEY)||'null')}catch{return null}}
  function fromBase(value){
