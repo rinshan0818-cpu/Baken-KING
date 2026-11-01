@@ -1,5 +1,15 @@
 # 🏇 Baken-KING
 
+## 安定化：自動テスト実行設定の確認（2026-11-02）
+
+- 最新の `index.html` 内インラインJavaScript 2本と、新規ブラウザ回帰テスト3本についてコード構文を静的点検し、検出された構文エラーは0件。
+- `UI smoke` ワークフローにNodeの `--check` による全 `tests/*.cjs` 構文検証を追加。既存のpush起動に加えてpull requestでも検証する。
+- **実際のPlaywrightテスト実行成功は未確認**。GitHub Actionsの結果一覧を取得する権限・経路が使えず、コミットのGitHub status APIにも完了報告はなかった。Actions UIで `UI smoke` の実行結果を確認すること。失敗の場合は `browser-smoke-diagnostics` artifact を調査する。
+- 本番iPhoneの残高・保存済み馬券、実レース、精算機の本番動作には変更なし。
+
+---
+
+
 ## 安定化：二重精算防止・バックアップ復元テスト（2026-11-02）
 
 - 新規 `tests/settlement_backup_regression.cjs` をGitHub Actions `UI smoke` に追加。アプリ本体の表示・精算・保存ロジックは変更せず。
