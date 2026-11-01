@@ -1,6 +1,8 @@
 /* Baken-KING monitoring target selector. Local-only; never uploads bets. */
 (() => {
   'use strict';
+ // The beta sandbox never contacts or alters live result-monitoring services.
+ if(localStorage.getItem('baken-king-mode-v1')==='test')return;
   const BETS_KEY='keiba-demo-v1';
   const CARDS_KEY='baken-king-personal-cards-v1';
   const VENUES=new Set(['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉']);
