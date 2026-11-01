@@ -41,7 +41,9 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
   assert.equal(repeat.bets.find(b=>b.id===ticketId).paid,450);
 
   // Export actual v2 JSON through the Settings UI, and restore it through the file input.
-  await page.evaluate(()=>showTab('settings'));
+  await page.locator('.bk-settings-trigger[data-nav="settings"]').click();
+  await page.waitForFunction(()=>document.querySelector('[data-tab="settings"]')?.hidden===false);
+  assert.equal(await page.locator('#backup').isVisible(),true,'Settings backup button must be visible after gear navigation');
   const [download]=await Promise.all([page.waitForEvent('download'),page.locator('#backup').click()]);
   const file=await download.createReadStream();
   const chunks=[];for await(const chunk of file)chunks.push(chunk);
