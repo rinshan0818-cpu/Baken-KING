@@ -11,6 +11,7 @@ on:
       - 'tests/race-settlement.test.cjs'
       - 'race-settlement.js'
       - '.github/workflows/ui-smoke.yml'
+  pull_request:
 permissions:
   contents: read
 jobs:
@@ -23,6 +24,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate all browser regression test scripts
+        run: |
+          find tests -maxdepth 1 -name '*.cjs' -print0 | xargs -0 -r -n 1 node --check
       - name: Install browser test dependency
         run: |
           npm install --no-save playwright@1.58.2
