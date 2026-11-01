@@ -1,6 +1,8 @@
 /* Optional Web Push: subscriptions only; no bets, balance or result details are uploaded. */
 (()=>{
  'use strict';
+ // The beta sandbox never contacts or alters live result-monitoring services.
+ if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const CONFIG_KEY='baken-monitor-sync-config-v1';
  const SECTION=document.querySelector('[data-tab="settings"]');
  if(!SECTION)return;
