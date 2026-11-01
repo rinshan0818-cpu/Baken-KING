@@ -2412,7 +2412,7 @@ bkTicketRaceTitle=function(b){
   const required={'単勝':1,'複勝':1,'馬連':2,'馬単':2,'ワイド':2,'三連複':3,'三連単':3};
   const counts={'単勝':1,'複勝':3,'馬連':2,'馬単':2,'ワイド':3,'三連複':1,'三連単':2};
   const payouts=payload.payouts;
-  if(!Array.isArray(payouts)||payouts.length!==14)throw Error('払戻金が不足しています');
+  if(!Array.isArray(payouts)||payouts.length!==16)throw Error('払戻金が不足しています');
   const map=new Map(),actual={};
   for(const p of payouts){
    if(!(p.type in required)||!Array.isArray(p.numbers)||p.numbers.length!==required[p.type]||
