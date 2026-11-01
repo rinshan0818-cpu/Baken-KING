@@ -43,6 +43,9 @@
   // and monitoring functions remain the same.
   for(const {node,group} of moved){
    node.removeAttribute('data-tab');
+   // Legacy showTab('home') marks each settings section hidden at boot.
+   // Once inside the new settings root, that old hidden flag must be cleared.
+   node.hidden=false;
    if(node.matches('section.card'))node.classList.add('bk-settings-item');
    groups[group].append(node);
   }
