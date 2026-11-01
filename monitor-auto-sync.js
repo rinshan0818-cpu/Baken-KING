@@ -1,6 +1,8 @@
 /* Opt-in private monitor synchronization. Never uploads wager details. */
 (()=>{
  'use strict';
+ // The beta sandbox never contacts or alters live result-monitoring services.
+ if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const SETTINGS='baken-monitor-sync-config-v1';
  const BETS='keiba-demo-v1',CARDS='baken-king-personal-cards-v1';
  function get(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch{return null}}
