@@ -10,6 +10,8 @@ on:
       - 'tests/settlement_backup_regression.cjs'
       - 'tests/race-settlement.test.cjs'
       - 'race-settlement.js'
+      - 'friends-share.js'
+      - 'tests/friends-share.test.cjs'
       - '.github/workflows/ui-smoke.yml'
   pull_request:
 permissions:
@@ -43,6 +45,8 @@ jobs:
         run: node tests/storage_regression.cjs
       - name: Test official settlement math, refunds and pending outcomes
         run: node tests/race-settlement.test.cjs
+      - name: Test consent-gated friend summary projection
+        run: node tests/friends-share.test.cjs
       - name: Test one-time settlement and backup restore
         run: node tests/settlement_backup_regression.cjs
       - name: Upload browser test diagnostics on failure
