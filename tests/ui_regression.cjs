@@ -30,12 +30,12 @@ const baseSelector='main.wrap > [data-tab]';
   for(const tab of approvedTabs){
    await page.locator('.bottom-nav [data-nav="'+tab+'"]').click();
    await page.waitForFunction(expected=>document.querySelector('.bottom-nav [data-nav="'+expected+'"]')?.classList.contains('active'),tab);
-   const state=await page.evaluate((selected,selector)=>{
+   const state=await page.evaluate(({selected,selector})=>{
     const nodes=[...document.querySelectorAll(selector)];
     const visible=nodes.filter(node=>!node.hidden && getComputedStyle(node).display!=='none').map(node=>node.dataset.tab);
     const leaked=nodes.filter(node=>node.dataset.tab!==selected && getComputedStyle(node).display!=='none').map(node=>node.dataset.tab);
     return {visible,leaked,homeVisible:!!document.querySelector('section.bk-home')?.getClientRects().length};
-   },tab,baseSelector);
+   },{selected:tab,selector:baseSelector});
    assert(state.visible.includes(tab),'Selected panel not visible: '+tab+' '+JSON.stringify(state));
    assert.deepEqual(state.leaked,[],'Hidden panels leak into '+tab+': '+JSON.stringify(state));
    assert.equal(state.homeVisible,tab==='home','Home panel stuck across tab switch: '+tab);
