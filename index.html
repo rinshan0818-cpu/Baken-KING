@@ -2313,7 +2313,7 @@ showTicketView('list');
 const TABS=['home','predict','tickets','payout','data','settings'];function showTab(tab){if(!TABS.includes(tab))tab='home';document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==tab);document.querySelectorAll('[data-nav]').forEach(el=>{const active=el.dataset.nav===tab;el.classList.toggle('active',active);el.setAttribute('aria-current',active?'page':'false')});document.body.classList.toggle('bk-payout-locked',tab==='payout');const summary=document.getElementById('dataSummary');summary.textContent='累計購入 '+fmt(s.totalStake)+' ／ 累計払戻 '+fmt(s.totalPaid)+' ／ 生涯回収率 '+(s.totalStake?(100*s.totalPaid/s.totalStake).toFixed(1)+'%':'—')+' ／ 購入 '+s.bets.length+'件';window.scrollTo(0,0);}
 function bkOpenNavigationTab(tab){if(tab==='payout'){machineCancelRead();machineSelectedId=null;machineVisibleId=null;machineRender()}showTab(tab)}
 document.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click',event=>{if(!event.isTrusted)return;bkOpenNavigationTab(btn.dataset.nav)}));
-window.addEventListener('baken:user-next-race',()=>{if(document.activeElement?.id==='bkHomeNextRace')bkOpenNavigationTab('predict')});document.getElementById('homeToPredict').onclick=()=>showTab('predict');document.getElementById('homeToPayout').onclick=()=>showTab('tickets');document.getElementById('goPayout').onclick=()=>showTab('tickets');// Always start at home after a page reload; do not restore a tab without user navigation.
+document.getElementById('homeToPredict').onclick=()=>showTab('predict');document.getElementById('homeToPayout').onclick=()=>showTab('tickets');document.getElementById('goPayout').onclick=()=>showTab('tickets');// Always start at home after a page reload; do not restore a tab without user navigation.
 bkOpenNavigationTab('home');
 
 // Race data adapter v2: imported files remain separate from fictional demo betting.
@@ -2775,7 +2775,7 @@ function bkOpenUpcomingRace(){
  date.value=next.date;venue.value=next.venue;syncImportedOptions();
  race.value=String(next.raceNumber);
  date.dispatchEvent(new Event('change'));
- window.dispatchEvent(new Event('baken:user-next-race'));
+ bkOpenNavigationTab('predict');
 }
 document.getElementById('bkHomeNextRace')?.addEventListener('click',bkOpenUpcomingRace);
 
