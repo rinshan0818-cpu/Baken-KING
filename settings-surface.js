@@ -1,4 +1,4 @@
-/* Settings surface v5.31: presentation only, no auth or data changes. */
+/* Settings surface v5.35: presentation only, no auth or data changes. */
 (()=>{
  'use strict';
  function init(){
@@ -49,6 +49,42 @@
    if(node.matches('section.card'))node.classList.add('bk-settings-item');
    groups[group].append(node);
   }
+  // Beta mode selector: never copy or overwrite production wallet data.
+  const modeKey='baken-king-mode-v1';
+  const testStateKey='baken-king-test-state-v1';
+  const testing=localStorage.getItem(modeKey)==='test';
+  const modePanel=document.createElement('section');
+  modePanel.className='bk-mode-panel';
+  const modeTitle=document.createElement('h3');modeTitle.textContent='ベータ版・動作テスト';
+  const modeCurrent=document.createElement('p');modeCurrent.className='bk-mode-current';
+  modeCurrent.textContent=testing?'現在：テストモード（専用の仮想データ）':'現在：本番モード（通常の馬券・残高）';
+  const actions=document.createElement('div');actions.className='bk-mode-buttons';
+  const modeSwitch=document.createElement('button');modeSwitch.type='button';
+  modeSwitch.textContent=testing?'本番モードに戻す':'テストモードに切り替え';
+  modeSwitch.onclick=()=>{
+   try{
+    localStorage.setItem(modeKey,testing?'production':'test');
+    if(localStorage.getItem(modeKey)!==(testing?'production':'test'))throw Error('保存できませんでした');
+    location.reload();
+   }catch(e){window.alert('モード切替に失敗しました：'+e.message)}
+  };
+  actions.append(modeSwitch);
+  if(testing){
+   const create=document.createElement('button');create.type='button';create.className='outline';
+   create.textContent='テスト馬券を4枚作成';
+   create.onclick=()=>{if(typeof window.BakenCreateDemoTickets==='function')window.BakenCreateDemoTickets();else alert('テスト機能を準備できませんでした')};
+   const reset=document.createElement('button');reset.type='button';reset.className='outline';
+   reset.textContent='テストデータだけ初期化';
+   reset.onclick=()=>{
+    if(!confirm('テスト専用の馬券・残高・履歴だけ初期化しますか？本番データは変更されません。'))return;
+    try{localStorage.removeItem(testStateKey);location.reload()}catch(e){alert('初期化に失敗しました：'+e.message)}
+   };
+   actions.append(create,reset);
+  }
+  const modeNote=document.createElement('p');modeNote.className='bk-mode-note';
+  modeNote.textContent='本番とテストは別々に端末内保存します。テスト中は本番の結果監視・プッシュ通知処理を起動せず、テスト馬券もサーバーへ送信しません。モード切替後は自動で画面を再読み込みします。';
+  modePanel.append(modeTitle,modeCurrent,actions,modeNote);
+  groups.general.prepend(modePanel);
   const adminNotice=document.createElement('p');
   adminNotice.className='muted bk-admin-note';
   adminNotice.textContent='管理機能は整理して表示しているだけです。複数アカウント導入時に、認証とサーバー側のアクセス制限を追加します。';
