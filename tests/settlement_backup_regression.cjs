@@ -42,8 +42,11 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
 
   // Export actual v2 JSON through the Settings UI, and restore it through the file input.
   await page.locator('.bk-settings-trigger[data-nav="settings"]').click();
-  await page.waitForFunction(()=>document.querySelector('[data-tab="settings"]')?.hidden===false);
-  assert.equal(await page.locator('#backup').isVisible(),true,'Settings backup button must be visible after gear navigation');
+  await page.waitForFunction(()=>document.querySelector('#bkSettingsSurface')?.hidden===false);
+  const dataFold=page.locator('#bkSettingsSurface details.bk-settings-fold').filter({has:page.locator('#backup')});
+  assert.equal(await dataFold.count(),1,'Backup button must belong to one settings fold');
+  await dataFold.locator('summary').click();
+  await page.locator('#backup').waitFor({state:'visible'});
   const [download]=await Promise.all([page.waitForEvent('download'),page.locator('#backup').click()]);
   const file=await download.createReadStream();
   const chunks=[];for await(const chunk of file)chunks.push(chunk);
