@@ -10,6 +10,8 @@
  const enable=document.createElement('button');enable.type='button';enable.textContent='通知を有効にする';enable.disabled=true;
  const disable=document.createElement('button');disable.type='button';disable.className='outline';disable.style.marginLeft='8px';disable.textContent='通知を停止';
  const status=document.createElement('p');status.className='muted';status.setAttribute('aria-live','polite');status.textContent='通知の利用環境を確認中…';
+ const testPush=document.createElement('button');testPush.type='button';testPush.className='outline';testPush.textContent='通知表示をテスト';testPush.disabled=true;
+ const testNote=document.createElement('p');testNote.className='muted';testNote.textContent='このiPhone内でテスト通知を表示します。サーバーからの自動配信テストではありません。馬券・残高・精算履歴は変更しません。';
  const CHIME_KEY='baken-king-settlement-chime-v1';
  const SOUND_DB='baken-king-private-audio-v1';
  const soundBox=document.createElement('div');soundBox.className='bk-push-sound-box';
@@ -32,7 +34,7 @@
  soundBox.append(soundTitle,chimeLabel,soundHelp,fileLabel,soundName,soundButtons,chimeNote,audioStatus);
  const pushButtons=document.createElement('div');pushButtons.className='bk-push-button-row';pushButtons.append(enable,disable);
  panel.classList.add('bk-push-panel');
- panel.append(title,desc,pushButtons,status,soundBox);SECTION.append(panel);
+ panel.append(title,desc,pushButtons,status,testPush,testNote,soundBox);SECTION.append(panel);
  let audio=null,customAudio=null,customUrl=null;
  const openSoundDb=()=>new Promise((resolve,reject)=>{
   if(!('indexedDB' in window)){reject(Error('この端末では音源を保存できません'));return}
@@ -142,6 +144,7 @@
  }
  async function refresh(){
   enable.disabled=true;
+  testPush.disabled=true;
   if(!available()){status.textContent='この環境はプッシュ通知非対応です。iPhoneではSafariからホーム画面に追加したアプリで開いてください。';return}
   if(/iPhone|iPad|iPod/.test(navigator.userAgent)&&!window.matchMedia('(display-mode: standalone)').matches&&!navigator.standalone){
    status.textContent='通知を利用するにはSafariからホーム画面に追加したBaken-KINGを起動してください。';return
@@ -157,11 +160,28 @@
    if(!/^[A-Za-z0-9_-]{80,100}$/.test(publicKey||''))throw Error('公開鍵が未設定です');
    const existing=await registration.pushManager.getSubscription();
    if(Notification.permission==='denied'){status.textContent='iPhoneの設定でBaken-KINGの通知が拒否されています。設定アプリから許可してください。';return}
+   testPush.disabled=Notification.permission!=='granted'||!existing;
    enable.disabled=false;
    enable.textContent=existing?'通知の登録を更新':'通知を有効にする';
    status.textContent=existing?'このiPhoneは通知を受信する設定です。':'通知はまだ有効になっていません。';
   }catch(e){const details=String(e?.message||'');status.textContent=/Load failed|Failed to fetch|NetworkError|HTTP 404|HTTP 503/i.test(details)?'通知サーバーの本番接続がまだ完了していません。MP3の試聴・アプリ使用中のチャイムは利用できます。':'通知の準備待ち：'+details}
  }
+ testPush.addEventListener('click',async event=>{
+  if(!event.isTrusted||busy||Notification.permission!=='granted')return;
+  testPush.disabled=true;
+  try{
+   const reg=registration||await navigator.serviceWorker.ready;
+   await reg.showNotification('Baken-KING【表示テスト】',{
+    body:'精算準備の通知表示テストです。実際のレース結果ではありません。',
+    icon:'./baken_king_icon_512.png',
+    badge:'./icon.svg',
+    tag:'baken-local-notification-test',
+    data:{url:new URL('./?open=tickets',location.href).href}
+   });
+   status.textContent='テスト通知を表示しました。通知をタップすると馬券タブへ移動します。';
+  }catch(e){status.textContent='テスト通知を表示できません：'+String(e?.message||e)}
+  finally{testPush.disabled=false}
+ });
  enable.addEventListener('click',async event=>{
   if(!event.isTrusted||busy||!registration||!publicKey)return;
   busy=true;enable.disabled=true;
