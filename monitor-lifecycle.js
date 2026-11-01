@@ -1,6 +1,8 @@
 /* Monitor lifecycle test: local race identities only; never sends bets or settles. */
 (() => {
  'use strict';
+ // Isolated Beta fixture mode must not read or alter live monitoring state.
+ if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const SNAPSHOT_KEY='baken-monitor-baseline-v1';
  const BETS_KEY='keiba-demo-v1';
  const CARDS_KEY='baken-king-personal-cards-v1';
