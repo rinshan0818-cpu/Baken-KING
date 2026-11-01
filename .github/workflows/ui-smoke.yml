@@ -7,6 +7,7 @@ on:
       - 'tests/browser_smoke.cjs'
       - 'tests/ui_regression.cjs'
       - 'tests/storage_regression.cjs'
+      - 'tests/settlement_backup_regression.cjs'
       - 'tests/race-settlement.test.cjs'
       - 'race-settlement.js'
       - '.github/workflows/ui-smoke.yml'
@@ -38,6 +39,8 @@ jobs:
         run: node tests/storage_regression.cjs
       - name: Test official settlement math, refunds and pending outcomes
         run: node tests/race-settlement.test.cjs
+      - name: Test one-time settlement and backup restore
+        run: node tests/settlement_backup_regression.cjs
       - name: Upload browser test diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
