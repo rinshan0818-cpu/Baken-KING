@@ -1360,6 +1360,9 @@ body.bk-payout-locked .bk-machine-display{min-height:0!important;flex:1 1 0!impo
 .bk-data-history-fold>div{padding:12px}
 @media(max-height:700px){.bk-ready-tray{padding:6px 9px;min-height:90px;max-height:100px}.bk-ready-ticket-rail{min-height:49px}.bk-ready-ticket{padding:6px 10px;min-width:112px}.bk-ready-tray-heading{margin-bottom:5px}}
 
+
+/* Result-waiting tickets remain readable but cannot launch the settlement machine. */
+.bk-ticket-list-page .bk-machine-queue-item:disabled{opacity:1;cursor:default}
 </style></head><body><header class="top"><div class="bk-top-inner"><h1 class="bk-app-title">Baken-KING <small>v5.33</small></h1><button type="button" class="bk-settings-trigger" data-nav="settings" aria-label="設定を開く" title="設定"><svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.86 1.86-.06-.06A1.7 1.7 0 0 0 16 18.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.06V21H9.4v-.94a1.7 1.7 0 0 0-1.4-1.66 1.7 1.7 0 0 0-1.88.34l-.06.06-1.86-1.86.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.06-.4H2v-3.2h.94A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88L4.2 7.06 6.06 5.2l.06.06A1.7 1.7 0 0 0 8 5.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.06V3h5.2v.94A1.7 1.7 0 0 0 16 5.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.86 1.86-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.06.4H22v3.2h-.94A1.7 1.7 0 0 0 19.4 15Z"/></svg></button></div></header><main class="wrap"><section class="card bk-home" data-tab="home">
 <div class="row space bk-home-head"><h2>マイ成績</h2><span id="season" class="tag"></span></div>
 <div class="bk-home-primary">
@@ -1404,7 +1407,7 @@ body.bk-payout-locked .bk-machine-display{min-height:0!important;flex:1 1 0!impo
   <div class="bk-machine-display" id="machineDisplayAnchor">
    <div class="bk-machine-screentop"><span>投票券精算画面</span><span>BAKEN-KING</span></div>
    <div class="bk-machine-screenbody">
-    <div class="bk-machine-instruction" id="machineInstruction">馬券タブから馬券を選択してください</div>
+    <div class="bk-machine-instruction" id="machineInstruction">下の精算待ち馬券から選択してください</div>
     <div class="bk-machine-slot"><span>▰</span> 投票券読取部 <span>▰</span></div>
     <div id="machineTicket" class="bk-machine-ticket" aria-live="polite">まだ馬券が選択されていません。</div>
     <div id="machineResultDetail" class="bk-machine-result-detail" aria-live="polite"></div>
@@ -2058,8 +2061,8 @@ function machineDrawTicket(){
   status.textContent='● 読取中';status.dataset.status='reading';return;
  }
  if(!ticket){
-  host.textContent=machineSelectedId?'「精算」を押すと結果を確認できます。':'馬券タブで精算する馬券を選択してください。';
-  amount.textContent='— 円';instruction.textContent=machineSelectedId?'投票券をセットしてください':'馬券タブから選択してください';
+  host.textContent=machineSelectedId?'投票券を読み取る準備ができました。':'下の精算待ち馬券から選択してください。';
+  amount.textContent='— 円';instruction.textContent=machineSelectedId?'投票券をセットしてください':'精算する馬券を選択してください';
   status.textContent='● 受付中';status.dataset.status='ready';return;
  }
  const isSettled=ticket.status!=='pending';
@@ -2162,7 +2165,7 @@ function machineRender(){
      left.append(result);
     }
    }
-   button.append(left,bkTicketReceipt(b,true));button.onclick=()=>{machineCancelRead();machineSelectedId=b.id;machineVisibleId=null;machineRender();showTab('payout');$('machineRead').click()};section.append(button)}queue.append(section)
+   button.append(left,bkTicketReceipt(b,true));button.disabled=true;button.setAttribute('aria-disabled','true');button.title='結果の確定を待っています';section.append(button)}queue.append(section)
  }
  $('machineRead').disabled=machineReading||!machineTicketById(machineSelectedId);
  $('machineRead').textContent=machineReading?'精算確認中…':'精算';
