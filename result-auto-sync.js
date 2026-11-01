@@ -42,6 +42,7 @@
      const count=await window.BakenImportVerifiedResults(payload);
      if(count>0){
        status.textContent='確定結果を受信：'+count+'枚の馬券が手動精算待ちになりました。';
+       window.dispatchEvent(new CustomEvent('baken:new-settlement-ready',{detail:{count}}));
      }else{
        status.textContent='接続成功：検証済みの結果 '+payload.races.length+'レース／新規の精算待ち登録なし。';
      }
