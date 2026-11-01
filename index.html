@@ -868,6 +868,7 @@ body.bk-payout-locked #realAutoSettle[disabled]{display:none!important}
 .bk-race-eyebrow{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:700;color:#dce7f8}
 .bk-grade{background:#f3e5bc;color:#76531d;padding:4px 9px;border-radius:5px;font-weight:900}
 .bk-race-hero h2{font-size:23px;margin:12px 0 10px;color:white;letter-spacing:.01em}
+.bk-race-condition-labels{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.bk-race-condition-labels[hidden]{display:none!important}.bk-race-condition-labels span{border:1px solid #ffffff60;background:#ffffff22;color:white;border-radius:5px;padding:4px 8px;font-size:12px;font-weight:700}
 .bk-race-meta{display:flex;flex-wrap:wrap;gap:7px;font-size:12px}.bk-race-meta span{background:#ffffff19;border:1px solid #ffffff2c;border-radius:6px;padding:5px 8px}
 #autumnFixtureCard .bk-autumn-row{transition:background .15s,border-color .15s;border-radius:10px}
 #autumnFixtureCard .bk-autumn-row:active{background:#e7effd}
@@ -2152,6 +2153,22 @@ bkTicketRaceTitle=function(b){
    const title=hero.querySelector('h2');if(title)title.textContent=entry.title||'出馬表';
    const eyebrow=hero.querySelector('.bk-race-eyebrow');if(eyebrow)eyebrow.textContent=entry.date+' '+entry.venue+entry.raceNumber+'R';
    const meta=hero.querySelector('.bk-race-meta');if(meta)meta.textContent=(entry.startTime||'時刻未登録')+'発走 · '+(entry.surface||'')+' '+(entry.distance||'')+'m · '+entry.horses.length+'頭';
+   // Race restrictions and weight rules come only from the verified JRA card.
+   // Never infer an absent condition from a race name or field composition.
+   const rule=entry.raceConditions||{};
+   const shown=new Set();
+   const labels=[];
+   for(const label of Array.isArray(rule.restrictions)?rule.restrictions:[]){
+    if(['混合','牝馬限定','牡・せん限定','指定','特別指定','国際','若手騎手'].includes(label)&&!shown.has(label)){
+     shown.add(label);labels.push(label);
+    }
+   }
+   if(['ハンデ','別定','定量','馬齢'].includes(rule.weightRule))labels.push(rule.weightRule);
+   let conditionLine=hero.querySelector('.bk-race-condition-labels');
+   if(!conditionLine){conditionLine=document.createElement('div');conditionLine.className='bk-race-condition-labels';hero.append(conditionLine)}
+   conditionLine.replaceChildren();
+   for(const label of labels){const tag=document.createElement('span');tag.textContent=label;conditionLine.append(tag)}
+   conditionLine.hidden=!labels.length;
   }
   draw();
  }
