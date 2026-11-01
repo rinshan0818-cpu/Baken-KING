@@ -1509,13 +1509,13 @@ body.bk-payout-locked #payoutMachinePanel .bk-ready-ticket-preview{
   height:100%!important;
 }
 body.bk-payout-locked #payoutMachinePanel .bk-ready-ticket-paper{
-  width:1100px!important;
-  max-width:none!important;
+  width:100%!important;
+  max-width:100%!important;
   position:absolute!important;
   margin:0!important;
   top:0!important;
   left:0!important;
-  transform:scale(var(--bk-preview-scale,.29))!important;
+  transform:none!important;
   transform-origin:top left!important;
 }
 /* Actual ticket is generated once; the gallery scales its real artwork. */
@@ -1547,7 +1547,7 @@ body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-ready-ticke
   padding:3px!important;
 }
 body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-ready-ticket-paper{
-  transform:scale(.13)!important;
+  width:300px!important;max-width:none!important;transform:scale(.48)!important;
 }
 body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-machine-ticket{
   padding:3px!important;
@@ -1573,7 +1573,7 @@ body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-machine-res
   width:115px!important;min-width:115px!important;max-width:115px!important;height:69px!important;
  }
  body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-ready-ticket-paper{
-  transform:scale(.098)!important;
+  width:300px!important;transform:scale(.36)!important;
  }
 }
 
