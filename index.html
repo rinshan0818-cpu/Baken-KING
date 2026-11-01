@@ -2360,13 +2360,13 @@ document.getElementById('addRealNote').onclick=()=>{const race=document.getEleme
 
 // Separate result-waiting tickets from past settlement history.
 const bkHistoryPanel=document.querySelector('[data-ticket-panel="history"]');
-const bkDataSection=document.querySelector('section[data-tab="data"]');
-if(bkHistoryPanel&&bkDataSection){
+const bkHistoryTargetTab=document.querySelector('section[data-tab="data"]');
+if(bkHistoryPanel&&bkHistoryTargetTab){
  const fold=document.createElement('details');fold.className='bk-data-history-fold';
  const label=document.createElement('summary');label.textContent='精算履歴を確認';
  fold.append(label);
  bkHistoryPanel.removeAttribute('data-ticket-panel');bkHistoryPanel.hidden=false;
- fold.append(bkHistoryPanel);bkDataSection.append(fold);
+ fold.append(bkHistoryPanel);bkHistoryTargetTab.append(fold);
 }
 document.querySelector('.bk-ticket-page-switch')?.remove();
 const bkTicketGuide=document.querySelector('.bk-ticket-page-guide');
