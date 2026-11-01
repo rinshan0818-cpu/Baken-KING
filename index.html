@@ -2153,7 +2153,7 @@ bkTicketRaceTitle=function(b){
   if(hero){
    const title=hero.querySelector('h2');if(title)title.textContent=entry.title||'出馬表';
    const eyebrow=hero.querySelector('.bk-race-eyebrow');if(eyebrow)eyebrow.textContent=entry.date+' '+entry.venue+entry.raceNumber+'R';
-   const meta=hero.querySelector('.bk-race-meta');if(meta)meta.textContent=(entry.startTime||'時刻未登録')+'発走 · '+(entry.surface||'')+' '+(entry.distance||'')+'m · '+entry.horses.length+'頭';
+   const meta=hero.querySelector('.bk-race-meta');if(meta){const course=entry.raceConditions?.obstacleCourse;const track=entry.surface||entry.raceConditions?.surface||'';const distance=entry.distance||entry.raceConditions?.distanceMeters;meta.textContent=[(entry.startTime||'時刻未登録')+'発走',distance?(track+' '+distance+'m'+(track==='障害'&&course?'（'+course+'）':'')):(track||'コース未取得'),entry.horses.length+'頭'].join(' · ')}
    const obstacle=(entry.surface||entry.raceConditions?.surface)==='障害';
    let obstacleTag=hero.querySelector('.bk-obstacle-tag');
    if(!obstacleTag){obstacleTag=document.createElement('span');obstacleTag.className='bk-obstacle-tag';hero.insertBefore(obstacleTag,hero.querySelector('h2'))}
