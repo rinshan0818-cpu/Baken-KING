@@ -24,7 +24,7 @@
     }
     const result=new Map();
     for(const b of bets){
-      if(!b||b.status!=='pending'||typeof b.realRaceId!=='string'||!b.realRaceId||!datePattern.test(b.raceDate)||!VENUES.has(b.raceVenue)||!Number.isInteger(Number(b.raceNumber)))continue;
+      if(!b||b.status!=='pending'||b.officialReady===true||b.specialManualResult===true||typeof b.realRaceId!=='string'||!b.realRaceId||!datePattern.test(b.raceDate)||!VENUES.has(b.raceVenue)||!Number.isInteger(Number(b.raceNumber)))continue;
       const number=Number(b.raceNumber);
       if(number<1||number>12)continue;
       const key=b.raceDate+'|'+b.raceVenue+'|'+number;
@@ -43,7 +43,7 @@
   const heading=document.createElement('h3');
   heading.textContent='結果監視の対象レース';
   const note=document.createElement('p');note.className='muted';
-  note.textContent='購入済み・未精算のレースを購入直後から監視予約します。発走時刻付き出馬表が必要です。買い目・金額・残高は出力しません。自動送信や精算はしません。';
+  note.textContent='購入済み・結果待ちのレースを購入直後から監視予約し、精算待ちになったら対象から解除します。発走時刻付き出馬表が必要です。買い目・金額・残高は出力しません。自動送信や精算はしません。';
   const button=document.createElement('button');
   button.type='button';button.textContent='監視対象をJSONで保存';
   const msg=document.createElement('p');msg.className='muted';
