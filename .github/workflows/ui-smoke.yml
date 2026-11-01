@@ -6,6 +6,9 @@ on:
       - 'index.html'
       - 'tests/browser_smoke.cjs'
       - 'tests/ui_regression.cjs'
+      - 'tests/storage_regression.cjs'
+      - 'tests/race-settlement.test.cjs'
+      - 'race-settlement.js'
       - '.github/workflows/ui-smoke.yml'
 permissions:
   contents: read
@@ -31,6 +34,10 @@ jobs:
         run: node tests/browser_smoke.cjs
       - name: Test approved tab UI and state isolation
         run: node tests/ui_regression.cjs
+      - name: Test purchase storage, reload and test-mode isolation
+        run: node tests/storage_regression.cjs
+      - name: Test official settlement math, refunds and pending outcomes
+        run: node tests/race-settlement.test.cjs
       - name: Upload browser test diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
