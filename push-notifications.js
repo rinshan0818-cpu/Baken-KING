@@ -160,7 +160,7 @@
    enable.disabled=false;
    enable.textContent=existing?'通知の登録を更新':'通知を有効にする';
    status.textContent=existing?'このiPhoneは通知を受信する設定です。':'通知はまだ有効になっていません。';
-  }catch(e){status.textContent='通知の準備待ち：'+e.message}
+  }catch(e){const details=String(e?.message||'');status.textContent=/Load failed|Failed to fetch|NetworkError|HTTP 404|HTTP 503/i.test(details)?'通知サーバーの本番接続がまだ完了していません。MP3の試聴・アプリ使用中のチャイムは利用できます。':'通知の準備待ち：'+details}
  }
  enable.addEventListener('click',async event=>{
   if(!event.isTrusted||busy||!registration||!publicKey)return;
