@@ -3,6 +3,8 @@
  */
 (()=>{
  'use strict';
+ // Isolated Beta fixture mode must not read or alter live monitoring state.
+ if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const SETTINGS='baken-monitor-sync-config-v1';
  const status=document.getElementById('bkCardImportStatus');
  const message=document.getElementById('bkPrivateCardMessage');
