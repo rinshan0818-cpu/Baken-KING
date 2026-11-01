@@ -65,12 +65,21 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
    const s=JSON.parse(localStorage.getItem(key));s.balance=999;localStorage.setItem(key,JSON.stringify(s));
   },TEST);
   page.on('dialog',dialog=>dialog.accept());
-  await page.locator('#restore').setInputFiles({name:'test-backup.json',mimeType:'application/json',buffer:Buffer.from(json)});
+  await Promise.all([
+   page.waitForEvent('load',{timeout:15000}),
+   page.locator('#restore').setInputFiles({name:'test-backup.json',mimeType:'application/json',buffer:Buffer.from(json)})
+  ]);
   await page.waitForFunction(([key,balance])=>JSON.parse(localStorage.getItem(key)).balance===balance,[TEST,repeat.balance]);
   const restored=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),TEST);
   assert.deepEqual(restored,repeat,'Restored ticket state is not identical to backup');
   console.log('PASS: backup restored wallet and tickets');
 
+  // The restore reload closes the settings surface. Navigate through the real UI again.
+  await page.locator('.bk-settings-trigger[data-nav="settings"]').click();
+  await page.waitForFunction(()=>document.querySelector('#bkSettingsSurface')?.hidden===false);
+  const restoredFold=page.locator('#bkSettingsSurface details.bk-settings-fold').filter({has:page.locator('#backup')});
+  if(!(await restoredFold.evaluate(el=>el.open)))await restoredFold.locator('summary').click();
+  await page.locator('#backup').waitFor({state:'visible'});
   // Reject malformed versions without modifying the saved records.
   await page.locator('#restore').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...backup,schemaVersion:999}))});
   await page.waitForTimeout(200);
