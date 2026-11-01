@@ -5,6 +5,7 @@ on:
     paths:
       - 'index.html'
       - 'tests/browser_smoke.cjs'
+      - 'tests/ui_regression.cjs'
       - '.github/workflows/ui-smoke.yml'
 permissions:
   contents: read
@@ -28,6 +29,8 @@ jobs:
           sleep 2
       - name: Test race selection in Chromium
         run: node tests/browser_smoke.cjs
+      - name: Test approved tab UI and state isolation
+        run: node tests/ui_regression.cjs
       - name: Upload browser test diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
