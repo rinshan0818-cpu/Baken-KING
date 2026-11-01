@@ -22,6 +22,8 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
   const ticketId=original.bets.find(b=>b.officialReady&&b.officialPendingPaid===450).id;
   await page.evaluate(id=>{
    machineSelectedId=id;
+   machineRender(); // Enables the read control after selecting the ticket.
+   if(document.getElementById('machineRead').disabled)throw Error('Read control remained disabled after selection');
    document.getElementById('machineRead').click();
   },ticketId);
   await page.waitForFunction(([key,id])=>JSON.parse(localStorage.getItem(key)).bets.find(b=>b.id===id)?.status==='settled',[TEST,ticketId]);
@@ -31,7 +33,7 @@ const LIVE='keiba-demo-v1',TEST='baken-king-test-state-v1';
   assert.equal(settled.bets.filter(b=>b.status==='settled').length,1);
 
   // Repeat read of the same ticket. Even when invoked directly, accounting must not pay twice.
-  await page.evaluate(id=>{machineSelectedId=id;document.getElementById('machineRead').click()},ticketId);
+  await page.evaluate(id=>{machineSelectedId=id;machineRender();document.getElementById('machineRead').click()},ticketId);
   await page.waitForTimeout(900);
   const repeat=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),TEST);
   assert.equal(repeat.balance,settled.balance,'Second read paid same ticket twice');
