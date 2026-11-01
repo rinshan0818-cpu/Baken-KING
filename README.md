@@ -1,5 +1,16 @@
 # 🏇 Baken-KING
 
+## v5.29：本番デプロイ待ちの間にiPhone通知表示テストを追加（2026-11-01）
+
+- 設定→精算準備のプッシュ通知に「通知表示をテスト」ボタンを追加。既にiPhoneの通知許可とWeb Push購読がある場合のみ利用可能。ServiceWorkerRegistration.showNotification()で**端末内のテスト通知**を表示する。
+- テスト通知には明確に「表示テスト」「実際のレース結果ではありません」と記載。通知タップは通常と同様に馬券タブを開く。実際のWeb Push配信、定期cron、結果検証の動作を保証するテストではない。
+- 馬券・残高・精算履歴・ユーザー指定MP3を変更しない。通知表示テストはローカルで行いサーバーに送信しない。
+- Private `monitor-bridge/api/monitor-trigger.js` と `monitor-bridge/api/push-dispatch.js` に既存cron統合コードを追加済みだが、Vercel Productionへの反映待ち。反映後に5分間隔の配信動作とiPhoneロック時のWeb Push受信を実レースで検証する。
+- ユーザーが実機でMP3選択・試聴、iPhone通知購読成功を確認済み。v5.29の通知表示テスト自体は実機未確認。
+
+---
+
+
 ## v5.28：通知サーバー接続状況の明確化（2026-11-01）
 
 - `push-notifications.js` の接続エラーがiPhoneで「Load failed」とだけ表示されていたため、`Load failed`、HTTP 404/503などの本番未反映時は「通知サーバーの本番接続がまだ完了していません。MP3の試聴・アプリ使用中のチャイムは利用できます。」へ変更。
