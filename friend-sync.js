@@ -14,7 +14,7 @@
    busy=true;
    try{
     const own=localSnapshot();
-    if(!own||!Array.isArray(Object.keys(own.metrics||{}))||!own.metrics)throw Error('Invalid local summary');
+    if(!own||typeof own!=='object'||!own.metrics||typeof own.metrics!=='object'||Array.isArray(own.metrics))throw Error('Invalid local summary');
     const result=await transport(own);
     if(!result||result.ok!==true)throw Error('Sync unavailable');
     // Never overwrite friend data on a failed request.
