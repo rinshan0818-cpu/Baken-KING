@@ -6,10 +6,10 @@ const end=html.indexOf('</section><section class="card" data-tab="settings"',beg
 assert(begin>=0&&end>begin,'Friends section is missing');
 const section=html.slice(begin,end);
 assert(section.includes('bk-compare-table'),'Comparison table is missing');
-for(const key of ['profit','roi','stake','paid','settled']){
+for(const key of ['profit','roi','stake','paid','settled','races','hitRaces','raceRate','maxPayout']){
  assert(section.includes('data-compare-own="'+key+'"'),'Missing own data metric '+key);
 }
-for(const label of ['収支','回収率','購入金額','払戻金額','精算済み馬券'])assert(section.includes(label));
+for(const label of ['収支','回収率','購入金額','払戻金額','精算済み馬券','購入レース数','的中レース数','レース的中率','最高払戻金'])assert(section.includes(label));
 assert(section.includes('未接続'),'Missing no-friend state');
 assert(!section.includes('8,400円')&&!section.includes('95.8%'),'Sample friend numbers must not ship');
 assert(html.includes('bk-compare-cell.bk-compare-win')&&html.includes('bk-compare-cell.bk-compare-lose'));
@@ -19,3 +19,6 @@ console.log('PASS: two-person comparison table, actual local metrics and neutral
 const full=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
 assert(full.includes('const bkHistoryTargetTab=document.querySelector(\'section[data-tab="data"] [data-data-panel="records"]\')'),'History must live in records only');
 assert(full.includes("label.textContent='精算履歴'"),'History label should be unique');
+
+assert(html.includes('const raceStats=bkRaceStats(allBets)'),'Must reuse existing race statistics for consistency');
+assert(html.includes('const maxPayout=resolved.length?Math.max'),'Must compute highest payout from resolved bets');
