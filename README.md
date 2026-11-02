@@ -1,5 +1,16 @@
 # 🏇 Baken-KING
 
+## 友達共有 P1：専用Neon DB実環境を作成（2026-11-02）
+
+- 既存の `machi-shindan` DBとは別に、Neonプロジェクト `baken-king-sharing` （ID: `wandering-art-06035802`、Singaporeリージョン）を作成。ブランチ `main`（`br-silent-snow-a1e3o1cq`）、DB `baken_sharing`。
+- `docs/sharing-schema-p1.sql` の4テーブル、招待重複防止インデックス、RLS/強制RLSを専用DBに適用。Postgresのカタログで全4テーブル `relrowsecurity=true`, `relforcerowsecurity=true` を確認。
+- **認証は未有効化**：Neon Authの有効化操作が安全性チェックでブロックされたため、強行・再試行していない。実ユーザー、API、ログイン画面、DB権限ポリシーは未作成。現段階ではテーブルを外部公開しない。
+- Neonプロジェクトの作成によりサービスプランに応じた利用量が発生する可能性がある。既存Vercel監視用プロジェクトと既存DBには変更なし。
+- GitHub Pages本体v5.63、iPhoneの馬券・残高・通知・精算に変更なし。次工程はユーザーによるNeon Auth設定とサーバー認証の接続、RLSの実装・検証。
+
+---
+
+
 ## 友達共有 P1：認証DB用の独立スキーマ準備（2026-11-02）
 
 - Vercelの既存 `baken-king-monitor-bridge` は結果監視専用、Neonの既存 `machi-shindan` は別事業のDBであることを確認。いずれにも変更・新規費用発生操作は行っていない。
