@@ -15,3 +15,7 @@ assert(!section.includes('8,400円')&&!section.includes('95.8%'),'Sample friend 
 assert(html.includes('bk-compare-cell.bk-compare-win')&&html.includes('bk-compare-cell.bk-compare-lose'));
 assert(html.includes("if(bkDataSection==='friends')bkRenderFriendCompare()"));
 console.log('PASS: two-person comparison table, actual local metrics and neutral no-friend state');
+
+const full=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
+assert(full.includes('const bkHistoryTargetTab=document.querySelector(\'section[data-tab="data"] [data-data-panel="records"]\')'),'History must live in records only');
+assert(full.includes("label.textContent='精算履歴'"),'History label should be unique');
