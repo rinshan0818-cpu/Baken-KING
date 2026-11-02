@@ -4,6 +4,7 @@
 // Do not bundle this into the public GitHub Pages application.
 const {createJwtAuthenticator}=require('./jwt-auth.cjs');
 const {createSharingStore}=require('./neon-store.cjs');
+const {createFriendshipStore}=require('./friendship-store.cjs');
 const {createSharingService}=require('./service.cjs');
 const {createSharingHttpHandler}=require('./http.cjs');
 function createSharingApi({env,db}){
@@ -11,7 +12,7 @@ function createSharingApi({env,db}){
  const {SHARING_JWT_ISSUER:issuer,SHARING_JWT_AUDIENCE:audience,SHARING_JWT_PUBLIC_KEY:publicKey}=env;
  if(!issuer||!audience||!publicKey)throw Error('Verified authentication not configured');
  const authenticate=createJwtAuthenticator({issuer,audience,publicKey});
- const store=createSharingStore(db);
+ const store={...createSharingStore(db),...createFriendshipStore(db)};
  const service=createSharingService({authenticate,store});
  return createSharingHttpHandler(service,{allowedOrigins:['https://rinshan0818-cpu.github.io']});
 }
