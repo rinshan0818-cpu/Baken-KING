@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0B2D5B"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>Baken-KING | v5.66 Beta</title><link rel="manifest" href="./manifest.webmanifest"><link rel="preload" href="./ticket-template-v2.png" as="image"><link rel="icon" type="image/svg+xml" href="./icon.svg?v=3.7"><link rel="apple-touch-icon" sizes="512x512" href="./baken_king_icon_512.png?v=3.8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Baken-KING"><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0B2D5B"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>Baken-KING | v5.67 Beta</title><link rel="manifest" href="./manifest.webmanifest"><link rel="preload" href="./ticket-template-v2.png" as="image"><link rel="icon" type="image/svg+xml" href="./icon.svg?v=3.7"><link rel="apple-touch-icon" sizes="512x512" href="./baken_king_icon_512.png?v=3.8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Baken-KING"><style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;color:#17251f;background:#f4f6f4}*{box-sizing:border-box}body{margin:0}.top{background:#10251e;color:white;padding:22px 18px 26px}.wrap{max-width:760px;margin:auto;padding:0 14px 35px}h1{font-size:22px;margin:0 0 8px}h2{font-size:18px;margin:0 0 14px}.muted{color:#64736a;font-size:12px}.top .muted{color:#c4d6c9}.pill{display:inline-block;background:#f7e8b6;color:#544019;padding:5px 9px;border-radius:50px;font-size:12px;font-weight:700}.card{background:white;border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 3px 16px #0a25100c}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:#edf4ee;border-radius:12px;padding:12px}.stat strong{display:block;font-size:20px;margin-top:5px}.label{font-size:12px;color:#506158}button,select,input{font:inherit}button{border:0;border-radius:10px;padding:11px 14px;background:#176d45;color:white;font-weight:700;cursor:pointer}button:disabled{background:#a9b7ae}button.alt{background:#e6eee8;color:#194d34}button.danger{background:#a13e36}button.outline{background:white;border:1px solid #d0ded3;color:#175e3d}.official{display:inline-block;padding:11px 13px;border:1px solid #c9ded1;border-radius:10px;color:#175e3d;text-decoration:none;font-size:13px;font-weight:700}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.space{justify-content:space-between}.horse{padding:11px 9px;border:1px solid #dbe5de;border-radius:9px;background:white;color:#17251f;min-width:0;text-align:left}.horse.on{background:#dcf4e4;border-color:#167346}.horses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.num{font-weight:800;font-size:18px;margin-right:6px}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form>div{min-width:0}select,input{width:100%;border:1px solid #ccd9d0;border-radius:10px;padding:12px;background:white}small{font-size:12px}.alert{background:#fff4da;border:1px solid #f1d594;border-radius:10px;padding:12px;font-size:13px;line-height:1.6}.line{border-bottom:1px solid #edf1ed;padding:10px 0;font-size:14px}.tag{background:#e8f1ea;color:#276341;padding:3px 8px;border-radius:20px;font-size:11px}.negative{color:#aa4136}.positive{color:#167346}.footer{font-size:12px;color:#65736b;line-height:1.6;margin-top:20px}#toast{position:fixed;bottom:18px;left:5%;right:5%;max-width:500px;margin:auto;background:#142e21;color:white;padding:14px;border-radius:12px;display:none;z-index:2}@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.horses{grid-template-columns:repeat(3,1fr)}}
 [data-tab][hidden]{display:none!important}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;justify-content:space-around;background:#fff;border-top:1px solid #dce8df;padding:7px 4px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -3px 15px #10251e10}.bottom-nav button{flex:1;background:transparent;color:#64736a;border-radius:9px;padding:5px 1px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}.bottom-nav button span{font-size:22px;line-height:24px}.bottom-nav button.active{color:#176d45;background:#edf5ee}.wrap{padding-bottom:115px}#toast{bottom:95px}@media(max-width:370px){.bottom-nav button{font-size:10px}}
 /* v3.8: iPhone layout stability and touch targets */
@@ -1278,7 +1278,7 @@ body.bk-payout-locked #realAutoSettle[disabled]{display:none!important}
 .bk-win-hero{margin:12px 0;padding:15px 12px;text-align:center;border:2px solid var(--bk-hit-border);border-radius:12px;background:var(--bk-hit-bg);color:var(--bk-hit-text);display:flex;flex-direction:column;gap:4px}
 .bk-win-hero-title{font-size:20px;font-weight:900}.bk-win-hero small{font-size:12px;font-weight:700}.bk-win-hero strong{font-size:clamp(25px,7vw,36px);line-height:1.25;overflow-wrap:anywhere}
 .bk-win-breakdown-heading{font-weight:800;font-size:13px;color:var(--bk-hit-text);padding:8px 0 3px}
-/* v5.66: winning result panel scrolls inside the monitor rather than clipping the green frame */
+/* v5.67: winning result panel scrolls inside the monitor rather than clipping the green frame */
 body.bk-payout-locked .bk-machine-result-detail:not(:empty){
  max-height:clamp(130px,25dvh,250px)!important;
  min-height:0!important;
@@ -1312,7 +1312,7 @@ body.bk-payout-locked .bk-win-hero{margin:3px 0 10px!important;padding:12px 10px
 [data-bk-legacy-hidden="true"]{display:none!important}
 #realAutoSettle{display:none!important}
 .bk-today-bar{margin:14px 0;padding:15px;border:1px solid #c7d7df;background:#f5faff;border-radius:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.bk-today-bar strong{font-size:24px}.bk-today-bar small{flex-basis:100%;color:#566674}.bk-next-race{display:block;width:100%;margin:10px 0;padding:14px;background:#e9f5ee;color:#164f3a;border:1px solid #adcfba;border-radius:13px;text-align:left;font-weight:700}.bk-next-race[hidden]{display:none!important}\n
-/* v5.66: highly visible but distinct waiting/ready ticket state */
+/* v5.67: highly visible but distinct waiting/ready ticket state */
 .bk-race-ticket-group .bk-race-status-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:0 0 auto}
 .bk-race-ticket-group .bk-race-pending-label.bk-race-status-ready{display:inline-block;background:#0d7350;color:#fff;font-size:12px;font-weight:800;padding:7px 10px;border-radius:9px;white-space:nowrap;box-shadow:0 2px 6px #0d73502b}
 .bk-race-ticket-group .bk-race-pending-label.bk-race-status-waiting{display:inline-block;background:#e9eef5;color:#4f627a;font-size:11px;font-weight:700;padding:5px 8px;border-radius:8px;white-space:nowrap}
@@ -1320,7 +1320,7 @@ body.bk-payout-locked .bk-win-hero{margin:3px 0 10px!important;padding:12px 10px
 /* Race number × venue matrix */
 .bk-matrix-period-label{display:block;margin:12px 0;color:#52647b;font-size:13px;font-weight:700}.bk-matrix-period-label select{display:block;margin-top:6px;width:100%;max-width:240px;padding:9px 12px;border:1px solid #cbd8ed;border-radius:10px;background:#fff;color:#173353}.bk-matrix-legend{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0}.bk-matrix-key{font-size:10px;border-radius:6px;padding:5px 7px;border:1px solid #dce5ee}.bk-matrix-key.excellent,.bk-matrix-cell.excellent{background:#166c45;color:#fff}.bk-matrix-key.positive,.bk-matrix-cell.positive{background:#c4f0d5;color:#125338}.bk-matrix-key.neutral,.bk-matrix-cell.neutral{background:#f7f1c9;color:#6f5510}.bk-matrix-key.weak,.bk-matrix-cell.weak{background:#ffe0c9;color:#82441f}.bk-matrix-key.poor,.bk-matrix-cell.poor{background:#fbe0e4;color:#9c2837}.bk-matrix-key.empty,.bk-matrix-cell.empty{background:#f0f3f7;color:#8793a3}.bk-matrix-scroll{overflow-x:auto;max-width:100%;border:1px solid #dce4ef;border-radius:12px;overscroll-behavior-x:contain}.bk-matrix-table{border-collapse:separate;border-spacing:3px;min-width:1060px;width:max-content;font-variant-numeric:tabular-nums}.bk-matrix-table th{font-size:12px;padding:7px 5px;color:#425b7c;white-space:nowrap;text-align:center;background:#fff}.bk-matrix-table thead th{position:sticky;top:0;z-index:1}.bk-matrix-table th:first-child{position:sticky;left:0;z-index:2;min-width:65px;text-align:left;padding-left:9px;background:#fff}.bk-matrix-table thead th:first-child{z-index:3}.bk-matrix-table td{padding:0}.bk-matrix-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:56px;min-width:70px;padding:8px 3px;border:2px solid transparent;border-radius:7px;cursor:pointer}.bk-matrix-cell strong{font-size:12px;font-weight:800}.bk-matrix-cell small{font-size:10px;opacity:.85}.bk-matrix-cell.selected{border-color:#1e4dce;outline:1px solid #1e4dce}.bk-matrix-cell:focus-visible{outline:3px solid #2563eb;outline-offset:0}.bk-matrix-cell.total{font-weight:800}.bk-matrix-overall th:first-child{color:#174e91;font-weight:900}.bk-matrix-detail{margin-top:15px;padding:14px;border:1px solid #cfdbeb;border-radius:12px;background:#f7faff}.bk-matrix-detail h4{font-size:15px;color:#17365c;margin:0 0 12px}.bk-matrix-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bk-matrix-detail-grid>div{padding:9px 6px;background:#fff;border-radius:7px;min-width:0}.bk-matrix-detail-grid small{display:block;font-size:10px;color:#69809c}.bk-matrix-detail-grid strong{display:block;font-size:13px;margin-top:5px;overflow-wrap:anywhere}.bk-matrix-pending{font-size:12px;color:#9b5a20}.bk-matrix-race-list{margin-top:12px;max-height:300px;overflow-y:auto}.bk-matrix-race-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 2px;border-top:1px solid #e1e9f3;font-size:12px}.bk-matrix-race-line small{grid-column:1/-1;color:#5e7089}.bk-matrix-legacy{margin-top:15px}
 
-/* v5.66: compact, mobile-safe push/audio settings */
+/* v5.67: compact, mobile-safe push/audio settings */
 .bk-push-panel{box-sizing:border-box;width:100%;min-width:0;max-width:100%;margin-top:16px;padding:15px 12px;overflow-wrap:anywhere}
 .bk-push-panel>*{box-sizing:border-box;max-width:100%;min-width:0}
 .bk-push-panel h3{font-size:17px;line-height:1.4;margin:0 0 9px}
@@ -1338,9 +1338,9 @@ body.bk-payout-locked .bk-win-hero{margin:3px 0 10px!important;padding:12px 10px
 .bk-push-sound-name{margin:9px 0;color:#435875;font-size:12px;overflow-wrap:anywhere}
 
 
-/* v5.66 compact navigation and grouped settings */
+/* v5.67 compact navigation and grouped settings */
 .bk-top-inner{max-width:760px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.bk-top-inner .bk-app-title{margin:0}.bk-settings-trigger{appearance:none;border:0;background:transparent;color:#e6edf8;border-radius:12px;width:44px;height:44px;padding:0;display:grid;place-items:center;cursor:pointer;flex:none;-webkit-tap-highlight-color:transparent}.bk-settings-trigger svg{display:block}.bk-settings-trigger:active,.bk-settings-trigger.active{background:#ffffff16}.bk-settings-trigger:focus-visible{outline:2px solid #d1e4ff;outline-offset:2px}.bk-settings-surface{margin-top:18px}.bk-settings-heading{padding:0 3px 6px}.bk-settings-heading h2{font-size:22px;margin-bottom:3px}.bk-settings-heading p{margin:0}.bk-settings-fold{background:white;border-radius:16px;box-shadow:0 3px 16px #10251e10;margin-top:12px;overflow:hidden}.bk-settings-fold>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:17px 42px 17px 17px;position:relative}.bk-settings-fold>summary::-webkit-details-marker{display:none}.bk-settings-fold>summary:after{content:"⌄";position:absolute;right:19px;top:21px;font-size:22px;color:#64736a;line-height:1;transition:transform .18s}.bk-settings-fold[open]>summary:after{transform:rotate(180deg)}.bk-settings-fold-label{font-weight:800;font-size:16px}.bk-settings-fold-hint{font-size:12px;color:#64736a}.bk-settings-fold-content{padding:0 12px 15px;border-top:1px solid #edf1ef}.bk-settings-fold-content>.card{box-shadow:none;border:1px solid #edf1ef;margin-top:12px;padding:15px;border-radius:12px}.bk-settings-fold-content>.footer{padding:8px}.bk-admin-note{margin:13px 6px}.bottom-nav button{max-width:25%}
-/* v5.66: fixed machine viewport with compact settlement-ready tray */
+/* v5.67: fixed machine viewport with compact settlement-ready tray */
 body.bk-payout-locked #payoutMachinePanel{bottom:calc(env(safe-area-inset-bottom,0px) + 73px)!important;gap:0!important}
 body.bk-payout-locked .bk-machine-display{min-height:0!important;flex:1 1 0!important;overflow:hidden!important}
 .bk-ready-tray{display:flex;flex-direction:column;flex:0 0 auto;background:#f8fafc;border-top:1px solid #d9e3f0;padding:9px 11px 11px;min-height:105px;max-height:118px}
@@ -1363,7 +1363,7 @@ body.bk-payout-locked .bk-machine-display{min-height:0!important;flex:1 1 0!impo
 
 /* Result-waiting tickets remain readable but cannot launch the settlement machine. */
 .bk-ticket-list-page .bk-machine-queue-item:disabled{opacity:1;cursor:default}
-/* v5.66: genuine betting-slip miniatures, not plain race/type tiles */
+/* v5.67: genuine betting-slip miniatures, not plain race/type tiles */
 body.bk-payout-locked .bk-ready-tray{min-height:167px;max-height:167px;padding:8px 10px 9px}
 body.bk-payout-locked .bk-ready-ticket-rail{min-height:123px;max-height:123px;align-items:flex-start;padding:2px 1px 5px}
 body.bk-payout-locked .bk-ready-ticket{width:194px;min-width:194px;max-width:194px;height:117px;padding:4px;border-radius:7px;display:block;overflow:hidden;flex:0 0 auto;background:#f3f8f6;border:1px solid #bad0c4;box-shadow:0 1px 5px #102a3920}
@@ -1375,7 +1375,7 @@ body.bk-payout-locked .bk-ready-ticket:active{transform:translateY(2px);transiti
 body.bk-payout-locked .bk-ready-tray-heading{margin-bottom:5px}
 @media(max-height:720px){body.bk-payout-locked .bk-ready-tray{min-height:142px;max-height:142px;padding:5px 9px 6px}body.bk-payout-locked .bk-ready-ticket-rail{min-height:112px;max-height:112px}body.bk-payout-locked .bk-ready-ticket{height:105px}body.bk-payout-locked .bk-ready-ticket-preview{height:98px}}
 
-/* v5.66: clear beta/test identity, safe independent sandbox wallet */
+/* v5.67: clear beta/test identity, safe independent sandbox wallet */
 .bk-app-title:after{content:'BETA';font-size:9px;letter-spacing:.1em;margin-left:9px;vertical-align:middle;background:#ffffff25;border:1px solid #ffffff35;border-radius:6px;padding:3px 6px}
 body.bk-test-mode{--bk-test:#9b5b10}
 body.bk-test-mode .bk-app-title:after{content:'BETA · TEST';background:#f5ddaa;color:#55340b;border-color:#f5ddaa}
@@ -1388,7 +1388,7 @@ body.bk-test-mode .bk-app-title:after{content:'BETA · TEST';background:#f5ddaa;
 body.bk-test-mode .bk-mode-panel{border-color:#d3ba7f;background:#fff9ec}
 
 
-/* v5.66 A: compact automatic payout LCD + generously sized sideways ticket gallery.
+/* v5.67 A: compact automatic payout LCD + generously sized sideways ticket gallery.
    The normal screen does not scroll vertically; results reclaim the machine area. */
 body.bk-payout-locked #payoutMachinePanel{
   gap:0!important;
@@ -1578,7 +1578,7 @@ body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-machine-res
 }
 
 
-/* v5.66: compact navigation and reliable ticket/settlement composition */
+/* v5.67: compact navigation and reliable ticket/settlement composition */
 .top{padding:8px 15px 9px!important;padding-top:calc(8px + env(safe-area-inset-top))!important}
 .bk-top-inner{min-height:42px!important}
 .bk-app-title{font-size:19px!important;gap:5px!important;white-space:nowrap}
@@ -1646,7 +1646,7 @@ body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-ready-ticke
 }
 
 
-/* v5.66 minimal navigation bar: right aligned test badge / settings */
+/* v5.67 minimal navigation bar: right aligned test badge / settings */
 .bk-top-inner{justify-content:flex-end!important;gap:11px!important}
 .bk-header-status{display:inline-flex;align-items:center;justify-content:center;
  padding:7px 12px;border:1px solid #f5de93;border-radius:8px;
@@ -1726,7 +1726,7 @@ body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-ready-tray{
 }
 
 
-/* v5.66: equal 46px header across every tab, using the payout tab as reference.
+/* v5.67: equal 46px header across every tab, using the payout tab as reference.
    The ordinary header stays in document flow; payout remains viewport-fixed. */
 .top{
  height:46px!important;
@@ -1753,7 +1753,7 @@ body.bk-payout-locked>.top{
 }
 
 
-/* v5.66: deterministic SVG ticket thumbnails (fixed aspect, no raster dependence) */
+/* v5.67: deterministic SVG ticket thumbnails (fixed aspect, no raster dependence) */
 body.bk-payout-locked #payoutMachinePanel .bk-ready-ticket .bk-slip-vector{
  display:block!important;width:100%!important;height:100%!important;
  max-width:none!important;max-height:none!important;overflow:visible!important;
@@ -1817,7 +1817,7 @@ body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-machine-res
 }
 
 
-/* v5.66: identical ticket DOM and art as 馬券, no SVG/special wrapper/transform. */
+/* v5.67: identical ticket DOM and art as 馬券, no SVG/special wrapper/transform. */
 body.bk-payout-locked #payoutMachinePanel .bk-ready-ticket{
  width:min(68vw,285px)!important;min-width:min(68vw,285px)!important;
  max-width:285px!important;height:auto!important;
@@ -1878,7 +1878,7 @@ body.bk-payout-locked.bk-machine-result-open #payoutMachinePanel .bk-machine-res
 }
 
 
-/* v5.66: ordinary receipt DOM in a non-button holder; a transparent control
+/* v5.67: ordinary receipt DOM in a non-button holder; a transparent control
    covers it rather than wrapping it (the former nested receipt rendered blank). */
 body.bk-payout-locked #payoutMachinePanel .bk-queue-slip-option{
  position:relative!important;display:block!important;flex:0 0 auto!important;
@@ -1959,13 +1959,13 @@ body.bk-payout-locked.bk-machine-finished #payoutMachinePanel .bk-machine-result
  }
 }
 
-/* v5.66: one completion action, return to the payout idle screen */
+/* v5.67: one completion action, return to the payout idle screen */
 body.bk-payout-locked.bk-machine-finished #payoutMachinePanel .bk-machine-next-actions button:last-child{
  flex:1 1 100%!important;width:100%!important;max-width:none!important;
  background:#173968!important;color:#fff!important;border:1px solid #163961!important;
 }
 
-/* v5.66: reader animation fills the LCD; payout stays on the bottom edge. */
+/* v5.67: reader animation fills the LCD; payout stays on the bottom edge. */
 body.bk-payout-locked.bk-machine-reading #payoutMachinePanel .bk-machine-screenbody{
  display:flex!important;flex-direction:column!important;min-height:0!important;
 }
@@ -1985,7 +1985,7 @@ body.bk-payout-locked.bk-machine-reading #payoutMachinePanel .bk-machine-reading
 }
 
 
-/* v5.66: during the brief read, avoid the cropped ticket carousel and
+/* v5.67: during the brief read, avoid the cropped ticket carousel and
    keep the payout bar attached to the bottom of the LCD display. */
 body.bk-payout-locked.bk-machine-reading #payoutMachinePanel .bk-ready-tray{
  display:none!important
@@ -2024,7 +2024,7 @@ body.bk-payout-locked.bk-machine-reading #payoutMachinePanel .bk-machine-total{
 }
 
 
-/* v5.66: reading display is explicitly controlled in JS; the lower carousel
+/* v5.67: reading display is explicitly controlled in JS; the lower carousel
    cannot remain partly visible while the LCD uses full height. */
 body.bk-payout-locked #payoutMachinePanel.bk-reader-active > .bk-ready-tray{
  display:none!important;
@@ -2037,7 +2037,7 @@ body.bk-payout-locked #payoutMachinePanel.bk-reader-active .bk-machine-total{
  margin-top:auto!important;
 }
 
-/* v5.66: bespoke consistent line icons, preserve existing footer touch layout */
+/* v5.67: bespoke consistent line icons, preserve existing footer touch layout */
 .bottom-nav button .bk-nav-icon{
  display:flex!important;align-items:center!important;justify-content:center!important;
  width:28px!important;height:22px!important;
@@ -2050,7 +2050,7 @@ body.bk-payout-locked #payoutMachinePanel.bk-reader-active .bk-machine-total{
 .bottom-nav button.active .bk-nav-icon svg{stroke-width:2!important}
 
 
-/* v5.66: one-screen home and data overview, preserve long analytical sections */
+/* v5.67: one-screen home and data overview, preserve long analytical sections */
 section[data-tab="home"].bk-home{padding:clamp(11px,2.4vh,18px)!important;margin-top:10px!important}
 .bk-home .bk-home-head{margin-bottom:8px!important}
 .bk-home .bk-home-head h2{margin-bottom:0!important}
@@ -2088,22 +2088,22 @@ section[data-tab="data"] .bk-overview-extra{margin-top:7px!important}
 }
 
 
-/* v5.66: completed result owns the viewport; no cropped pending ticket rail. */
+/* v5.67: completed result owns the viewport; no cropped pending ticket rail. */
 body.bk-payout-locked.bk-machine-finished #payoutMachinePanel > .bk-ready-tray{display:none!important;flex:0 0 0!important;min-height:0!important;max-height:0!important;padding:0!important;border:0!important}
 body.bk-payout-locked.bk-machine-finished #payoutMachinePanel > .bk-machine-display{flex:1 1 0!important;min-height:0!important;max-height:none!important}
 body.bk-payout-locked.bk-machine-finished #payoutMachinePanel .bk-machine-result-detail{min-height:0!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch}
 
 
-/* v5.66: avoid flashing the legacy ticket while the approved artwork loads. */
+/* v5.67: avoid flashing the legacy ticket while the approved artwork loads. */
 .bk-ticket-v23.bk-art-loading>.bk-v25-face{visibility:hidden!important}
 .bk-ticket-v23.bk-art-loading{background:#e8f9ed!important}
 
-/* v5.66: permanent next-race slot without changing race selection or navigation. */
+/* v5.67: permanent next-race slot without changing race selection or navigation. */
 .bk-home #bkHomeNextRace{display:flex!important;align-items:center!important;width:100%;min-height:70px!important;margin:10px 0!important;padding:14px 16px!important;box-sizing:border-box!important}
 .bk-home #bkHomeNextRace.bk-next-race-empty{background:#eef3fb!important;border:1px solid #d2deee!important;color:#6b7d94!important;cursor:default!important;opacity:1!important}
 .bk-home #bkHomeNextRace:not(:disabled){cursor:pointer!important}
 
-/* v5.66: let the home dashboard use spare iPhone vertical space without fixed clipping. */
+/* v5.67: let the home dashboard use spare iPhone vertical space without fixed clipping. */
 @media (min-height:780px){
  section[data-tab="home"].bk-home:not([hidden]){
   display:flex!important;flex-direction:column!important;
@@ -2127,7 +2127,7 @@ body.bk-payout-locked.bk-machine-finished #payoutMachinePanel .bk-machine-result
  }
 }
 
-/* v5.66: consistent home KPI numeral size regardless of value length. */
+/* v5.67: consistent home KPI numeral size regardless of value length. */
 .bk-home .bk-home-primary strong,
 .bk-home .bk-home-kpis .stat strong{
  font-size:clamp(21px,4.45vw,28px)!important;
@@ -2144,16 +2144,16 @@ body.bk-payout-locked.bk-machine-finished #payoutMachinePanel .bk-machine-result
  .bk-home .bk-home-kpis .stat strong{font-size:clamp(19px,5.2vw,23px)!important}
 }
 
-/* v5.66: never expose the home panel when another tab is active. */
+/* v5.67: never expose the home panel when another tab is active. */
 section[data-tab="home"].bk-home[hidden]{display:none!important}
 
-/* v5.66: stable tab boundaries for the approved home/tickets/payout/data UI.
+/* v5.67: stable tab boundaries for the approved home/tickets/payout/data UI.
    Always keep hidden panels out of layout; scope flexible home only to visible home. */
 main.wrap > [data-tab][hidden]{display:none!important}
 main.wrap > section.bk-home[data-tab="home"][hidden]{display:none!important}
 main.wrap > section.bk-home[data-tab="home"]:not([hidden]){box-sizing:border-box}
 
-/* v5.66: predict-only compact hero and consistent ordered-axis labels. */
+/* v5.67: predict-only compact hero and consistent ordered-axis labels. */
 #weekRaceStatus{display:none!important}
 #autumnFixtureCard .bk-race-hero{padding:12px 16px 12px!important;margin-bottom:10px!important}
 #autumnFixtureCard .bk-race-eyebrow{display:none!important}
@@ -2173,7 +2173,7 @@ main.wrap > section.bk-home[data-tab="home"]:not([hidden]){box-sizing:border-box
 }
 @media(max-width:390px){#autumnFixtureCard .bk-bet-choices .bk-leg-choice{min-width:34px!important;width:34px!important;flex-basis:34px!important}}
 
-/* v5.66: restore the class/grade badge's original colored appearance after moving it into condition tags. */
+/* v5.67: restore the class/grade badge's original colored appearance after moving it into condition tags. */
 #autumnFixtureCard .bk-race-condition-labels > .bk-race-class-tag{background:#e4efff;color:#153764;border:1px solid #b7d3ff;font-weight:800;padding:5px 10px}
 #autumnFixtureCard .bk-race-condition-labels > .bk-race-class-tag.bk-grade-g1{background:linear-gradient(135deg,#fff0a6,#dca623);border-color:#a87b0b;color:#523800}
 #autumnFixtureCard .bk-race-condition-labels > .bk-race-class-tag.bk-grade-g2{background:linear-gradient(135deg,#f7f9fc,#afb8c6);border-color:#8695a7;color:#293a50}
@@ -2181,7 +2181,7 @@ main.wrap > section.bk-home[data-tab="home"]:not([hidden]){box-sizing:border-box
 #autumnFixtureCard .bk-race-condition-labels > .bk-race-class-tag.bk-grade-listed,
 #autumnFixtureCard .bk-race-condition-labels > .bk-race-class-tag.bk-grade-open{background:#d9f4a6;border-color:#9ac854;color:#345400}
 
-/* v5.66: predict hero information hierarchy: badge row, name, start conditions. */
+/* v5.67: predict hero information hierarchy: badge row, name, start conditions. */
 #autumnFixtureCard .bk-race-hero .bk-race-condition-labels{margin:0 0 8px!important;gap:6px!important;align-items:center!important;min-height:0!important}
 #autumnFixtureCard .bk-race-hero h2{margin:0 0 6px!important;line-height:1.25!important}
 #autumnFixtureCard .bk-race-hero{padding-top:12px!important;padding-bottom:12px!important}
@@ -2202,7 +2202,7 @@ main.wrap > section.bk-home[data-tab="home"]:not([hidden]){box-sizing:border-box
 
 <div class="bk-dashboard"><h3>馬券の状況</h3><div class="bk-home-status"><div class="stat"><span class="label">結果待ち</span><strong id="homePending">0件</strong></div><div class="stat"><span class="label">精算待ち</span><strong id="homeReady">0件</strong></div><div class="stat" hidden style="display:none!important"><span class="label">的中件数</span><strong id="homeHits">0件</strong></div><div class="stat" hidden style="display:none!important"><span class="label">ゲームオーバー</span><strong id="bankrupt"></strong></div></div></div>
 
-</section><section class="card" data-tab="settings"><h2>アプリの更新</h2><p class="muted">ホーム画面版でも最新版を確認できます。保存済みの残高・履歴は更新しても保持されます。</p><div class="row"><button id="checkUpdate" class="alt">最新版を確認</button><span id="updateStatus" class="muted">現在 v5.66</span></div></section><section class="card" data-tab="predict"><h2>実際のレース情報を確認</h2><p class="muted">出馬表と確定結果の自動取得に対応しています。精算操作は手動です。</p><div class="row"><a class="official" href="https://www.jra.go.jp/keiba/" target="_blank" rel="noopener noreferrer">JRA公式の競馬情報 ↗</a><a class="official" href="https://www.jra.go.jp/JRADB/accessD.html" target="_blank" rel="noopener noreferrer">JRAデータファイル ↗</a></div></section><section class="card" data-bk-legacy-hidden="true" hidden aria-hidden="true" data-tab="predict"><h2>旧式レース画面（提供終了）</h2><p class="muted">実際の競走データではない旧形式の過去レースで、枠番・馬番・発走時刻・結果を検証します。本番モードでは過去レース購入を許可しません。</p><div class="row"><button class="outline" id="loadHistoricalFixture">旧形式の情報を確認</button></div><div id="historicalFixtureView" class="alert" style="margin-top:12px">まだ読み込んでいません。</div></section><section class="card" data-tab="settings" id="bkCardImportSettings"><h2>出馬表データを読み込む</h2><p class="muted">iPhoneの「ファイル」から selected-race-cards.json を選択してください。購入済みの馬券・精算履歴は消えません。</p><input type="file" id="bkCardImportFile" accept=".json,application/json" aria-label="出馬表JSONファイルを選択"><p id="bkCardImportStatus" class="muted">未読込</p><div id="bkPrivateCardStatus" style="margin-top:14px"><h3>出馬表の自動取得</h3><p id="bkPrivateCardMessage" class="muted">接続状況を確認中です。</p><button id="bkPrivateCardCheck" type="button" class="outline">出馬表の接続を確認</button></div></section><div hidden aria-hidden="true"><input id="raceImport" type="file" accept=".json,application/json"><div id="importedRace"></div></div><section class="card" data-tab="predict" id="weekendRaceSelector"><div class="bk-race-picker"><div><label class="label" for="weekDate">開催日</label><select id="weekDate"><option value="2026-10-31">10/31（土）</option><option value="2026-11-01">11/1（日）</option></select></div><div><label class="label" for="weekVenue">競馬場</label><select id="weekVenue"><option>東京</option><option>京都</option></select></div><div><label class="label" for="weekRace">レース</label><select id="weekRace"></select></div></div><p id="weekRaceStatus" class="bk-race-status" hidden aria-live="polite">レース情報を確認しています。</p><button id="weekOpenTenno" class="alt" hidden>天皇賞（秋）の投票へ</button></section><section class="card" data-tab="predict" id="bkPersonalCardImport" hidden aria-hidden="true"><h2>読み込んだ出馬表</h2><div id="bkCardImportHorses"></div><div hidden aria-hidden="true"><p id="bkCardPurchaseNotice"></p><select id="bkImportedBetType"><option>馬連</option></select><input id="bkImportedStake" type="number" value="100"><p id="bkImportedSelectionSummary"></p><button id="bkImportedSaveDraft" type="button">保存</button><div id="bkImportedDraftList"></div></div></section><section class="card" data-tab="predict" id="preDrawRaceCard" hidden><h2 id="preDrawRaceTitle">出馬表</h2><p class="muted">馬番未確定のため、投票受付前です。馬番確定後に更新します。</p><div id="preDrawHorses"></div></section><section class="card" data-tab="predict" id="autumnFixtureCard">
+</section><section class="card" data-tab="settings"><h2>アプリの更新</h2><p class="muted">ホーム画面版でも最新版を確認できます。保存済みの残高・履歴は更新しても保持されます。</p><div class="row"><button id="checkUpdate" class="alt">最新版を確認</button><span id="updateStatus" class="muted">現在 v5.67</span></div></section><section class="card" data-tab="predict"><h2>実際のレース情報を確認</h2><p class="muted">出馬表と確定結果の自動取得に対応しています。精算操作は手動です。</p><div class="row"><a class="official" href="https://www.jra.go.jp/keiba/" target="_blank" rel="noopener noreferrer">JRA公式の競馬情報 ↗</a><a class="official" href="https://www.jra.go.jp/JRADB/accessD.html" target="_blank" rel="noopener noreferrer">JRAデータファイル ↗</a></div></section><section class="card" data-bk-legacy-hidden="true" hidden aria-hidden="true" data-tab="predict"><h2>旧式レース画面（提供終了）</h2><p class="muted">実際の競走データではない旧形式の過去レースで、枠番・馬番・発走時刻・結果を検証します。本番モードでは過去レース購入を許可しません。</p><div class="row"><button class="outline" id="loadHistoricalFixture">旧形式の情報を確認</button></div><div id="historicalFixtureView" class="alert" style="margin-top:12px">まだ読み込んでいません。</div></section><section class="card" data-tab="settings" id="bkCardImportSettings"><h2>出馬表データを読み込む</h2><p class="muted">iPhoneの「ファイル」から selected-race-cards.json を選択してください。購入済みの馬券・精算履歴は消えません。</p><input type="file" id="bkCardImportFile" accept=".json,application/json" aria-label="出馬表JSONファイルを選択"><p id="bkCardImportStatus" class="muted">未読込</p><div id="bkPrivateCardStatus" style="margin-top:14px"><h3>出馬表の自動取得</h3><p id="bkPrivateCardMessage" class="muted">接続状況を確認中です。</p><button id="bkPrivateCardCheck" type="button" class="outline">出馬表の接続を確認</button></div></section><div hidden aria-hidden="true"><input id="raceImport" type="file" accept=".json,application/json"><div id="importedRace"></div></div><section class="card" data-tab="predict" id="weekendRaceSelector"><div class="bk-race-picker"><div><label class="label" for="weekDate">開催日</label><select id="weekDate"><option value="2026-10-31">10/31（土）</option><option value="2026-11-01">11/1（日）</option></select></div><div><label class="label" for="weekVenue">競馬場</label><select id="weekVenue"><option>東京</option><option>京都</option></select></div><div><label class="label" for="weekRace">レース</label><select id="weekRace"></select></div></div><p id="weekRaceStatus" class="bk-race-status" hidden aria-live="polite">レース情報を確認しています。</p><button id="weekOpenTenno" class="alt" hidden>天皇賞（秋）の投票へ</button></section><section class="card" data-tab="predict" id="bkPersonalCardImport" hidden aria-hidden="true"><h2>読み込んだ出馬表</h2><div id="bkCardImportHorses"></div><div hidden aria-hidden="true"><p id="bkCardPurchaseNotice"></p><select id="bkImportedBetType"><option>馬連</option></select><input id="bkImportedStake" type="number" value="100"><p id="bkImportedSelectionSummary"></p><button id="bkImportedSaveDraft" type="button">保存</button><div id="bkImportedDraftList"></div></div></section><section class="card" data-tab="predict" id="preDrawRaceCard" hidden><h2 id="preDrawRaceTitle">出馬表</h2><p class="muted">馬番未確定のため、投票受付前です。馬番確定後に更新します。</p><div id="preDrawHorses"></div></section><section class="card" data-tab="predict" id="autumnFixtureCard">
 <div class="bk-race-hero"><div class="bk-race-eyebrow"><span class="bk-grade">GⅠ</span><span>東京 11R · 11月1日（日）</span></div><h2>天皇賞（秋）</h2><div class="bk-race-meta"><span>15:40 発走</span><span>芝 2000m</span><span>17頭</span></div></div>
 <div class="form bk-bet-controls"><div><label class="label" for="realBetType">券種</label><select id="realBetType"></select></div><div><label class="label" for="realBetMode">購入方法</label><select id="realBetMode"><option value="normal">通常</option><option value="box">BOX</option><option value="wheel">流し</option><option value="formation">フォーメーション</option></select></div></div>
 <div id="bkWheelOptions" class="bk-wheel-options" hidden><div><label class="label" for="bkWheelAxisCount">軸馬</label><select id="bkWheelAxisCount"><option value="1">1頭軸</option><option value="2">2頭軸</option></select></div><div><label class="label" for="bkWheelPosition">軸の着順</label><select id="bkWheelPosition"><option value="1">1着固定</option><option value="2">2着固定</option><option value="3">3着固定</option><option value="12">1・2着固定</option><option value="13">1・3着固定</option><option value="23">2・3着固定</option></select></div><label class="bk-wheel-multi"><input id="bkWheelMulti" type="checkbox"> マルチ</label></div><div id="autumnHorseList" class="bk-autumn-list"></div>
@@ -2839,17 +2839,81 @@ function bkRenderRecords(bets){const host=$('dataRecords');host.replaceChildren(
 function bkRenderTags(bets){const stats=$('dataTagStats'),editor=$('dataTagEditor');stats.replaceChildren();editor.replaceChildren();const subset=bkPeriodBets(bets);const rows=BK_TAGS.map(name=>{const tagged=subset.filter(b=>bkTags[b.id]===name);return {name,...bkAnalytics(tagged)}}).filter(x=>x.tickets);if(rows.length)bkTable('dataTagStats',rows,'タグ');else stats.append(bkNode('p','タグ付きの購入履歴はありません。','bk-empty'));const recent=bets.slice(-15).reverse();if(!recent.length){editor.append(bkNode('p','購入履歴ができると、ここからタグを付けられます。','bk-empty'));return}editor.append(bkNode('h4','最近の購入にタグを付ける'));for(const b of recent){const row=bkNode('div','','bk-tag-item');row.append(bkNode('small',bkTicketDescription(b)+' ／ '+fmt(b.stake)+' ／ '+(bkDate(b)||'日付不明')));const sel=document.createElement('select');const empty=document.createElement('option');empty.value='';empty.textContent='タグなし';sel.append(empty);BK_TAGS.forEach(tag=>{const o=document.createElement('option');o.value=tag;o.textContent=tag;sel.append(o)});sel.value=bkTags[b.id]||'';sel.addEventListener('change',()=>{if(sel.value)bkTags[b.id]=sel.value;else delete bkTags[b.id];try{localStorage.setItem(BK_TAG_KEY,JSON.stringify(bkTags))}catch{}bkRenderTags(bets)});row.append(sel);editor.append(row)}}
 function bkInitInsights(){document.querySelectorAll('[data-data-section]').forEach(btn=>btn.addEventListener('click',()=>{bkDataSection=btn.dataset.dataSection;bkRenderSections()}));$('calendarPrev').addEventListener('click',()=>bkMoveCalendar(-1));$('calendarNext').addEventListener('click',()=>bkMoveCalendar(1))}
 function bkMoveCalendar(delta){const [y,m]=bkCalendarMonth.split('-').map(Number),d=new Date(y,m-1+delta,1);bkCalendarMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');bkSelectedDay=null;bkRenderCalendar(bkBets())}
-function bkRenderFriendCompare(){
- // Only the local owner's numbers are available until explicit friend sync exists.
- const fmtYen=n=>Number.isFinite(n)?Math.round(n).toLocaleString('ja-JP')+'円':'—';
- const stake=Number(s.totalStake),paid=Number(s.totalPaid);
- const allBets=Array.isArray(s.bets)?s.bets:[];
- const raceStats=bkRaceStats(allBets);
- const resolved=allBets.filter(b=>['settled','paid','lost','refunded','final'].includes(b.status));
- const maxPayout=resolved.length?Math.max(...resolved.map(b=>Number(b.paid)||0)):null;
- const values={races:raceStats.purchased+'R',hitRaces:raceStats.hit+'R',raceRate:raceStats.settled?(raceStats.hit/raceStats.settled*100).toFixed(1)+'%':'—',maxPayout:maxPayout===null?'—':fmtYen(maxPayout),profit:fmtYen(paid-stake),roi:stake>0?(paid/stake*100).toFixed(1)+'%':'—',stake:fmtYen(stake),paid:fmtYen(paid),settled:Array.isArray(s.bets)?s.bets.filter(b=>['settled','paid','lost','refunded','final'].includes(b.status)).length+'枚':'—'};
- document.querySelectorAll('[data-compare-own]').forEach(el=>{el.textContent=values[el.dataset.compareOwn]||'—'});
+const BK_FRIEND_SCORE_KEY='baken-king-friend-score-v1';
+const BK_SCORE_KEYS=['profit','roi','stake','paid','races','hitRaces','raceRate','maxPayout','settled'];
+function bkFriendMetrics(){
+ const bets=Array.isArray(s.bets)?s.bets:[],stake=s.totalStake,paid=s.totalPaid;
+ const race=bkRaceStats(bets),resolved=bets.filter(b=>['settled','paid','lost','refunded','final'].includes(b.status));
+ return {profit:paid-stake,roi:stake>0?Math.round(paid/stake*1000)/10:null,stake,paid,
+  races:race.purchased,hitRaces:race.hit,raceRate:race.settled?Math.round(race.hit/race.settled*1000)/10:null,
+  maxPayout:resolved.length?Math.max(...resolved.map(b=>Number(b.paid)||0)):null,settled:resolved.length};
 }
+function bkScoreValid(m){
+ if(!m||typeof m!=='object'||Array.isArray(m)||Object.keys(m).length!==BK_SCORE_KEYS.length)return false;
+ return BK_SCORE_KEYS.every(k=>{
+  const v=m[k];return v===null&&(k==='roi'||k==='raceRate'||k==='maxPayout')||
+   typeof v==='number'&&Number.isFinite(v)&&Math.abs(v)<=1e12&&
+   (k==='profit'||v>=0)&&((k==='roi'||k==='raceRate')||Number.isSafeInteger(v));
+ })&&m.profit===m.paid-m.stake&&m.hitRaces<=m.races&&m.settled<=100000&&
+ (m.roi===null?m.stake===0:Math.abs(m.roi-Math.round(m.paid/m.stake*1000)/10)<0.001)&&
+ (m.raceRate===null?m.hitRaces===0: m.raceRate>=0&&m.raceRate<=100);
+}
+function bkRenderFriendCompare(){
+ const own=bkFriendMetrics();
+ const fmtYen=n=>n===null?'–':Math.round(n).toLocaleString('ja-JP')+'円';
+ const fmtValue=(k,n)=>n===null?'–':['profit','stake','paid','maxPayout'].includes(k)?fmtYen(n):
+ ['roi','raceRate'].includes(k)?n.toFixed(1)+'%':n+(['races','hitRaces'].includes(k)?'R':'枚');
+ document.querySelectorAll('[data-compare-own]').forEach(el=>{el.textContent=fmtValue(el.dataset.compareOwn,own[el.dataset.compareOwn])});
+ let friend=null;
+ if(localStorage.getItem('baken-king-mode-v1')!=='test')try{const x=JSON.parse(localStorage.getItem(BK_FRIEND_SCORE_KEY));if(x?.version===1&&bkScoreValid(x.metrics))friend=x.metrics}catch{}
+ document.querySelectorAll('[data-compare-friend]').forEach(el=>{
+  const key=el.dataset.compareFriend,value=friend?.[key]??null,ownValue=own[key];
+  el.textContent=friend?fmtValue(key,value):(key==='profit'?'未登録':'–');
+  el.classList.remove('bk-compare-win','bk-compare-lose','bk-compare-tie','bk-compare-placeholder');
+  if(!friend||value===null){el.classList.add('bk-compare-placeholder');return}
+  if(['stake','paid','races','hitRaces','settled'].includes(key)||ownValue===null){el.classList.add('bk-compare-neutral');return}
+  const diff=value-ownValue;
+  const peer=document.querySelector('[data-compare-own="'+key+'"]');
+  if(peer){peer.classList.remove('bk-compare-win','bk-compare-lose','bk-compare-tie')}
+  if(diff>0){el.classList.add('bk-compare-win');peer?.classList.add('bk-compare-lose')}
+  else if(diff<0){el.classList.add('bk-compare-lose');peer?.classList.add('bk-compare-win')}
+  else{el.classList.add('bk-compare-tie');peer?.classList.add('bk-compare-tie')}
+ });
+ if(!friend)document.querySelectorAll('[data-compare-own]').forEach(el=>el.classList.remove('bk-compare-win','bk-compare-lose','bk-compare-tie'));
+}
+function bkFriendEncode(){
+ if(localStorage.getItem('baken-king-mode-v1')==='test')throw Error('テストモードでは発行できません');
+ const metrics=bkFriendMetrics();if(!bkScoreValid(metrics))throw Error('成績を確認できません');
+ return 'BKFC1-'+btoa(JSON.stringify({version:1,metrics}));
+}
+function bkFriendDecode(code){
+ if(typeof code!=='string'||code.length>4000||!code.trim().startsWith('BKFC1-'))throw Error('比較コードの形式が違います');
+ let obj;try{obj=JSON.parse(atob(code.trim().slice(6)))}catch{throw Error('比較コードを読み取れません')}
+ if(!obj||obj.version!==1||!bkScoreValid(obj.metrics))throw Error('比較コードのデータが不正です');
+ return {version:1,metrics:obj.metrics};
+}
+document.getElementById('bkFriendCodeExport')?.addEventListener('click',()=>{
+ try{document.getElementById('bkFriendCodeOutput').value=bkFriendEncode()}catch(e){alert(e.message)}
+});
+document.getElementById('bkFriendCodeImport')?.addEventListener('click',()=>{
+ const status=document.getElementById('bkFriendCodeStatus');
+ try{
+  if(localStorage.getItem('baken-king-mode-v1')==='test')throw Error('テストモードでは登録できません');
+  const parsed=bkFriendDecode(document.getElementById('bkFriendCodeInput').value);
+  localStorage.setItem(BK_FRIEND_SCORE_KEY,JSON.stringify(parsed));
+  status.textContent='友達の成績を反映しました。';bkRenderFriendCompare();
+ }catch(e){status.textContent=e.message}
+});
+document.getElementById('bkFriendCodeClear')?.addEventListener('click',()=>{
+ localStorage.removeItem(BK_FRIEND_SCORE_KEY);
+ document.getElementById('bkFriendCodeStatus').textContent='登録した友達の成績を削除しました。';
+ bkRenderFriendCompare();
+});
+document.getElementById('bkFriendCodeCopy')?.addEventListener('click',async()=>{
+ const value=document.getElementById('bkFriendCodeOutput').value;if(!value)return;
+ try{await navigator.clipboard.writeText(value);alert('比較コードをコピーしました')}catch{alert('コピーできません。コード欄を長押ししてコピーしてください')}
+});
+
 function bkRenderSections(){if(bkDataSection==='friends')bkRenderFriendCompare();document.querySelectorAll('[data-data-panel]').forEach(p=>p.hidden=p.dataset.dataPanel!==bkDataSection);document.querySelectorAll('[data-data-section]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.dataSection===bkDataSection)))}
 function bkRenderInsights(bets){bkRenderSections();bkRenderTrend(bets);bkRenderCalendar(bets);bkRenderRanking(bets);bkRenderRecords(bets);bkRenderTags(bets)}
 let bkPeriod='all';
@@ -3183,7 +3247,7 @@ $('restore').onchange=async e=>{
 $('resetDemo').onclick=()=>{if(!confirm('全記録を完全に削除します。よろしいですか？'))return;s=initial();selected=[];save()};render();
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{});}
-const APP_VERSION='v5.66';
+const APP_VERSION='v5.67';
 const updateButton=document.getElementById('checkUpdate');
 let latestUpdateUrl='';
 async function checkForUpdate(silent=false){
@@ -3294,7 +3358,7 @@ function bkRecordNavigation(type,from,to,detail=''){
  try{
   const old=JSON.parse(localStorage.getItem(BK_NAV_LOG_KEY)||'[]');
   const arr=Array.isArray(old)?old:[];
-  arr.push({time:new Date().toISOString(),type,from,to,detail:String(detail).slice(0,240),version:'v5.66'});
+  arr.push({time:new Date().toISOString(),type,from,to,detail:String(detail).slice(0,240),version:'v5.67'});
   localStorage.setItem(BK_NAV_LOG_KEY,JSON.stringify(arr.slice(-30)));
  }catch(e){}
 }
