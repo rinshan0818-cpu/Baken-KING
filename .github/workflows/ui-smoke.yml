@@ -11,6 +11,8 @@ on:
       - 'tests/race-settlement.test.cjs'
       - 'race-settlement.js'
       - 'friends-share.js'
+      - 'friend-sync.js'
+      - 'tests/friend-sync.test.cjs'
       - 'share.html'
       - 'tests/share-page.test.cjs'
       - 'tests/friends-comparison-ui.test.cjs'
@@ -69,6 +71,8 @@ jobs:
         run: node tests/friends-policy.test.cjs
       - name: Test nicknames in settings and friend codes
         run: node tests/friend-nickname.test.cjs
+      - name: Test manual and thirty-minute sync scheduling
+        run: node tests/friend-sync.test.cjs
       - name: Test manual friend score exchange
         run: node tests/friend-score-exchange.test.cjs
       - name: Test two-person heatmap comparison display
