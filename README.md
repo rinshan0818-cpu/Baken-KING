@@ -1,5 +1,16 @@
 # 🏇 Baken-KING
 
+## 友達同期：実DBスキーマ照合（2026-11-02）
+
+- 実際のNeonプロジェクト `baken-king-sharing` の `sharing_snapshots`, `sharing_friendships`, `sharing_users` を参照。既存snapshotテーブルは購入額・払戻額・精算枚数のみのため、9項目対応に未移行と確認。
+- `sharing-server/neon-store.cjs` で購入レース数、的中レース数、精算済レース数、最高払戻額を追加。レース的中率はサーバー側で導出。パラメータ化SQL・範囲検証を維持。
+- `docs/sharing-schema-v2.sql` に非破壊の追加カラム移行案を記録。**DBには未適用**。稼働中のDBは既存スキーマのまま。
+- **本番利用前の未解決事項**：強制RLSと認証サーバーの適切な権限、テーブルの移行、HTTP API、ペア承認、スマホからの送受信。現状のUI同期ボタンは無効。
+- 既存ローカル馬券・残高は変更なし。
+
+---
+
+
 ## 友達同期：Neon DBアクセス実装の第一歩（2026-11-02）
 
 - `sharing-server/neon-store.cjs` に共有DBへのパラメータ化された数値書込・友達関係をSQL内で確認する読込アダプタを実装。本人IDは実装上、認証済みサーバー側でのみ渡す前提。
