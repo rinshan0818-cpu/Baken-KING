@@ -3,7 +3,7 @@ const calls=[];const handler=createSharingHttpHandler({writeSummary:async(req,m)
 async function call(method,url,body='',authorization='Bearer valid',contentType='application/json',origin){
  const req=Readable.from(body?[body]:[]);req.method=method;req.url=url;req.headers={authorization,'content-type':contentType};if(origin)req.headers.origin=origin;
  let json='';const headers={};const res={statusCode:200,setHeader(k,v){headers[k.toLowerCase()]=v},end(v){json=v}};
- await handler(req,res);return {status:res.statusCode,body:JSON.parse(json),headers};
+ await handler(req,res);return {status:res.statusCode,body:json?JSON.parse(json):null,headers};
 }
 (async()=>{
  let r=await call('POST','/api/sharing/summary',JSON.stringify({metrics:{stakeYen:10}}));assert.equal(r.status,200);
@@ -17,6 +17,8 @@ async function call(method,url,body='',authorization='Bearer valid',contentType=
  const goodOrigin=await call('GET','/api/sharing/summary/11111111-1111-4111-8111-111111111111','','Bearer valid','application/json','https://rinshan0818-cpu.github.io');
  assert.equal(goodOrigin.status,200);
  assert.equal(goodOrigin.headers['access-control-allow-origin'],'https://rinshan0818-cpu.github.io');
+ const preflight=await call('OPTIONS','/api/sharing/summary','','Bearer invalid','application/json','https://rinshan0818-cpu.github.io');
+ assert.equal(preflight.status,204);assert.equal(preflight.body,null);
  assert.equal(calls.length,3);
  console.log('PASS: authenticated sharing HTTP boundary rejects impersonation, anonymous and oversized requests');
 })().catch(e=>{console.error(e);process.exitCode=1});
