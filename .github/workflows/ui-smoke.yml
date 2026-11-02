@@ -25,6 +25,7 @@ on:
       - 'tests/sharing-schema.test.cjs'
       - 'docs/sharing-schema-p1.sql'
       - 'sharing-server/**'
+      - 'tests/sharing-neon-store.test.cjs'
       - 'tests/sharing-server.test.cjs'
       - 'tests/sharing-jwt-auth.test.cjs'
       - 'tests/friends-share.test.cjs'
@@ -63,6 +64,8 @@ jobs:
         run: node tests/race-settlement.test.cjs
       - name: Test signed login token verification
         run: node tests/sharing-jwt-auth.test.cjs
+      - name: Test Neon sharing data access adapter
+        run: node tests/sharing-neon-store.test.cjs
       - name: Test server sharing access guard
         run: node tests/sharing-server.test.cjs
       - name: Test sharing schema security defaults
