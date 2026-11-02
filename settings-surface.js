@@ -29,7 +29,7 @@
   const classify=node=>{
    const heading=node.querySelector?.('h2,h3')?.textContent?.trim()||'';
    if(/シーズン管理|データ.*管理|バックアップ/.test(heading))return 'data';
-   if(/通知|サウンド|音|アプリの更新/.test(heading))return 'general';
+   if(node.id==='bkAccountSettings'||/アカウント|通知|サウンド|音|アプリの更新/.test(heading))return 'general';
    return 'admin';
   };
   const moved=[];
