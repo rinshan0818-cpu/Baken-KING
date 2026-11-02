@@ -13,6 +13,6 @@ function createSharingApi({env,db}){
  const authenticate=createJwtAuthenticator({issuer,audience,publicKey});
  const store=createSharingStore(db);
  const service=createSharingService({authenticate,store});
- return createSharingHttpHandler(service);
+ return createSharingHttpHandler(service,{allowedOrigins:['https://rinshan0818-cpu.github.io']});
 }
 module.exports={createSharingApi};
