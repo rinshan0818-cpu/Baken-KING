@@ -15,6 +15,7 @@ on:
       - 'tests/share-page.test.cjs'
       - 'tests/friends-comparison-ui.test.cjs'
       - 'tests/friends-comparison-heatmap.test.cjs'
+      - 'tests/friend-score-exchange.test.cjs'
       - 'friends-policy.js'
       - 'tests/friends-policy.test.cjs'
       - 'tests/sharing-schema.test.cjs'
@@ -64,6 +65,8 @@ jobs:
         run: node tests/sharing-schema.test.cjs
       - name: Test friend approval and revocation policy
         run: node tests/friends-policy.test.cjs
+      - name: Test manual friend score exchange
+        run: node tests/friend-score-exchange.test.cjs
       - name: Test two-person heatmap comparison display
         run: node tests/friends-comparison-heatmap.test.cjs
       - name: Test friend comparison data panel structure
