@@ -1,13 +1,24 @@
 'use strict';
 // Server-only HTTP boundary. Mount behind TLS at a trusted API origin.
 // Authentication is always performed by createSharingService's injected JWT verifier.
-// No permissive CORS headers are emitted.
-function createSharingHttpHandler(service){
+// Cross-origin GitHub Pages callers must be allowlisted exactly; no wildcard origins.
+function createSharingHttpHandler(service,{allowedOrigins=[]}={}){
+ if(!Array.isArray(allowedOrigins)||allowedOrigins.some(v=>typeof v!=='string'||!/^https:\/\/[^/]+$/.test(v)))throw Error('Invalid CORS configuration');
+ const origins=new Set(allowedOrigins);
  if(!service||typeof service.writeSummary!=='function'||typeof service.readSummary!=='function')throw Error('Sharing service required');
  const send=(res,status,body)=>{res.statusCode=status;res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.end(JSON.stringify(body))};
  return async function handler(req,res){
   try{
    if(!req||!res||typeof req.url!=='string')return send(res,400,{error:'Bad request'});
+   const origin=req.headers?.origin;
+   if(origin!==undefined){
+    if(!origins.has(origin))return send(res,403,{error:'Forbidden'});
+    res.setHeader('Access-Control-Allow-Origin',origin);
+    res.setHeader('Vary','Origin');
+    res.setHeader('Access-Control-Allow-Headers','Authorization, Content-Type');
+    res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');
+   }
+   if(req.method==='OPTIONS')return send(res,204,{ok:true});
    const path=new URL(req.url,'https://baken.invalid').pathname;
    if(path==='/api/sharing/summary'&&req.method==='POST'){
     if(!/^application\/json(?:;|$)/i.test(req.headers?.['content-type']||''))return send(res,415,{error:'JSON required'});
