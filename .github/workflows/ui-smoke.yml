@@ -14,6 +14,7 @@ on:
       - 'friend-sync.js'
       - 'friend-score-wire.js'
       - 'tests/friend-score-wire.test.cjs'
+      - 'tests/friend-cloud-snapshot.test.cjs'
       - 'tests/friend-sync.test.cjs'
       - 'share.html'
       - 'tests/share-page.test.cjs'
@@ -82,6 +83,8 @@ jobs:
         run: node tests/friends-policy.test.cjs
       - name: Test nicknames in settings and friend codes
         run: node tests/friend-nickname.test.cjs
+      - name: Test isolated cloud score projection
+        run: node tests/friend-cloud-snapshot.test.cjs
       - name: Test nine-metric cloud payload mapping
         run: node tests/friend-score-wire.test.cjs
       - name: Test manual and thirty-minute sync scheduling
