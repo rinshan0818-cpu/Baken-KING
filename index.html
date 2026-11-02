@@ -2851,6 +2851,16 @@ function bkFriendMetrics(){
   races:race.purchased,hitRaces:race.hit,raceRate:race.settled?Math.round(race.hit/race.settled*1000)/10:null,
   maxPayout:resolved.length?Math.max(...resolved.map(b=>Number(b.paid)||0)):null,settled:resolved.length};
 }
+// Cloud-only projection: the settled race denominator is calculated from real local bets.
+// No betting details or wallet balance leave the device.
+function bkFriendCloudSnapshot(){
+ const metrics=bkFriendMetrics();
+ const race=bkRaceStats(Array.isArray(s.bets)?s.bets:[]);
+ return {stakeYen:metrics.stake,returnedYen:metrics.paid,
+  settledTicketCount:metrics.settled,purchasedRaceCount:metrics.races,
+  hitRaceCount:metrics.hitRaces,settledRaceCount:race.settled,
+  maxPayoutYen:metrics.maxPayout};
+}
 function bkScoreValid(m){
  if(!m||typeof m!=='object'||Array.isArray(m)||Object.keys(m).length!==BK_SCORE_KEYS.length)return false;
  return BK_SCORE_KEYS.every(k=>{
