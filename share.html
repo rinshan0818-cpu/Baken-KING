@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Baken-KING | 成績を共有</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;color:#132c46;background:#f4f7fa}*{box-sizing:border-box}body{margin:0}main{max-width:520px;margin:auto;padding:24px 18px 46px}h1{font-size:22px;margin:8px 0 12px}p{line-height:1.65}section{background:white;border:1px solid #d8e2ed;border-radius:15px;padding:20px;margin-top:18px}button,a.back{font:inherit;border-radius:11px;padding:12px 15px;cursor:pointer}button{border:0;background:#0b467b;color:white;width:100%;font-weight:700}button:disabled{opacity:.45;cursor:default}.back{color:#0b467b;padding:0}.secondary{background:#edf3f8;color:#0b467b;margin-top:8px}.muted{color:#56677c;font-size:13px}.notice{color:#975215}#preview{white-space:pre-wrap;background:#f3f7fa;border-radius:9px;padding:14px;line-height:1.7;margin:12px 0;font-variant-numeric:tabular-nums}#status{min-height:1.6em}
+</style></head><body><main>
+<a class="back" href="./">← Baken-KINGに戻る</a><h1>成績を共有</h1>
+<p>友達に自分のゲーム成績を送れる簡易機能です。ログイン不要・友達登録不要。共有ボタンを押すまで外部には送信されません。</p>
+<section><h2 style="font-size:18px;margin-top:0">共有内容の確認</h2>
+<p class="muted">購入額・払戻額・収支・回収率・精算済み枚数だけを表示します。馬券の買い目・未精算の予想・残高・氏名は送りません。</p>
+<button id="prepare">自分の成績を表示</button>
+<div id="preview" hidden></div>
+<button id="share" hidden>共有する（送信先を選ぶ）</button>
+<button class="secondary" id="copy" hidden>テキストをコピー</button>
+<p class="muted" id="status" role="status" aria-live="polite"></p>
+</section>
+<p class="muted">この機能は同じ端末・同じブラウザのBaken-KING保存データを使用します。共有文は送信した時点の成績で、自動更新されません。テストモード中は使用できません。</p>
+</main><script src="./friends-share.js"></script><script>
+(()=>{
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ let text='';
+ function yen(n){return n.toLocaleString('ja-JP')+'円'}
+ function prepare(){
+  text='';$('preview').hidden=true;$('share').hidden=true;$('copy').hidden=true;$('status').textContent='';
+  try{
+   if(localStorage.getItem('baken-king-mode-v1')==='test')throw Error('テストモードでは共有できません。本番モードに切り替えてください。');
+   const raw=localStorage.getItem('keiba-demo-v1');
+   if(!raw)throw Error('本番の保存データが見つかりません。Baken-KINGと同じブラウザで開いてください。');
+   const saved=JSON.parse(raw);
+   const {summary:s}=window.BakenFriendsShare.project(saved,{consent:true,mode:'production'});
+   text=['Baken-KING 成績', '購入額：'+yen(s.stakeYen),'払戻額：'+yen(s.returnedYen),
+    '収支：'+(s.profitYen>0?'+':'')+yen(s.profitYen),
+    '回収率：'+(s.roiPercent===null?'—':s.roiPercent+'%'),
+    '精算済み：'+s.settledTicketCount+'枚','※共有時点のゲーム成績'].join('\n');
+   $('preview').textContent=text;$('preview').hidden=false;$('share').hidden=false;$('copy').hidden=false;
+   $('status').textContent='内容を確認して、送信する場合だけ共有してください。';
+  }catch(e){$('status').textContent='成績を表示できません：'+(e instanceof SyntaxError?'保存データが読み取れません':e.message)}
+ }
+ $('prepare').addEventListener('click',prepare);
+ $('share').addEventListener('click',async()=>{
+  if(!text)return;
+  if(navigator.share){try{await navigator.share({title:'Baken-KING 成績',text});$('status').textContent='共有操作を終了しました。';return}catch(e){if(e.name==='AbortError')return}}
+  $('status').textContent='共有メニューを利用できません。コピー機能を使用してください。';
+ });
+ $('copy').addEventListener('click',async()=>{
+  if(!text)return;
+  try{await navigator.clipboard.writeText(text);$('status').textContent='コピーしました。';}
+  catch{
+   const el=document.createElement('textarea');el.value=text;el.style.position='fixed';el.style.opacity='0';document.body.appendChild(el);el.select();
+   const ok=document.execCommand('copy');el.remove();$('status').textContent=ok?'コピーしました。':'コピーできませんでした。プレビューの文字を選択してコピーしてください。';
+  }
+ });
+})();
+</script></body></html>
