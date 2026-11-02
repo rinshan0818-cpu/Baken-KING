@@ -2863,7 +2863,7 @@ function bkRenderFriendCompare(){
  const fmtYen=n=>n===null?'–':Math.round(n).toLocaleString('ja-JP')+'円';
  const fmtValue=(k,n)=>n===null?'–':['profit','stake','paid','maxPayout'].includes(k)?fmtYen(n):
  ['roi','raceRate'].includes(k)?n.toFixed(1)+'%':n+(['races','hitRaces'].includes(k)?'R':'枚');
- document.querySelectorAll('[data-compare-own]').forEach(el=>{el.textContent=fmtValue(el.dataset.compareOwn,own[el.dataset.compareOwn])});
+ document.querySelectorAll('[data-compare-own]').forEach(el=>{el.textContent=fmtValue(el.dataset.compareOwn,own[el.dataset.compareOwn]);el.classList.remove('bk-compare-win','bk-compare-lose','bk-compare-tie')});
  let friend=null;
  if(localStorage.getItem('baken-king-mode-v1')!=='test')try{const x=JSON.parse(localStorage.getItem(BK_FRIEND_SCORE_KEY));if(x?.version===1&&bkScoreValid(x.metrics))friend=x.metrics}catch{}
  document.querySelectorAll('[data-compare-friend]').forEach(el=>{
