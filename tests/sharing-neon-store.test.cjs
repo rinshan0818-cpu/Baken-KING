@@ -7,9 +7,11 @@ const a='11111111-1111-4111-8111-111111111111',b='22222222-2222-4222-8222-222222
  const read=await store.getPublicSummary(a,b);
  assert.equal(read.profitYen,50);assert.equal(read.roiPercent,150);assert.equal(read.raceHitRatePercent,50);assert.equal(read.maxPayoutYen,150);
  assert.equal(calls[0].params[0],a);assert.equal(calls[1].params[1],b);
+ assert.equal(await store.areFriends(a,b),true);
  assert(calls[1].sql.includes('sharing_friendships'));
  assert(calls[1].sql.includes('$1::uuid=$2::uuid'));
  await assert.rejects(store.upsertOwnSummary(a,{stakeYen:-1,returnedYen:1,settledTicketCount:1}));
+ await assert.rejects(store.upsertOwnSummary(a,{stakeYen:100,returnedYen:150,settledTicketCount:1,purchasedRaceCount:1,hitRaceCount:2,settledRaceCount:1,maxPayoutYen:150}));
  await assert.rejects(store.upsertOwnSummary(a,{stakeYen:1,returnedYen:1,settledTicketCount:1,privateBets:[]}));
  await assert.rejects(store.getPublicSummary('spoof',b));
  console.log('PASS: server data adapter parameterizes writes, guards reads, and rejects extra data');
