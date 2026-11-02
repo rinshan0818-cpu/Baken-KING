@@ -23,6 +23,11 @@ function createSharingStore(db){
     RETURNING updated_at`,[uid,m.stakeYen,m.returnedYen,m.settledTicketCount,m.purchasedRaceCount,m.hitRaceCount,m.settledRaceCount,m.maxPayoutYen]);
    return {updatedAt:rows[0]?.updated_at};
   },
+  async areFriends(actor,owner){
+   const a=id(actor),b=id(owner);
+   const {rows}=await db.query(`SELECT 1 AS ok FROM sharing_friendships WHERE user_low=LEAST($1::uuid,$2::uuid) AND user_high=GREATEST($1::uuid,$2::uuid) LIMIT 1`,[a,b]);
+   return rows.length>0;
+  },
   async getPublicSummary(actor,owner){
    const viewer=id(actor),target=id(owner);
    // Permission checked in the same statement as data retrieval; no unauthenticated query path.
