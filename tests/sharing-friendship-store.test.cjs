@@ -1,0 +1,24 @@
+const assert=require('node:assert/strict');
+const {createFriendshipStore}=require('../sharing-server/friendship-store.cjs');
+const A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222';
+let calls=[],rows=[];
+const db={async query(sql,params){calls.push({sql,params});return {rows:rows.shift()||[]}}};
+const store=createFriendshipStore(db);
+(async()=>{
+ rows=[[{display_name:'Alice'}]];assert.deepEqual(await store.getOwnProfile(A),{displayName:'Alice'});
+ await assert.rejects(store.createInvitation(A,A),/Forbidden/);
+ await assert.rejects(store.createInvitation('fake',B),/Invalid identifier/);
+ rows=[[{id:A,status:'pending'}]];await store.createInvitation(A,B);
+ assert.match(calls.at(-1).sql,/NOT EXISTS\(SELECT 1 FROM sharing_friendships/);
+ assert.deepEqual(calls.at(-1).params.slice(1),[A,B]);
+ rows=[[]];await assert.rejects(store.createInvitation(A,B),/Forbidden/);
+ rows=[[{id:B}]];await store.respondToInvitation(B,A,true);
+ assert.match(calls.at(-1).sql,/recipient_id=\$2::uuid AND status='pending'/);
+ assert.match(calls.at(-1).sql,/ON CONFLICT \(user_low,user_high\) DO NOTHING/);
+ rows=[[]];await assert.rejects(store.respondToInvitation(A,B,true),/Forbidden/);
+ rows=[[{id:A,status:'rejected'}]];assert.equal((await store.respondToInvitation(B,A,false)).status,'rejected');
+ rows=[[]];await assert.rejects(store.respondToInvitation(A,B,false),/Forbidden/);
+ rows=[[{user_low:A}]];assert.deepEqual(await store.revokeFriendship(A,B),{ok:true});
+ rows=[[]];await assert.rejects(store.revokeFriendship(A,B),/Forbidden/);
+ console.log('PASS: server-side friendship methods scope invitations/approval/revocation to verified actor');
+})().catch(e=>{console.error(e);process.exitCode=1});
