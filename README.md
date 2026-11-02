@@ -1,5 +1,15 @@
 # 🏇 Baken-KING
 
+## 友達同期：認証付きHTTP境界とテストを追加（2026-11-02）
+
+- `sharing-server/http.cjs` を追加。POST `/api/sharing/summary` はJSON中の `metrics` だけ受け、本人IDは署名検証済みサーバーセッションからのみ取得する設計。GET `/api/sharing/summary/:uuid` は認証済み友達判定を通したサマリーの読出し。
+- 2048バイトのPOSTサイズ制限、想定外フィールド拒否、エラー時の内部詳細非表示、`Cache-Control: no-store`、CORS許可を発行しない仕様。テスト `tests/sharing-http.test.cjs` をCIに組み込んだ。
+- **この段階ではサーバーAPIはデプロイしていない。** 認証発行元・検証鍵・DB権限設定・Neonスキーマ変更が未完了で、本番利用は不可。無効化された同期ボタンを有効にしていない。フロントの既存馬券や残高は変更なし。
+- 11/7-8の共有が最優先。認証付き同期が安全に完成しない場合は、既に利用可能な比較コードの交換方式で対応する。
+
+---
+
+
 ## 友達同期：実DBスキーマ照合（2026-11-02）
 
 - 実際のNeonプロジェクト `baken-king-sharing` の `sharing_snapshots`, `sharing_friendships`, `sharing_users` を参照。既存snapshotテーブルは購入額・払戻額・精算枚数のみのため、9項目対応に未移行と確認。
