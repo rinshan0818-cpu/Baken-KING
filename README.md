@@ -1,5 +1,15 @@
 # 🏇 Baken-KING
 
+## 友達共有 P1：サーバーAPIの認証境界を先行実装（2026-11-02）
+
+- `sharing-server/service.cjs` にサーバー専用の認証・権限チェック境界を追加。ログイン本人のプロフィール、友達申請・承認・解除、友達の公開成績取得の操作を独立実装。
+- `tests/sharing-server.test.cjs` で未認証・メール未検証・非友達・誤HTTPメソッド・自己招待を拒否する検査を追加し、UI smoke CIに接続。
+- **現段階はアプリケーションサービスの骨組み**。認証検証関数とDBストアはテスト用の注入モックのみ。本物の認証トークン検証・DB権限制御・HTTPエンドポイント・デプロイは未実装。利用者から渡された `verifiedSession` を本番環境で信用してはならない。
+- Neon共有専用DBは作成済みだが、Neon Authの有効化は前回安全性チェックでブロックされたため再実行しない。本番v5.63・iPhoneデータ・Vercel監視サービスに変更なし。
+
+---
+
+
 ## 友達共有 P1：専用Neon DB実環境を作成（2026-11-02）
 
 - 既存の `machi-shindan` DBとは別に、Neonプロジェクト `baken-king-sharing` （ID: `wandering-art-06035802`、Singaporeリージョン）を作成。ブランチ `main`（`br-silent-snow-a1e3o1cq`）、DB `baken_sharing`。
