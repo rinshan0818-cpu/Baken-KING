@@ -13,6 +13,8 @@ on:
       - 'friends-share.js'
       - 'friends-policy.js'
       - 'tests/friends-policy.test.cjs'
+      - 'tests/sharing-schema.test.cjs'
+      - 'docs/sharing-schema-p1.sql'
       - 'tests/friends-share.test.cjs'
       - '.github/workflows/ui-smoke.yml'
   pull_request:
@@ -47,6 +49,8 @@ jobs:
         run: node tests/storage_regression.cjs
       - name: Test official settlement math, refunds and pending outcomes
         run: node tests/race-settlement.test.cjs
+      - name: Test sharing schema security defaults
+        run: node tests/sharing-schema.test.cjs
       - name: Test friend approval and revocation policy
         run: node tests/friends-policy.test.cjs
       - name: Test consent-gated friend summary projection
