@@ -33,6 +33,7 @@ on:
       - 'tests/sharing-app.test.cjs'
       - 'tests/sharing-server.test.cjs'
       - 'tests/sharing-friendship-store.test.cjs'
+      - 'tests/sharing-friend-http.test.cjs'
       - 'tests/sharing-jwt-auth.test.cjs'
       - 'tests/friends-share.test.cjs'
       - '.github/workflows/ui-smoke.yml'
@@ -78,6 +79,8 @@ jobs:
         run: node tests/sharing-neon-store.test.cjs
       - name: Test server sharing access guard
         run: node tests/sharing-server.test.cjs
+      - name: Test friend HTTP routes and request validation
+        run: node tests/sharing-friend-http.test.cjs
       - name: Test server-only friend invitation and approval SQL
         run: node tests/sharing-friendship-store.test.cjs
       - name: Test sharing schema security defaults
