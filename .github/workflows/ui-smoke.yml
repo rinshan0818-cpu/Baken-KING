@@ -27,6 +27,7 @@ on:
       - 'sharing-server/**'
       - 'tests/sharing-neon-store.test.cjs'
       - 'tests/sharing-http.test.cjs'
+      - 'tests/sharing-app.test.cjs'
       - 'tests/sharing-server.test.cjs'
       - 'tests/sharing-jwt-auth.test.cjs'
       - 'tests/friends-share.test.cjs'
@@ -65,6 +66,8 @@ jobs:
         run: node tests/race-settlement.test.cjs
       - name: Test signed login token verification
         run: node tests/sharing-jwt-auth.test.cjs
+      - name: Test signed sharing API composition
+        run: node tests/sharing-app.test.cjs
       - name: Test authenticated sharing HTTP boundary
         run: node tests/sharing-http.test.cjs
       - name: Test Neon sharing data access adapter
