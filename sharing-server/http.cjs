@@ -18,7 +18,7 @@ function createSharingHttpHandler(service,{allowedOrigins=[]}={}){
     res.setHeader('Access-Control-Allow-Headers','Authorization, Content-Type');
     res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');
    }
-   if(req.method==='OPTIONS')return send(res,204,{ok:true});
+   if(req.method==='OPTIONS'){res.statusCode=204;res.setHeader('Cache-Control','no-store');return res.end()}
    const path=new URL(req.url,'https://baken.invalid').pathname;
    if(path==='/api/sharing/summary'&&req.method==='POST'){
     if(!/^application\/json(?:;|$)/i.test(req.headers?.['content-type']||''))return send(res,415,{error:'JSON required'});
