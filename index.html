@@ -2843,7 +2843,7 @@ function bkRenderFriendCompare(){
  // Only the local owner's numbers are available until explicit friend sync exists.
  const fmtYen=n=>Number.isFinite(n)?Math.round(n).toLocaleString('ja-JP')+'円':'—';
  const stake=Number(s.totalStake),paid=Number(s.totalPaid);
- const values={profit:fmtYen(paid-stake),roi:stake>0?(paid/stake*100).toFixed(1)+'%':'—',stake:fmtYen(stake),paid:fmtYen(paid),settled:Array.isArray(s.bets)?s.bets.filter(b=>b.status!=='pending').length+'枚':'—'};
+ const values={profit:fmtYen(paid-stake),roi:stake>0?(paid/stake*100).toFixed(1)+'%':'—',stake:fmtYen(stake),paid:fmtYen(paid),settled:Array.isArray(s.bets)?s.bets.filter(b=>['settled','paid','lost','refunded','final'].includes(b.status)).length+'枚':'—'};
  document.querySelectorAll('[data-compare-own]').forEach(el=>{el.textContent=values[el.dataset.compareOwn]||'—'});
 }
 function bkRenderSections(){if(bkDataSection==='friends')bkRenderFriendCompare();document.querySelectorAll('[data-data-panel]').forEach(p=>p.hidden=p.dataset.dataPanel!==bkDataSection);document.querySelectorAll('[data-data-section]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.dataSection===bkDataSection)))}
