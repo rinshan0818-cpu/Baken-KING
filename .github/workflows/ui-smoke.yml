@@ -11,6 +11,8 @@ on:
       - 'tests/race-settlement.test.cjs'
       - 'race-settlement.js'
       - 'friends-share.js'
+      - 'share.html'
+      - 'tests/share-page.test.cjs'
       - 'friends-policy.js'
       - 'tests/friends-policy.test.cjs'
       - 'tests/sharing-schema.test.cjs'
@@ -60,6 +62,8 @@ jobs:
         run: node tests/sharing-schema.test.cjs
       - name: Test friend approval and revocation policy
         run: node tests/friends-policy.test.cjs
+      - name: Test simple share screen remains local-only
+        run: node tests/share-page.test.cjs
       - name: Test consent-gated friend summary projection
         run: node tests/friends-share.test.cjs
       - name: Test one-time settlement and backup restore
