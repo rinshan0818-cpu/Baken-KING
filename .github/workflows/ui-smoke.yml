@@ -14,6 +14,7 @@ on:
       - 'share.html'
       - 'tests/share-page.test.cjs'
       - 'tests/friends-comparison-ui.test.cjs'
+      - 'tests/friends-comparison-heatmap.test.cjs'
       - 'friends-policy.js'
       - 'tests/friends-policy.test.cjs'
       - 'tests/sharing-schema.test.cjs'
@@ -63,6 +64,8 @@ jobs:
         run: node tests/sharing-schema.test.cjs
       - name: Test friend approval and revocation policy
         run: node tests/friends-policy.test.cjs
+      - name: Test two-person heatmap comparison display
+        run: node tests/friends-comparison-heatmap.test.cjs
       - name: Test friend comparison data panel structure
         run: node tests/friends-comparison-ui.test.cjs
       - name: Test simple share screen remains local-only
