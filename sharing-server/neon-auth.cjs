@@ -15,7 +15,7 @@ function createNeonAuthenticator({authBaseUrl,jwksUrl,fetcher=globalThis.fetch,c
   if(!response.ok)throw Error('JWKS unavailable');
   const json=await response.json();
   if(!Array.isArray(json?.keys)||json.keys.length>12)throw Error('Bad JWKS');
-  cached=json.keys.filter(k=>k&&k.kty==='OKP'&&k.crv==='Ed25519'&&k.alg==='EdDSA'&&k.use!=='enc'&&typeof k.kid==='string'&&typeof k.x==='string');
+  cached=json.keys.filter(k=>k&&k.kty==='OKP'&&k.crv==='Ed25519'&&(k.alg===undefined||k.alg==='EdDSA')&&(k.use===undefined||k.use==='sig')&&typeof k.kid==='string'&&typeof k.x==='string');
   cacheUntil=now+300;return cached;
  }
  return async request=>{
