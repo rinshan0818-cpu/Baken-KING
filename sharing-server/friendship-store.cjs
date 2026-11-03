@@ -49,20 +49,26 @@ function createFriendshipStore(db){
        RETURNING id,status`,[req,user]);
     if(!rows.length)forbidden();return {id:rows[0].id,status:'rejected'};
    }
-   // One SQL statement: granting friendship is contingent on recipient-only
-   // pending->accepted transition, and rolls back with the statement on error.
-   const {rows}=await db.query(`WITH approved AS (
-     UPDATE sharing_requests SET status='accepted',decided_at=now()
-      WHERE id=$1::uuid AND recipient_id=$2::uuid AND status='pending'
-      RETURNING id,sender_id,recipient_id
-    ), linked AS (
-     INSERT INTO sharing_friendships(user_low,user_high)
-      SELECT LEAST(sender_id,recipient_id),GREATEST(sender_id,recipient_id) FROM approved
-      ON CONFLICT (user_low,user_high) DO NOTHING RETURNING user_low
-    )
-    SELECT id FROM approved`,[req,user]);
+   // Caller MUST wrap this store operation in one transaction (see actor-transaction.cjs).
+   // PostgreSQL RLS cannot see an UPDATE CTE's accepted status in the
+   // same statement's INSERT policy snapshot; use sequential statements.
+   const {rows}=await db.query(`UPDATE sharing_requests SET status='accepted',decided_at=now()
+    WHERE id=$1::uuid AND recipient_id=$2::uuid AND status='pending'
+    RETURNING id,sender_id,recipient_id`,[req,user]);
    if(!rows.length)forbidden();
-   return {id:rows[0].id,status:'accepted'};
+   const approved=rows[0];
+   const linked=await db.query(`INSERT INTO sharing_friendships(user_low,user_high)
+    VALUES(LEAST($1::uuid,$2::uuid),GREATEST($1::uuid,$2::uuid))
+    ON CONFLICT(user_low,user_high) DO NOTHING RETURNING user_low`,[approved.sender_id,approved.recipient_id]);
+   if(!linked.rows.length){
+    // A concurrent friendship may exist, but the acceptance transaction
+    // must still ensure the actual pair is linked before commit.
+    const existing=await db.query(`SELECT 1 FROM sharing_friendships
+     WHERE user_low=LEAST($1::uuid,$2::uuid) AND user_high=GREATEST($1::uuid,$2::uuid)`,[approved.sender_id,approved.recipient_id]);
+    if(!existing.rows.length)throw Error('Friendship not established');
+   }
+   return {id:approved.id,status:'accepted'};
+
   },
   async revokeFriendship(actor,friendId){
    const user=validId(actor),other=validId(friendId);if(user===other)forbidden();
