@@ -1,18 +1,18 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow"><title>Baken-KING｜アカウント接続テスト</title>
+<meta name="robots" content="noindex,nofollow"><title>Baken-KING｜ログイン</title>
 <style>
 :root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif}*{box-sizing:border-box}body{margin:0;background:#f4f7f6;color:#142b28;padding:calc(28px + env(safe-area-inset-top)) 18px 40px}.wrap{max-width:430px;margin:auto}.eyebrow{font-size:12px;letter-spacing:.14em;color:#52716d;font-weight:700}h1{font-size:25px;margin:12px 0}p{font-size:14px;line-height:1.7;color:#526763}#account{white-space:pre-line}.panel{background:white;padding:22px;border:1px solid #dfe9e6;border-radius:18px;box-shadow:0 5px 25px #173b3010}label{display:block;font-weight:650;font-size:13px;margin:17px 0 7px}input{font:inherit;font-size:16px;border:1px solid #b8cbc5;border-radius:11px;padding:13px;width:100%;background:white}button{font:inherit;cursor:pointer;padding:13px 16px;border-radius:11px;border:0;font-weight:700}button.primary{background:#0f6654;color:white;width:100%;margin-top:20px}button.secondary{background:#eaf2ef;color:#175344;width:100%;margin-top:10px}button:disabled{opacity:.5;cursor:wait}#status{font-size:13px;white-space:pre-wrap;border-radius:10px;background:#edf3f0;padding:12px;margin-top:15px;line-height:1.6}#status[hidden],#signedIn[hidden],#formPanel[hidden],#verification[hidden]{display:none}.warn{color:#755a25;font-size:12px;margin:18px 0}a{color:#126858}.muted{font-size:12px}
-</style></head><body><main class="wrap"><div class="eyebrow">BAKEN-KING · PHASE 1</div><h1>アカウント接続テスト</h1>
-<p>Neon Auth の登録・ログインを独立して検証するための画面です。馬券・残高・精算履歴にはアクセスしません。ログアウト時はこの端末に残った友達比較キャッシュのみ消去します。</p>
+</style></head><body><main class="wrap"><div class="eyebrow">BAKEN-KING · ACCOUNT</div><h1>ログイン・アカウント管理</h1>
+<p>友達との成績比較に使うアカウントです。馬券・残高・精算履歴は変更しません。</p>
 <section class="panel"><div id="formPanel"><form id="authForm">
 <label for="email">メールアドレス</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254">
 <label for="password">パスワード</label><input id="password" name="password" type="password" autocomplete="current-password" required minlength="8">
 <button class="primary" id="login" type="submit">ログイン</button><button class="secondary" id="signup" type="button">新規登録</button>
 </form></div><div id="signedIn" hidden><strong>ログイン中</strong><p id="account"></p><button class="secondary" id="logout" type="button">ログアウト</button></div>
-<div id="verification"><label for="otp">メール確認コード（6桁）</label><input id="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="6桁のコード"><button class="secondary" id="sendOtp" type="button">確認コードをメールで送信</button><button class="primary" id="verifyOtp" type="button">コードを確認する</button><p class="muted">メール認証がNeon側で有効になっている場合に使用します。コードの有効期限は15分です。</p></div><div id="status" role="status" aria-live="polite" hidden></div></section>
-<p class="warn">試験用画面です。アカウント認証後も共有DBへの書込み・30分同期は行いません。GitHub PagesとNeon Authが異なるオリジンのため、iPhoneではCookie制限によりログイン状態が維持できない場合があります。</p>
-<p id="inviteReturn" hidden><a id="returnLink" href="./friends.html">友達申請に戻る</a></p>
+<div id="verification" hidden><label for="otp">メール確認コード（6桁）</label><input id="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="6桁のコード"><button class="secondary" id="sendOtp" type="button">確認コードをメールで送信</button><button class="primary" id="verifyOtp" type="button">コードを確認する</button><p class="muted">メール認証がNeon側で有効になっている場合に使用します。コードの有効期限は15分です。</p></div><div id="status" role="status" aria-live="polite" hidden></div></section>
+<p class="warn">SafariではブラウザのCookie保護により、ログインが成功してもセッションを維持できないことがあります。その場合、登録し直さずに別ブラウザでお試しください。馬券データは消去されません。</p>
+<p id="inviteReturn" hidden><a id="returnLink" href="./friends.html">友達申請に戻る</a></p><p><a href="./friends.html">友達管理へ戻る</a></p>
 <p><a href="./">Baken-KINGに戻る</a></p></main>
 <script>
 (()=>{'use strict';
@@ -28,7 +28,7 @@ if(returnValue&&/^friends\.html\?invite=[0-9a-f-]{36}$/i.test(returnValue)){
  }
 }
 function showStatus(message){status.hidden=false;status.textContent=message}
-function view(user){$('formPanel').hidden=!!user;$('signedIn').hidden=!user;$('verification').hidden=user?.emailVerified===true;$('account').textContent=user?('メールアドレス: '+String(user.email||'登録済み')+'\nメール確認: '+(user.emailVerified===true?'確認済み':'未確認')):'';if(user?.email&&$('email').value==='')$('email').value=user.email}
+function view(user){$('formPanel').hidden=!!user;$('signedIn').hidden=!user;$('verification').hidden=!user||user.emailVerified===true;$('account').textContent=user?('メールアドレス: '+String(user.email||'登録済み')+'\nメール確認: '+(user.emailVerified===true?'確認済み':'未確認')):'';if(user?.email&&$('email').value==='')$('email').value=user.email}
 async function call(path,data){const opts={method:data===undefined?'GET':'POST',credentials:'include',headers:{'Accept':'application/json'},cache:'no-store'};if(data!==undefined){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(data)}
  const res=await fetch(authUrl+path,opts);let body={};try{body=await res.json()}catch{};if(!res.ok||body?.error)throw Error('認証リクエストに失敗しました（HTTP '+res.status+'）。');return body}
 async function run(fn){if(busy)return;busy=true;login.disabled=signup.disabled=logout.disabled=true;try{await fn()}catch(e){showStatus(e instanceof TypeError?'認証サービスに接続できません。ブラウザのCookie/CORS設定を確認してください。':e.message)}finally{busy=false;login.disabled=signup.disabled=logout.disabled=false}}
@@ -37,8 +37,8 @@ async function refresh(){const result=await call('/get-session');const user=resu
  const owner=localStorage.getItem('baken-king-friend-score-owner-v1');
  if(user?.id&&owner&&user.id!==owner)clearFriendCache();
  view(user);return !!user}
-$('authForm').addEventListener('submit',e=>{e.preventDefault();run(async()=>{await call('/sign-in/email',{email:$('email').value.trim(),password:$('password').value});$('password').value='';showStatus(await refresh()?'ログインしました。':'認証は受理されましたが、セッションを確認できません。');})});
-signup.addEventListener('click',()=>run(async()=>{const email=$('email').value.trim(),password=$('password').value;if(!$('authForm').reportValidity())return;await call('/sign-up/email',{email,password,name:email.split('@')[0].slice(0,16)});$('password').value='';showStatus(await refresh()?'アカウントを作成しました。メール確認状況をご確認ください。':'登録受付済みです。確認コードが必要な場合はログイン後に手続きしてください。')}));
+$('authForm').addEventListener('submit',e=>{e.preventDefault();run(async()=>{await call('/sign-in/email',{email:$('email').value.trim(),password:$('password').value});$('password').value='';showStatus(await refresh()?'ログインしました。友達管理画面へ進めます。':'ログイン情報は受け付けられましたが、このブラウザでログイン状態を保持できません。SafariのCookie制限が考えられます。新規登録はせず、別ブラウザでログインしてください。');})});
+signup.addEventListener('click',()=>run(async()=>{const email=$('email').value.trim(),password=$('password').value;if(!$('authForm').reportValidity())return;await call('/sign-up/email',{email,password,name:email.split('@')[0].slice(0,16)});$('password').value='';showStatus(await refresh()?'アカウントを作成しました。メール確認状況をご確認ください。':'登録を受け付けましたが、このブラウザではログイン状態を確認できません。既存アカウントの再登録は不要です。')}));
 $('sendOtp').addEventListener('click',()=>run(async()=>{const email=$('email').value.trim();if(!email||!$('email').checkValidity()){showStatus('メールアドレスを入力してください。');return}await call('/email-otp/send-verification-otp',{email,type:'email-verification'});showStatus('確認コードの送信を受け付けました。メールを確認してください。')}));
 $('verifyOtp').addEventListener('click',()=>run(async()=>{const email=$('email').value.trim(),otp=$('otp').value.trim();if(!/^[0-9]{6}$/.test(otp)){showStatus('6桁の確認コードを入力してください。');return}await call('/email-otp/verify-email',{email,otp});$('otp').value='';const active=await refresh();showStatus(active?'メール確認の結果を更新しました。':'メール確認を受け付けました。再ログインしてください。')}));
 logout.addEventListener('click',()=>run(async()=>{await call('/sign-out',{});clearFriendCache();view(null);showStatus('ログアウトしました。')}));
