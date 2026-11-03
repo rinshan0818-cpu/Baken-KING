@@ -1,0 +1,37 @@
+name: Prepare sharing API source-only release bundle
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'sharing-server/**'
+      - 'api/index.js'
+      - 'vercel.json'
+      - 'deployment/sharing-api-package.json'
+      - 'scripts/build-sharing-release.cjs'
+      - 'scripts/check-sharing-release.cjs'
+      - 'tests/test-sharing-release-guard.cjs'
+      - '.github/workflows/sharing-api-release-package.yml'
+permissions:
+  contents: read
+jobs:
+  build-source-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify sharing API integrity and regression guard
+        run: |
+          node --test tests/test-sharing-release-guard.cjs
+          node scripts/check-sharing-release.cjs
+      - name: Assemble full 18-file source package without secrets
+        run: node scripts/build-sharing-release.cjs
+      - name: Upload checked source-only deployment bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharing-api-source-only-bundle
+          path: dist/sharing-api/
+          if-no-files-found: error
+          retention-days: 7
