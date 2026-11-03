@@ -17,6 +17,14 @@ function createSharingService({authenticate,store}){
    const id=await identity(request);
    return {id,profile:await store.getOwnProfile(id)};
   },
+  async register(request,displayName){
+   requireMethod('POST',request.method);
+   return store.ensureOwnProfile(await identity(request),displayName);
+  },
+  async connections(request){
+   requireMethod('GET',request.method);
+   return store.listConnections(await identity(request));
+  },
   async invite(request,recipient){
    requireMethod('POST',request.method);
    const actor=await identity(request);
