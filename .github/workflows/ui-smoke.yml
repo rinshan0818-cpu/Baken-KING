@@ -50,6 +50,7 @@ on:
       - 'tests/private-backup.test.cjs'
       - 'tests/private-backup-http.test.cjs'
       - 'tests/vercel-entry-failclosed.test.cjs'
+      - 'tests/sharing-health.test.cjs'
       - 'docs/sharing-private-backup-staging.sql'
       - 'tests/sharing-jwt-auth.test.cjs'
       - 'tests/sharing-neon-auth.test.cjs'
@@ -115,6 +116,8 @@ jobs:
         run: node tests/sharing-friend-http.test.cjs
       - name: Test server-only friend invitation and approval SQL
         run: node tests/sharing-friendship-store.test.cjs
+      - name: Test restricted database health endpoint
+        run: node tests/sharing-health.test.cjs
       - name: Test Vercel API refuses missing private credentials
         run: node tests/vercel-entry-failclosed.test.cjs
       - name: Test account backup API authorization and conflict handling
