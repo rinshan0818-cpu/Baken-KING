@@ -10,6 +10,8 @@ for(const id of ['connect','register','copyId','copyInvite','invite','invitation
 assert(html.includes('emailVerified!==true'),'Verified login guard required');
 assert(html.includes('/api/sharing/me'),'Profile provisioning status must be checked before inviting');
 assert(html.includes("searchParams.get('invite')"),'Friend invitation link should prefill recipient ID');
+assert(html.includes("$('loginLink').href='./auth.html?return='"),'Invitation must survive navigation to login');
+assert(html.includes("me.user.profile.displayName"),'Reconnect must reuse server profile display name');
 assert(html.includes("encodeURIComponent(id)"),'Friend invite URL must safely encode identifier');
 assert(!html.includes('準備中・先行画面'),'Obsolete preview label must be removed');
 assert(html.includes('if(!profileReady)throw Error'),'Invitation must require explicit profile registration');
