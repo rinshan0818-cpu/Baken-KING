@@ -9,8 +9,8 @@
  const state=document.createElement('p');state.className='muted';state.id='bkAccountResultStatus';
  state.textContent='確定結果の自動取得：確認中';
  account.append(state);
- let busy=false,again=false,lastData='',lastCheckedAt=0;
- const ACTIVE_MS=60*1000,IDLE_MS=5*60*1000;
+ let busy=false,again=false,lastData='';
+ const ACTIVE_MS=60*1000;
  function hasPendingWagers(){
   try{
    const state=JSON.parse(localStorage.getItem('keiba-demo-v1')||'null');
@@ -20,13 +20,16 @@
   }catch{return false}
  }
  function tick(){
-  if(hasPendingWagers()||Date.now()-lastCheckedAt>=IDLE_MS)fetchResults();
+  if(hasPendingWagers())fetchResults();
  }
  async function fetchResults(){
   if(document.visibilityState==='hidden')return;
+  if(!hasPendingWagers()){
+   state.textContent='結果待ちの馬券なし（自動確認停止）';
+   return;
+  }
   if(busy){again=true;return}
   busy=true;
-  lastCheckedAt=Date.now();
   try{
    const r=await fetch('/api/auth/friends/verified-results',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
    if(r.status===401){state.textContent='確定結果の自動取得：ログイン後に利用できます';return}
@@ -47,7 +50,13 @@
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')fetchResults()});
  window.addEventListener('focus',fetchResults);
  window.addEventListener('baken:account-changed',()=>{lastData='';fetchResults()});
- window.addEventListener('baken:wagers-updated',()=>{lastData=''});
+ window.addEventListener('baken:wagers-updated',()=>{
+  lastData='';
+  // Buying a ticket starts result checks without waiting for the next minute.
+  // The verified result importer also emits this event; avoid a new request
+  // during an in-flight import to prevent a self-triggered fetch loop.
+  if(!busy&&hasPendingWagers())fetchResults();
+ });
  // Check the already verified server feed more frequently only while a wager
  // still awaits official results. JRA scraping cadence is unchanged.
  setInterval(tick,ACTIVE_MS);
