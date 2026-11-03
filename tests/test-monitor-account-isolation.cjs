@@ -57,3 +57,30 @@ test('validator rejects money, selections, and duplicate targets',()=>{
  assert.throws(()=>validateTargets([{...race('東京',11),picks:[1,2,3]}],now),/fields/);
  assert.throws(()=>validateTargets([race('東京',11),race('東京',11)],now),/Duplicate/);
 });
+
+test('a single account may hold 36 races on each of three different days',()=>{
+ const now=new Date('2026-11-04T09:00:00+09:00');
+ const dates=['2026-11-05','2026-11-06','2026-11-07'];
+ const all=dates.flatMap(day=>['東京','京都','阪神'].flatMap(venue=>
+  Array.from({length:12},(_,i)=>race(venue,i+1,day))));
+ const valid=validateTargets(all,now);
+ assert.equal(valid.length,108);
+ assert.equal(new Set(valid.map(r=>r.date+'|'+r.venue+'|'+r.raceNumber)).size,108);
+});
+test('the 37th race on one day and fourth distinct day are rejected',()=>{
+ const now=new Date('2026-11-04T09:00:00+09:00');
+ const all=['東京','京都','阪神'].flatMap(venue=>
+  Array.from({length:12},(_,i)=>race(venue,i+1,'2026-11-05')));
+ assert.throws(()=>validateTargets([...all,race('福島',1,'2026-11-05')],now),/capacity/);
+ const four=['2026-11-04','2026-11-05','2026-11-06','2026-11-07']
+  .map(day=>race('東京',1,day));
+ assert.throws(()=>validateTargets(four,now),/capacity/);
+});
+test('invalid calendar dates and the 109th total race are rejected',()=>{
+ const now=new Date('2026-11-04T09:00:00+09:00');
+ assert.throws(()=>validateTargets([race('東京',1,'2026-11-31')],new Date('2026-11-28T09:00:00+09:00')),/calendar/);
+ const hundredEight=['2026-11-05','2026-11-06','2026-11-07']
+  .flatMap(day=>['東京','京都','阪神'].flatMap(venue=>
+   Array.from({length:12},(_,i)=>race(venue,i+1,day))));
+ assert.throws(()=>validateTargets([...hundredEight,race('福島',1,'2026-11-07')],now),/count/);
+});
