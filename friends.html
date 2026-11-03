@@ -53,7 +53,7 @@
    const incoming=r.recipientId===user.id;
    return entry((incoming?'受信：':'送信：')+display(incoming?r.senderId:r.recipientId),incoming?[['承認',async()=>{await request('POST','/api/sharing/invitations/'+r.id+'/respond',{accepted:true});await refresh();status('承認しました。')}],['拒否',async()=>{await request('POST','/api/sharing/invitations/'+r.id+'/respond',{accepted:false});await refresh();status('申請を拒否しました。')}]]:[]);
   }));
-  fillList('friends',(data.friends||[]).map(f=>entry('友達：'+display(f.id),[
+  fillList('friends',(data.friends||[]).map(f=>entry('友達：'+(f.displayName||display(f.id)),[
    ['成績を見る',async()=>{const result=await request('GET','/api/sharing/summary/'+f.id);selectedFriendId=f.id;renderSummary(result.summary);status('成績を更新しました。')}],
    ['解除',async()=>{if(!confirm('この友達との共有を解除しますか？'))return;await request('DELETE','/api/sharing/friends/'+f.id);if(localStorage.getItem('baken-king-friend-score-friend-id-v1')===f.id){localStorage.removeItem('baken-king-friend-score-v1');localStorage.removeItem('baken-king-friend-score-owner-v1');localStorage.removeItem('baken-king-friend-score-friend-id-v1')}await refresh();$('comparison').textContent='友達を選択してください。';status('友達を解除しました。')}]
   ])));
