@@ -64,6 +64,16 @@
   if(!s){el.textContent='相手の成績はまだ登録されていません。';return}
   const fields=[['収支',yen(s.profitYen)],['回収率',s.roiPercent==null?'—':s.roiPercent+'%'],['購入金額',yen(s.stakeYen)],['払戻金額',yen(s.returnedYen)],['精算済み馬券数',s.settledTicketCount+'件'],['購入レース数',s.purchasedRaceCount+'R'],['的中レース数',s.hitRaceCount+'R'],['レース的中率',s.raceHitRatePercent==null?'—':s.raceHitRatePercent+'%'],['最高払戻金',yen(s.maxPayoutYen)]];
   const ul=document.createElement('ul');for(const [k,v] of fields)ul.append(entry(k+'：'+v));el.append(ul);
+  // Only the nine public summary fields are passed to the existing comparison
+  // table. No wagers, balance, settlement history or JWT is persisted.
+  const metrics={profit:s.profitYen,roi:s.roiPercent==null?null:Math.round(s.roiPercent*10)/10,
+   stake:s.stakeYen,paid:s.returnedYen,races:s.purchasedRaceCount,hitRaces:s.hitRaceCount,
+   raceRate:s.raceHitRatePercent,maxPayout:s.maxPayoutYen,settled:s.settledTicketCount};
+  const valid=Object.values(metrics).every(v=>v===null||(typeof v==='number'&&Number.isFinite(v)));
+  if(valid&&metrics.profit===metrics.paid-metrics.stake){
+   localStorage.setItem('baken-king-friend-score-v1',JSON.stringify({version:1,metrics,nickname:'友達'}));
+   const note=document.createElement('p');note.textContent='アプリの「データ」タブの比較表にも反映しました。';el.append(note);
+  }
  }
  $('connect').onclick=()=>operation(async()=>{
   const result=(await authCall('/get-session')).data;user=result?.user||result?.data?.user||null;
