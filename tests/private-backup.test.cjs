@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const {createPrivateBackupStore}=require('../sharing-server/private-backup.cjs');
 const user='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
-const key='a'.repeat(64);const payload={format:'BAKEN_KING_BACKUP',schemaVersion:2,exportedAt:'2026-11-03T00:00:00Z',state:{bets:[],balance:100000,totalPaid:0,totalStake:0,season:1},extras:{}};
+const key='a'.repeat(64);const payload={format:'BAKEN_KING_BACKUP',schemaVersion:2,exportedAt:'2026-11-03T00:00:00Z',state:{bets:[],seasons:[],balance:100000,totalPaid:0,totalStake:0,grants:100000,season:1,bankrupt:0,manualRestarts:0},extras:{}};
 const records=new Map(),queries=[];
 const db={async query(sql,params){
  queries.push([sql,params]);
