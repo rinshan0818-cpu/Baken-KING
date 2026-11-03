@@ -4,7 +4,7 @@
 :root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;color:#173733;background:#f3f7f5}*{box-sizing:border-box}body{margin:0;padding:calc(20px + env(safe-area-inset-top)) 16px 40px}.wrap{max-width:530px;margin:auto}h1{font-size:25px;margin:12px 0 6px}h2{font-size:18px;margin:0 0 12px}p{font-size:13px;line-height:1.7;color:#576c66}a{color:#166b56}.card{background:white;border:1px solid #dce7e2;border-radius:16px;padding:17px;margin:13px 0}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1 1 auto}button,input{font:inherit;font-size:15px;border-radius:10px;padding:11px}input{width:100%;border:1px solid #a5bcb2;margin:5px 0 10px}button{border:0;background:#086c54;color:white;font-weight:700;cursor:pointer}button.secondary{background:#e5efea;color:#1a6250}button:disabled{opacity:.5;cursor:not-allowed}.mini{font-size:12px;color:#64776e}#status{white-space:pre-wrap;background:#e9f2ed;padding:12px;border-radius:10px;margin:15px 0;line-height:1.5}ul{list-style:none;padding:0;margin:0}li{border-top:1px solid #edf2ee;padding:12px 0}li p{margin:4px 0}.entry-actions{display:flex;gap:7px;margin-top:7px}.entry-actions button{font-size:12px;flex:1}#app[hidden],#status[hidden]{display:none}.pill{display:inline-block;background:#e9f1ec;padding:5px 9px;border-radius:99px;color:#315c4c;font-size:12px}
 </style></head><body><main class="wrap">
 <p><a href="./">Baken-KINGに戻る</a></p><h1>友達管理</h1><p>メールログインで友達を登録し、成績を比較するための画面です。馬券・残高・精算履歴そのものは友達に公開しません。</p>
-<div class="card"><span class="pill" id="connectionBadge">接続確認前</span><p>メールログイン後に友達申請・承認ができます。成績の公開はアプリの「データ」タブから本人が許可した場合だけ行われます。</p><div class="row"><button id="connect">ログイン状態を確認</button><a id="loginLink" href="./auth.html">ログイン・メール確認</a></div><div id="status" role="status" aria-live="polite">まだ接続していません。</div></div>
+<div class="card"><span class="pill" id="connectionBadge">接続確認前</span><p>メールログイン後に友達申請・承認ができます。成績の公開はアプリの「データ」タブから本人が許可した場合だけ行われます。</p><div class="row"><button id="connect" class="secondary">接続を再確認</button><a id="loginLink" href="./auth.html">ログイン・アカウント</a></div><div id="status" role="status" aria-live="polite">まだ接続していません。</div></div>
 <div id="app" hidden>
 <section class="card"><h2>自分のプロフィール</h2><p id="myId" class="mini"></p><label for="nickname">表示名（16文字以内）</label><input id="nickname" maxlength="16" autocomplete="nickname"><button id="register" type="button">プロフィールを登録・更新</button><div class="row"><button id="copyId" class="secondary" type="button">自分の友達IDをコピー</button><button id="copyInvite" class="secondary" type="button">招待リンクをコピー</button><button id="refresh" class="secondary" type="button">一覧を更新</button></div></section>
 <section class="card"><h2>友達を追加</h2><p>相手の招待リンクから開くと友達IDが自動入力されます。直接IDを貼り付けても申請できます。</p><label for="recipient">友達ID</label><input id="recipient" type="text" autocapitalize="off" spellcheck="false" placeholder="例：xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><button id="invite" type="button">友達申請を送る</button></section>
@@ -20,7 +20,7 @@
  const $=id=>document.getElementById(id);
  let user=null,token=null,busy=false,selectedFriendId=null,profileReady=false;
  const status=m=>{$('status').hidden=false;$('status').textContent=m};
- const friendly=e=>e?.status===503?'共有APIは現在準備中です。データは送信されていません。':e?.status===401?'ログインし直してください。':e?.status===403?'操作できません。申請・友達IDを確認してください。':e?.message||'通信に失敗しました。';
+ const friendly=e=>e?.status===503?'友達APIに接続できません。時間をおいて再確認してください。':e?.status===401?'ログイン状態を確認できません。ログイン・アカウントから確認してください。':e?.status===403?'操作できません。申請・友達IDを確認してください。':e?.message||'通信に失敗しました。';
  async function authCall(path){
   const res=await fetch(AUTH+path,{credentials:'include',cache:'no-store',headers:{Accept:'application/json'}});
   if(!res.ok)throw Error('認証状態を確認できません');
@@ -96,7 +96,7 @@
    const note=document.createElement('p');note.textContent='アプリの「データ」タブの比較表にも反映しました。';el.append(note);
   }
  }
- $('connect').onclick=()=>operation(async()=>{
+ async function connectAccount(){return operation(async()=>{
   const result=(await authCall('/get-session')).data;user=result?.user||result?.data?.user||null;
   if(!user||!UUID.test(user.id)||user.emailVerified!==true)throw Error('メール確認済みのログインが必要です。');
   // Never display a prior account's cached nine-field comparison.
@@ -111,11 +111,14 @@
   await refresh();$('app').hidden=false;
   $('connectionBadge').textContent='接続済み';
   status(profileReady?(inviteId&&inviteId!==user.id?'ログイン確認済み。友達申請を送信できます。':'友達管理に接続しました。'):'まず「プロフィールを登録・更新」を押してください。登録後に友達IDを送れます。');
- });
+ });}
+ $('connect').onclick=connectAccount;
  $('register').onclick=()=>operation(async()=>{const name=$('nickname').value.trim();if(!name||name.length>16)throw Error('1～16文字の名前を入力してください');await request('POST','/api/sharing/profile',{displayName:name});profileReady=true;status('プロフィールを登録しました。友達IDをコピーして相手に送れます。')});
  $('invite').onclick=()=>operation(async()=>{if(!profileReady)throw Error('まずプロフィールを登録してください');const id=$('recipient').value.trim();if(!UUID.test(id)||id===user.id)throw Error('正しい友達IDを入力してください');await request('POST','/api/sharing/invitations',{recipientId:id});await refresh();status('友達申請を送信しました。')});
  $('copyInvite').onclick=()=>operation(async()=>{if(!profileReady)throw Error('まずプロフィールを登録してください');await copy(inviteUrl(user.id));status('招待リンクをコピーしました。相手に送るとID入力なしで申請できます。')});
  $('refresh').onclick=()=>operation(async()=>{await refresh();status('友達一覧を更新しました。')});
  $('copyId').onclick=()=>operation(async()=>{if(!profileReady)throw Error('まずプロフィールを登録してください');await copy(user.id);status('友達IDをコピーしました。')});
+ // Returning visitors should not need to tap another login confirmation.
+ connectAccount();
 })();
 </script></body></html>
