@@ -1,6 +1,8 @@
 /* Opt-in private monitor synchronization. Never uploads wager details. */
 (()=>{
  'use strict';
+ // The Vercel PWA uses account-scoped monitor registration instead.
+ if(location.hostname==='baken-king-app-next.vercel.app')return;
  // The beta sandbox never contacts or alters live result-monitoring services.
  if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const SETTINGS='baken-monitor-sync-config-v1';
