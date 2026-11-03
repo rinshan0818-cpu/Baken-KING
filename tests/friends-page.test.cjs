@@ -9,7 +9,9 @@ for(const endpoint of ['/api/sharing/profile','/api/sharing/connections','/api/s
 for(const id of ['connect','register','copyId','invite','invitations','friends','comparison'])assert(html.includes('id="'+id+'"'),id+' missing');
 assert(html.includes('emailVerified!==true'),'Verified login guard required');
 assert(html.includes('credentials:\'omit\''),'Sharing bearer requests must not send cookies');
-assert(!html.includes('localStorage.setItem('),'Friend page must not modify local wallet or tickets');
+assert(html.includes("localStorage.setItem('baken-king-friend-score-v1'"),'Friend summary must be reflected into data tab');
+assert(!html.includes("localStorage.setItem('keiba-demo-v1'"),'Friend page must not modify local wallet or tickets');
+assert(!html.includes("localStorage.setItem('baken-king-test-state-v1'"),'Friend page must not modify test wallet');
 assert(!html.includes('/api/account/backup'),'Friend management must not touch personal backups');
 assert(html.includes('共有APIが未接続'),'Disabled API status must be explicit');
 console.log('PASS: friends page syntax, secured transport, nine metrics and unchanged local data');
