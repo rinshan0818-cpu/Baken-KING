@@ -10,6 +10,9 @@ for(const id of ['connect','register','copyId','invite','invitations','friends',
 assert(html.includes('emailVerified!==true'),'Verified login guard required');
 assert(html.includes('credentials:\'omit\''),'Sharing bearer requests must not send cookies');
 assert(html.includes("localStorage.setItem('baken-king-friend-score-v1'"),'Friend summary must be reflected into data tab');
+assert(html.includes("cachedOwner!==user.id"),'Different accounts must not reuse a cached friend comparison');
+assert(html.includes("baken-king-friend-score-friend-id-v1"),'Friend cache must record which friend is compared');
+assert(html.includes("localStorage.removeItem('baken-king-friend-score-v1'"),'Unfriend must clear cached comparison');
 assert(!html.includes("localStorage.setItem('keiba-demo-v1'"),'Friend page must not modify local wallet or tickets');
 assert(!html.includes("localStorage.setItem('baken-king-test-state-v1'"),'Friend page must not modify test wallet');
 assert(!html.includes('/api/account/backup'),'Friend management must not touch personal backups');
