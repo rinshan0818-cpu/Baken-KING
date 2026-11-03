@@ -61,7 +61,8 @@ test('reject data with additional ticket information',async()=>{
  assert.equal(db.releases,1);
 });
 test('reject duplicate races or more than 36 race identities',async()=>{
- for(const races of [[race,race],Array.from({length:37},(_,i)=>({...race,raceNumber:i%12+1}))]){
+ const full=['東京','京都','阪神'].flatMap(venue=>Array.from({length:12},(_,i)=>({...race,venue,raceNumber:i+1})));
+ for(const races of [[race,race],[...full,{date:'2026-11-08',venue:'東京',raceNumber:1}]]){
   const db=connection({races});
   const h=createSchedulerUnionHttp({token,connect:db.connect});
   assert.equal((await invoke(h,{authorization:'Bearer '+token})).statusCode,503);
