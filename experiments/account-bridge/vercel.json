@@ -4,6 +4,10 @@
     {
       "source": "/api/auth/:path*",
       "destination": "/api/index?auth_route=:path*"
+    },
+    {
+      "source": "/api/friends/:path*",
+      "destination": "/api/index?sharing_route=:path*"
     }
   ]
 }
