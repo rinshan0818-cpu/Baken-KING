@@ -9,7 +9,7 @@ const {createSharingHttpHandler}=require('./http.cjs');
 const {createPrivateBackupHandler}=require('./private-backup-http.cjs');
 function createRestrictedSharingHandler({authenticate,pool,allowedOrigins,encryptionKey}){
  if(typeof authenticate!=='function'||!pool||typeof pool.connect!=='function')throw Error('Verified auth and private DB pool required');
- const methods=['me','invite','respond','revoke','writeSummary','readSummary'];
+ const methods=['me','register','connections','invite','respond','revoke','writeSummary','readSummary'];
  const service={};
  for(const method of methods){
   service[method]=async(request,...args)=>{
