@@ -2,6 +2,14 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/api/auth/friends/:path*",
+      "destination": "/api/auth/index?sharing_route=:path*"
+    },
+    {
+      "source": "/api/auth/:path*",
+      "destination": "/api/auth/index?auth_route=:path*"
+    },
+    {
       "source": "/api/:path*",
       "destination": "/api/index?bk_route=:path*"
     }
