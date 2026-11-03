@@ -55,7 +55,7 @@
   const testing=localStorage.getItem(modeKey)==='test';
   const modePanel=document.createElement('section');
   modePanel.className='bk-mode-panel';
-  const modeTitle=document.createElement('h3');modeTitle.textContent='ベータ版・動作テスト';
+  const modeTitle=document.createElement('h3');modeTitle.textContent='動作テスト';
   const modeCurrent=document.createElement('p');modeCurrent.className='bk-mode-current';
   modeCurrent.textContent=testing?'現在：テストモード（専用の仮想データ）':'現在：本番モード（通常の馬券・残高）';
   const actions=document.createElement('div');actions.className='bk-mode-buttons';
