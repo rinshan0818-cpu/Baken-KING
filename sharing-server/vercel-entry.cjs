@@ -1,7 +1,20 @@
 'use strict';
 // Vercel Node entry point. Deliberately fails closed without all private env vars.
 // Never deploy to GitHub Pages; env secrets belong ONLY to the Vercel project.
-let handler,bootError,healthPool;
+let handler,bootError,healthPool,schedulerPool;
+function initializeScheduler(){
+ const url=process.env.SHARING_SCHEDULER_DATABASE_URL;
+ const token=process.env.SHARING_SCHEDULER_SERVICE_TOKEN;
+ if(typeof url!=='string'||!url.trim()||typeof token!=='string'||token.length<32)
+  return null;
+ const {Pool}=require('pg');
+ const {createSchedulerUnionHttp}=require('./scheduler-union-http.cjs');
+ // Dedicated connection only, never the ordinary sharing database pool.
+ schedulerPool=new Pool({connectionString:url,max:2,connectionTimeoutMillis:5000,
+  ssl:{rejectUnauthorized:true}});
+ return createSchedulerUnionHttp({token,connect:()=>schedulerPool.connect()});
+}
+let schedulerHandler,schedulerBootError;
 const requireEnv=names=>names.every(name=>typeof process.env[name]==='string'&&process.env[name].trim()!=='');
 function initialize(){
  const required=['SHARING_DATABASE_URL','NEON_AUTH_BASE_URL','NEON_AUTH_JWKS_URL'];
@@ -18,6 +31,16 @@ function initialize(){
 module.exports=async function vercelHandler(req,res){
  res.setHeader('Cache-Control','no-store');
  res.setHeader('X-Content-Type-Options','nosniff');
+ if(new URL(req.url,'https://baken.invalid').pathname==='/api/monitor/scheduler-union'){
+  if(!schedulerHandler&&!schedulerBootError){
+   try{schedulerHandler=initializeScheduler()}catch(e){schedulerBootError=e}
+  }
+  if(!schedulerHandler){
+   res.statusCode=503;res.setHeader('Content-Type','application/json; charset=utf-8');
+   return res.end(JSON.stringify({error:'Scheduler unavailable'}));
+  }
+  return schedulerHandler(req,res);
+ }
  if(!handler&&!bootError){
   try{handler=initialize()}catch(e){bootError=e}
  }
