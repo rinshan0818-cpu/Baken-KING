@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const {Script}=require('node:vm');
 const html=fs.readFileSync('index.html','utf8');
 const settings=fs.readFileSync('settings-surface.js','utf8');
-const scripts=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)].map(m=>m[1]);
+const scripts=html.split('<script>').slice(1).map(s=>s.split('</script>')[0]);
 for(const script of scripts)new Script(script);
 new Script(settings);
 assert(html.includes('id="bkVerifyBackup"'));
