@@ -35,6 +35,7 @@ on:
       - 'tests/sharing-friendship-store.test.cjs'
       - 'tests/sharing-friend-http.test.cjs'
       - 'tests/sharing-jwt-auth.test.cjs'
+      - 'tests/sharing-neon-auth.test.cjs'
       - 'tests/friends-share.test.cjs'
       - '.github/workflows/ui-smoke.yml'
   pull_request:
@@ -69,6 +70,8 @@ jobs:
         run: node tests/storage_regression.cjs
       - name: Test official settlement math, refunds and pending outcomes
         run: node tests/race-settlement.test.cjs
+      - name: Test Neon Auth EdDSA token verification
+        run: node tests/sharing-neon-auth.test.cjs
       - name: Test signed login token verification
         run: node tests/sharing-jwt-auth.test.cjs
       - name: Test signed sharing API composition
