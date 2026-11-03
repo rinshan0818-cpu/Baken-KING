@@ -1,11 +1,14 @@
 -- Baken-KING sharing authorization plan (NOT APPLIED).
 -- Review and test on a Neon test branch before production deployment.
 --
--- Trust boundary: ONLY a private API server may hold the credential for
--- baken_sharing_api. This role MUST NEVER be used in GitHub Pages or Data API.
+-- Trust boundary: ONLY a private API server may hold credentials for
+-- the limited LOGIN role baken_sharing_limited. baken_sharing_api is NOLOGIN.
+-- Neither role may be exposed to GitHub Pages or Data API.
 -- API must verify Neon Auth JWT (Ed25519/JWKS) AND verified email first.
 -- The authenticated server runs each request in ONE transaction:
--- BEGIN; SELECT set_config('bk.actor_id', $1, true); SQL; COMMIT;
+-- BEGIN; verify session_user=baken_sharing_limited with no BYPASSRLS;
+-- SET LOCAL ROLE baken_sharing_api;
+-- SELECT set_config('bk.actor_id', $1, true); SQL; COMMIT;
 -- $1 must be taken solely from the verified JWT subject. With a transaction
 -- pool the identity MUST be set afresh in every transaction.
 --
@@ -59,7 +62,9 @@ CREATE POLICY bk_request_recipient_update ON public.sharing_requests FOR UPDATE 
 CREATE POLICY bk_friend_member_read ON public.sharing_friendships FOR SELECT TO baken_sharing_api
  USING (user_low=public.bk_actor_id() OR user_high=public.bk_actor_id());
 -- Only the recipient of an accepted invitation can create that pair.
--- The acceptance CTE and insertion must execute in a single SQL statement.
+-- IMPORTANT: acceptance UPDATE and INSERT must be TWO consecutive SQL
+-- statements in the SAME transaction. A modifying CTE sees the old row
+-- under RLS in the insertion policy, causing the insertion to fail.
 CREATE POLICY bk_friend_approved_insert ON public.sharing_friendships
  FOR INSERT TO baken_sharing_api
  WITH CHECK (
