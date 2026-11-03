@@ -30,18 +30,20 @@ test('pending official result: poll at one-minute cadence',async()=>{
  x.advance(60000);x.interval.fn();await settle();assert.equal(x.requests,2);
  x.advance(60000);x.interval.fn();await settle();assert.equal(x.requests,3);
 });
-test('no pending ticket: return to five-minute cadence',async()=>{
+test('no pending ticket: never poll, including on app start',async()=>{
  const x=fixture([]);await settle();
- x.advance(60000);x.interval.fn();await settle();assert.equal(x.requests,1);
- for(let i=0;i<4;i++){x.advance(60000);x.interval.fn();await settle()}
- assert.equal(x.requests,2);
+ assert.equal(x.requests,0);
+ for(let i=0;i<10;i++){x.advance(60000);x.interval.fn();await settle()}
+ assert.equal(x.requests,0);
+ x.handlers.focus();await settle();
+ assert.equal(x.requests,0);
 });
-test('after officialReady: stop accelerated polling without settling wallet',async()=>{
+test('after officialReady: stop all result polling without settling wallet',async()=>{
  const x=fixture([pending]);await settle();
  x.setBets([{...pending,officialReady:true}]);
  for(let i=0;i<4;i++){x.advance(60000);x.interval.fn();await settle()}
  assert.equal(x.requests,1);
- x.advance(60000);x.interval.fn();await settle();assert.equal(x.requests,2);
+ x.advance(60000);x.interval.fn();await settle();assert.equal(x.requests,1);
 });
 test('hidden PWA makes no requests; visibility resumes immediately',async()=>{
  const x=fixture([pending]);await settle();x.setVisible(false);
@@ -51,4 +53,10 @@ test('hidden PWA makes no requests; visibility resumes immediately',async()=>{
 test('focus requests results without waiting for next interval',async()=>{
  const x=fixture([pending]);await settle();x.handlers.focus();await settle();
  assert.equal(x.requests,2);
+});
+
+test('buying the first pending ticket checks results immediately',async()=>{
+ const x=fixture([]);await settle();assert.equal(x.requests,0);
+ x.setBets([pending]);x.handlers['baken:wagers-updated']();await settle();
+ assert.equal(x.requests,1);
 });
