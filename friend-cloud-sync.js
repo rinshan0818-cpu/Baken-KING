@@ -52,7 +52,7 @@
  }
  async function sync(manual){
   // No background authentication/network calls until a user has first opted in.
-  if(!manual&&!Object.keys(localStorage).some(k=>k.startsWith('baken-friend-cloud-consent:')&&localStorage.getItem(k)==='1'))return;
+  if(!manual&&localStorage.getItem('baken-friend-cloud-ever-opted-in')!=='1')return;
   if(busy)return;
   busy=true;button.disabled=true;
   try{
@@ -77,6 +77,7 @@
    await request(identity,'POST','/api/sharing/profile',{displayName:name});
    await request(identity,'POST','/api/sharing/summary',{metrics:summary});
    localStorage.setItem(consentKey,'1');
+   localStorage.setItem('baken-friend-cloud-ever-opted-in','1');
    localStorage.setItem(lastKey,String(Date.now()));
    label('9項目の成績を同期しました（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）');
   }catch(e){
