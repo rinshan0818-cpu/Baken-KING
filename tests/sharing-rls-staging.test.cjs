@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const sql=fs.readFileSync('docs/sharing-rls-staging.sql','utf8');
+assert.match(sql,/CREATE ROLE baken_sharing_api NOLOGIN NOBYPASSRLS/);
+assert.match(sql,/bk_snapshot_self_insert[\s\S]*?owner_id=public\.bk_actor_id\(\)/);
+assert.match(sql,/bk_snapshot_self_or_friend_read[\s\S]*?sharing_friendships/);
+assert.match(sql,/bk_request_recipient_update[\s\S]*?recipient_id=public\.bk_actor_id\(\)/);
+assert.match(sql,/bk_friend_approved_insert[\s\S]*?r\.status='accepted'[\s\S]*?r\.recipient_id=public\.bk_actor_id\(\)/);
+assert.match(sql,/DO NOT RUN on production/);
+assert.doesNotMatch(sql,/GRANT ALL|TO PUBLIC|DISABLE ROW LEVEL SECURITY/);
+console.log('PASS: staging-only RLS plan preserves owner-write, accepted-friend read and deny-by-default contracts');
