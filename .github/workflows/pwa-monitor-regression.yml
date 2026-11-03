@@ -9,6 +9,7 @@ on:
       - 'sharing-server/vercel-entry.cjs'
       - 'api/index.js'
       - 'tests/test-scheduler-union-http.cjs'
+      - 'tests/test-scheduler-routing-fail-closed.cjs'
       - 'tests/test-monitor-account-isolation.cjs'
       - 'sharing-server/monitor-store.cjs'
       - 'tests/test-monitor-target-retirement.cjs'
@@ -33,4 +34,5 @@ jobs:
           node --test tests/test-account-monitor-heartbeat.cjs
           node --test tests/test-monitor-target-retirement.cjs
           node --test tests/test-scheduler-union-http.cjs
+          node --test tests/test-scheduler-routing-fail-closed.cjs
           node --test tests/test-monitor-account-isolation.cjs
