@@ -6,12 +6,12 @@ const ID='11111111-1111-4111-8111-111111111111';
 const METRICS={stakeYen:1000,returnedYen:1500,settledTicketCount:2,purchasedRaceCount:2,hitRaceCount:1,settledRaceCount:2,maxPayoutYen:1500};
 function setup({connected=false,approved=true,mode='production'}={}){
  const storage=new Map([['baken-king-mode-v1',mode]]);
- const button={disabled:true,textContent:'',onclick:null};
+ const button={disabled:true,textContent:'',onclick:null,insertAdjacentElement(position,node){this.stop=node}};
  const status={textContent:''};const calls=[];
  let confirms=0,timer=null;
  const sandbox={
-  localStorage:{getItem:k=>storage.has(k)?storage.get(k):null,setItem:(k,v)=>storage.set(k,v),keys:()=>[...storage.keys()]},
-  document:{getElementById:k=>({bkFriendSyncNow:button,bkFriendSyncStatus:status})[k]||null,visibilityState:'visible'},
+  localStorage:{getItem:k=>storage.has(k)?storage.get(k):null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k),key:i=>[...storage.keys()][i]||null,get length(){return storage.size}},
+  document:{getElementById:k=>({bkFriendSyncNow:button,bkFriendSyncStatus:status})[k]||null,createElement:()=>({style:{},disabled:false}),visibilityState:'visible'},
   confirm:()=>{confirms++;return approved},
   setInterval:fn=>{timer=fn},
   bkFriendCloudSnapshot:()=>METRICS,
@@ -49,9 +49,16 @@ function setup({connected=false,approved=true,mode='production'}={}){
  assert(!upload.opts.body.includes('bets'),'No ticket history allowed');
  assert(!upload.opts.body.includes('balance'),'No wallet allowed');
  assert.equal(upload.opts.credentials,'omit');
+ assert.equal(connected.button.stop.disabled,false,'Stop control available after consent');
  const before=connected.calls.length;
  await connected.timer();
  assert.equal(connected.calls.length,before,'30 minute window must throttle subsequent uploads');
+ await connected.button.stop.onclick();
+ assert.equal(connected.storage.get('baken-friend-cloud-ever-opted-in'),undefined,'Stop must disable background sync');
+ assert.equal(connected.storage.get('baken-friend-cloud-consent:'+ID),undefined,'Stop must revoke remembered upload consent');
+ const afterStop=connected.calls.length;
+ await connected.timer();
+ assert.equal(connected.calls.length,afterStop,'Stopped sync must never contact the API');
  const declined=setup({connected:true,approved:false});
  await declined.button.onclick();
  assert(!declined.calls.some(c=>c.url.endsWith('/api/sharing/summary')));
