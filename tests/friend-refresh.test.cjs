@@ -1,43 +1,53 @@
+'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 const source=fs.readFileSync('friend-cloud-sync.js','utf8');
-const OWN='11111111-1111-4111-8111-111111111111',FRIEND='22222222-2222-4222-8222-222222222222';
-function fixture({friendOk=true}={}){
- const values=new Map([['baken-king-mode-v1','production'],['baken-king-friend-score-owner-v1',OWN],
- ['baken-king-friend-score-friend-id-v1',FRIEND],['baken-king-friend-score-v1','previous']]);
- const button={onclick:null,disabled:true,insertAdjacentElement(){}},status={textContent:''};let renders=0;const calls=[];
- const summary={profitYen:500,roiPercent:150,stakeYen:1000,returnedYen:1500,settledTicketCount:2,
-  purchasedRaceCount:2,hitRaceCount:1,raceHitRatePercent:50,maxPayoutYen:1500};
+function fixture({testing=false,host='rinshan0818-cpu.github.io',consent=true}={}){
+ const storage=new Map([['baken-king-mode-v1',testing?'test':'production']]);
+ let listener=null,clicked=null,fetches=0,confirms=0;
+ const button={disabled:false,textContent:'',addEventListener(type,callback){
+  assert.equal(type,'click');listener=callback;
+ }};
+ const status={textContent:''};
  const sandbox={
-  localStorage:{getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k),key:i=>[...values.keys()][i],get length(){return values.size}},
-  document:{getElementById:k=>k==='bkFriendSyncNow'?button:k==='bkFriendSyncStatus'?status:null,createElement:()=>({style:{}}),visibilityState:'visible'},
-  confirm:()=>true,setInterval(){},Date,
-  bkFriendCloudSnapshot:()=>({stakeYen:1000,returnedYen:1500,settledTicketCount:2,purchasedRaceCount:2,hitRaceCount:1,settledRaceCount:2,maxPayoutYen:1500}),
-  bkScoreValid:m=>m.profit===m.paid-m.stake&&Object.keys(m).length===9,
-  bkRenderFriendCompare:()=>{renders++},
-  fetch:async (url,options)=>{
-   calls.push({url,options});
-   if(url.endsWith('/get-session'))return {ok:true,status:200,json:async()=>({user:{id:OWN,emailVerified:true}})};
-   if(url.endsWith('/token'))return {ok:true,status:200,json:async()=>({token:'head.body.signature'})};
-   if(url.endsWith('/summary/'+FRIEND))return {ok:friendOk,status:friendOk?200:403,json:async()=>friendOk?{ok:true,summary}:{ok:false}};
-   return {ok:true,status:200,json:async()=>({ok:true})};
-  }
+  location:{hostname:host},document:{
+   getElementById:id=>id==='bkFriendSyncNow'?button:id==='bkFriendSyncStatus'?status:null,
+   createElement(tag){assert.equal(tag,'a');return {href:'',click(){clicked=this.href}}}
+  },
+  localStorage:{getItem:key=>storage.get(key)??null,setItem(){throw Error('Must not modify wallet')}},
+  confirm(){confirms++;return consent},
+  fetch(){fetches++;throw Error('GitHub Pages must not send cloud write requests')},
+  bkFriendCloudSnapshot(){return{
+   stakeYen:1000,returnedYen:1500,settledTicketCount:2,
+   purchasedRaceCount:2,hitRaceCount:1,settledRaceCount:2,maxPayoutYen:1500
+  }},
+  encodeURIComponent
  };
  vm.runInNewContext(source,sandbox);
- return {button,values,calls,getRenders:()=>renders,status};
+ return {button,status,getListener:()=>listener,getClicked:()=>clicked,getFetches:()=>fetches,getConfirms:()=>confirms};
 }
-(async()=>{
- const f=fixture();await f.button.onclick();
- const cache=JSON.parse(f.values.get('baken-king-friend-score-v1'));
- assert.equal(cache.metrics.profit,500);
- assert.deepEqual(Object.keys(cache.metrics).sort(),['profit','roi','stake','paid','races','hitRaces','raceRate','maxPayout','settled'].sort());
- assert.equal(f.getRenders(),1);
- assert(f.calls.some(c=>c.url.endsWith('/summary/'+FRIEND)));
- assert(!JSON.stringify(cache).includes('token'));
- const fail=fixture({friendOk:false});await fail.button.onclick();
- assert.equal(fail.values.get('baken-king-friend-score-v1'),'previous','Failed friend fetch cannot erase last good comparison');
- assert.equal(fail.getRenders(),0);
- assert.equal(fail.values.get('baken-friend-cloud-ever-opted-in'),'1','Own summary must succeed even when friend read fails');
- console.log('PASS: friend nine metrics refresh, rejects failed reads without wiping cache');
-})().catch(e=>{console.error(e);process.exitCode=1});
+{
+ const t=fixture();assert.equal(t.button.disabled,false);
+ const listener=t.getListener();assert.equal(typeof listener,'function');listener();
+ const clicked=t.getClicked();assert(clicked);
+ assert(clicked.startsWith('https://baken-king-account-bridge.vercel.app/#score='));
+ const data=JSON.parse(decodeURIComponent(clicked.split('#score=')[1]));
+ assert.equal(data.v,1);assert.equal(data.metrics.stakeYen,1000);
+ assert.equal(Object.keys(data.metrics).length,7);
+ assert.equal(t.getFetches(),0);assert.equal(t.getConfirms(),1);
+ assert(t.status.textContent.includes('認証済み画面'));
+}
+{
+ const t=fixture({testing:true});assert.equal(t.button.disabled,true);
+ t.getListener()();assert.equal(t.getClicked(),null);assert.equal(t.getFetches(),0);
+}
+{
+ const t=fixture({consent:false});t.getListener()();
+ assert.equal(t.getClicked(),null);assert.equal(t.getFetches(),0);
+}
+{
+ const t=fixture({host:'baken-king-app-next.vercel.app'});
+ assert.equal(t.getListener(),null);
+}
+console.log('PASS: friend cloud consent, aggregate-only handoff, and no unauthenticated browser writes');
