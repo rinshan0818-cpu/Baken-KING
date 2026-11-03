@@ -14,9 +14,11 @@
  let user=null,friend=null,busy=false,lastSuccess=0;
  const message=t=>{status.textContent=t};
  const accountPanel=document.createElement('div');
- accountPanel.innerHTML='<div class="row"><label style="flex:1 1 100%">メールアドレス<input id="bkNextEmail" type="email" autocomplete="email" style="width:100%"></label><label style="flex:1 1 100%">パスワード<input id="bkNextPassword" type="password" autocomplete="current-password" style="width:100%"></label></div><div class="row"><button id="bkNextLogin" class="alt" type="button">ログイン</button><button id="bkNextLogout" class="outline" type="button">ログアウト</button></div><p id="bkNextAccountStatus" class="muted" aria-live="polite">ログイン状態を確認しています</p><div class="row"><button id="bkNextRefresh" class="outline" type="button">友達の成績を更新</button></div>';
+ account.querySelectorAll('a[href*="baken-king-account-bridge.vercel.app"]').forEach(a=>a.hidden=true);
+ accountPanel.innerHTML='<div class="row"><label style="flex:1 1 100%">メールアドレス<input id="bkNextEmail" type="email" autocomplete="email" style="width:100%"></label><label style="flex:1 1 100%">パスワード<input id="bkNextPassword" type="password" autocomplete="current-password" style="width:100%"></label></div><div class="row"><button id="bkNextLogin" class="alt" type="button">ログイン</button><button id="bkNextLogout" class="outline" type="button">ログアウト</button></div><p id="bkNextAccountStatus" class="muted" aria-live="polite">ログイン状態を確認しています</p><label>アカウントのニックネーム<input id="bkNextNickname" type="text" maxlength="16" placeholder="ニックネーム" style="width:100%"></label><button id="bkNextSaveName" class="outline" type="button">表示名を更新</button><div class="row"><button id="bkNextRefresh" class="outline" type="button">友達の成績を更新</button></div>';
  account.append(accountPanel);
- const login=$('bkNextLogin'),logout=$('bkNextLogout'),email=$('bkNextEmail'),password=$('bkNextPassword'),accountStatus=$('bkNextAccountStatus'),refreshButton=$('bkNextRefresh');
+ const login=$('bkNextLogin'),logout=$('bkNextLogout'),email=$('bkNextEmail'),password=$('bkNextPassword'),accountStatus=$('bkNextAccountStatus'),refreshButton=$('bkNextRefresh'),nickInput=$('bkNextNickname'),saveName=$('bkNextSaveName');
+ nickInput.hidden=true;saveName.hidden=true;
  async function api(method,path,body){
   const options={method,credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}};
   if(body!==undefined){options.headers['Content-Type']='application/json';options.body=JSON.stringify(body)}
@@ -33,15 +35,19 @@
  const lastKey=id=>'baken-next-score-last:'+id;
  function setUser(next){
   user=next&&UUID.test(next.id)&&next.emailVerified===true?next:null;
-  login.hidden=!!user;email.hidden=!!user;password.hidden=!!user;logout.hidden=!user;
+  login.hidden=!!user;email.hidden=!!user;password.hidden=!!user;logout.hidden=!user;nickInput.hidden=!user;saveName.hidden=!user;
+  if(!user){window.BakenCloudNickname=null;window.dispatchEvent(new Event('baken:nickname-changed'));}
   accountStatus.textContent=user?'ログイン中：'+(user.email||'確認済み'):'未ログイン（馬券データは端末に保存）';
  }
  async function loadUser(){
   const auth=await api('GET','get-session');
   setUser(auth?.user||auth?.data?.user||null);
   if(!user)return;
+  const oldOwner=localStorage.getItem('baken-king-friend-score-owner-v1');
+  if(oldOwner&&oldOwner!==user.id){for(const key of ['baken-king-friend-score-v1','baken-king-friend-score-owner-v1','baken-king-friend-score-friend-id-v1'])localStorage.removeItem(key);if(typeof bkRenderFriendCompare==='function')bkRenderFriendCompare()}
   const me=await friends('GET','me');
   const name=me.user?.profile?.displayName;
+  nickInput.value=typeof name==='string'?name:'';
   if(typeof name==='string'&&name.trim()){
    window.BakenCloudNickname=name.trim().slice(0,16);
    window.dispatchEvent(new Event('baken:nickname-changed'));
@@ -89,6 +95,7 @@
   }catch(e){if(manual)message(e.message||'同期に失敗しました')}
   finally{busy=false;sync.disabled=false}
  }
+ saveName.onclick=async()=>{try{if(!user)throw Error('ログインしてください');const name=nickInput.value.trim();if(!name||name.length>16)throw Error('表示名は1〜16文字で入力してください');await friends('POST','profile',{displayName:name});window.BakenCloudNickname=name;window.dispatchEvent(new Event('baken:nickname-changed'));accountStatus.textContent='表示名を更新しました：'+name}catch(e){accountStatus.textContent=e.message}};
  login.onclick=async()=>{
   try{
    if(!email.value.trim()||!password.value)throw Error('メールとパスワードを入力してください');
