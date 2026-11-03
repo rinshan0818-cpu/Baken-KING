@@ -13,7 +13,7 @@
  const status=document.getElementById('bkFriendSyncStatus');
  if(!button||!status||localStorage.getItem('baken-king-mode-v1')==='test')return;
  const label=t=>{status.textContent=t};
- let busy=false;
+ let busy=false,lastSuccessThisSession=0;
  async function auth(){
   const res=await fetch(authBase+'/get-session',{credentials:'include',cache:'no-store'});
   if(!res.ok)throw Error('ログイン状態を確認できません');
@@ -53,6 +53,7 @@
  async function sync(manual){
   // No background authentication/network calls until a user has first opted in.
   if(!manual&&localStorage.getItem('baken-friend-cloud-ever-opted-in')!=='1')return;
+  if(!manual&&lastSuccessThisSession&&Date.now()-lastSuccessThisSession<interval)return;
   if(busy)return;
   busy=true;button.disabled=true;
   try{
@@ -78,7 +79,8 @@
    await request(identity,'POST','/api/sharing/summary',{metrics:summary});
    localStorage.setItem(consentKey,'1');
    localStorage.setItem('baken-friend-cloud-ever-opted-in','1');
-   localStorage.setItem(lastKey,String(Date.now()));
+   lastSuccessThisSession=Date.now();
+   localStorage.setItem(lastKey,String(lastSuccessThisSession));
    label('9項目の成績を同期しました（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）');
   }catch(e){
    if(manual)label(e instanceof TypeError?'接続できません。ログイン状態と通信環境を確認してください。':e.message);
