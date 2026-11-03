@@ -6,7 +6,7 @@ const token='server-only-scheduler-secret-should-be-at-least-32-chars';
 const race={date:'2026-11-07',venue:'東京',raceNumber:11};
 function reply(){
  const out={statusCode:0,headers:{},body:null};
- return {out,res:{setHeader(k,v){out.headers[k]=v},end(s){out.body=JSON.parse(s)}}};
+ return {out,res:{get statusCode(){return out.statusCode},set statusCode(code){out.statusCode=code},setHeader(k,v){out.headers[k]=v},end(s){out.body=JSON.parse(s)}}};
 }
 async function invoke(handler,headers={},method='GET'){
  const {out,res}=reply();
