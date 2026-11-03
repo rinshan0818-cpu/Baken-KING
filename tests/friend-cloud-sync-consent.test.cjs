@@ -1,70 +1,55 @@
+'use strict';
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const vm=require('node:vm');
+const fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync('friend-cloud-sync.js','utf8');
-const ID='11111111-1111-4111-8111-111111111111';
-const METRICS={stakeYen:1000,returnedYen:1500,settledTicketCount:2,purchasedRaceCount:2,hitRaceCount:1,settledRaceCount:2,maxPayoutYen:1500};
-function setup({connected=false,approved=true,mode='production'}={}){
- const storage=new Map([['baken-king-mode-v1',mode]]);
- const button={disabled:true,textContent:'',onclick:null,insertAdjacentElement(position,node){this.stop=node}};
- const status={textContent:''};const calls=[];
- let confirms=0,timer=null;
+const METRICS={stakeYen:1000,returnedYen:1500,settledTicketCount:2,
+ purchasedRaceCount:2,hitRaceCount:1,settledRaceCount:2,maxPayoutYen:1500};
+function setup({approved=true,mode='production',metrics=METRICS,host='rinshan0818-cpu.github.io'}={}){
+ const storage=new Map([['baken-king-mode-v1',mode]]),events={requests:0,timers:0,confirmations:0,opened:[]};
+ const button={disabled:true,listener:null,addEventListener(type,fn){
+  assert.equal(type,'click');this.listener=fn;
+ }},status={textContent:''};
  const sandbox={
-  localStorage:{getItem:k=>storage.has(k)?storage.get(k):null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k),key:i=>[...storage.keys()][i]||null,get length(){return storage.size}},
-  document:{getElementById:k=>({bkFriendSyncNow:button,bkFriendSyncStatus:status})[k]||null,createElement:()=>({style:{},disabled:false}),visibilityState:'visible'},
-  confirm:()=>{confirms++;return approved},
-  setInterval:fn=>{timer=fn},
-  bkFriendCloudSnapshot:()=>METRICS,
-  Date,
-  fetch:async(url,opts)=>{
-   calls.push({url,opts});
-   if(url.endsWith('/get-session'))return {ok:true,status:200,json:async()=>({user:{id:ID,emailVerified:true}})};
-   if(url.endsWith('/token'))return {ok:true,status:200,json:async()=>({token:'header.body.signature'})};
-   if(url.endsWith('/api/sharing/me'))return {ok:connected,status:connected?200:503,json:async()=>({ok:connected})};
-   if(url.endsWith('/api/sharing/profile')||url.endsWith('/api/sharing/summary'))return {ok:true,status:200,json:async()=>({ok:true})};
-   throw Error('Unexpected network call '+url);
-  }
+  location:{hostname:host},
+  document:{getElementById:id=>id==='bkFriendSyncNow'?button:id==='bkFriendSyncStatus'?status:null,
+   createElement:type=>{assert.equal(type,'a');return{
+    href:'',target:'',rel:'',click(){events.opened.push({href:this.href,target:this.target,rel:this.rel})}
+   }}},
+  localStorage:{getItem:key=>storage.get(key)??null,setItem(){throw Error('No cloud consent may be silently persisted')}},
+  confirm(){events.confirmations++;return approved},
+  fetch(){events.requests++;throw Error('GH Pages cannot directly upload account data')},
+  setInterval(){events.timers++},
+  bkFriendCloudSnapshot:()=>metrics,encodeURIComponent
  };
- vm.runInNewContext(source,sandbox,{filename:'friend-cloud-sync.js'});
- return {storage,button,status,calls,confirms:()=>confirms,timer:()=>timer};
+ vm.runInNewContext(source,sandbox);
+ return {button,status,events,storage};
 }
-(async()=>{
- const initial=setup();
- assert.equal(initial.calls.length,0,'Boot must not contact auth or API without consent');
- assert.equal(initial.button.disabled,false);
- await initial.timer();
- assert.equal(initial.calls.length,0,'Timer must not request auth before consent');
- await initial.button.onclick();
- assert(!initial.calls.some(c=>c.url.endsWith('/api/sharing/summary')),'API 503 must never upload data');
- assert.equal(initial.confirms(),0,'Do not prompt to publish before API is ready');
- assert(!initial.storage.has('baken-friend-cloud-consent:'+ID));
- const connected=setup({connected:true});
- await connected.button.onclick();
- assert.equal(connected.confirms(),1);
- assert.equal(connected.storage.get('baken-friend-cloud-consent:'+ID),'1');
- const upload=connected.calls.find(c=>c.url.endsWith('/api/sharing/summary'));
- assert(upload,'Summary endpoint must receive opted-in summary');
- const sent=JSON.parse(upload.opts.body);
- assert.deepEqual(Object.keys(sent.metrics).sort(),Object.keys(METRICS).sort());
- assert(!upload.opts.body.includes('bets'),'No ticket history allowed');
- assert(!upload.opts.body.includes('balance'),'No wallet allowed');
- assert.equal(upload.opts.credentials,'omit');
- assert.equal(connected.button.stop.disabled,false,'Stop control available after consent');
- const before=connected.calls.length;
- await connected.timer();
- assert.equal(connected.calls.length,before,'30 minute window must throttle subsequent uploads');
- await connected.button.stop.onclick();
- assert.equal(connected.storage.get('baken-friend-cloud-ever-opted-in'),undefined,'Stop must disable background sync');
- assert.equal(connected.storage.get('baken-friend-cloud-consent:'+ID),undefined,'Stop must revoke remembered upload consent');
- const afterStop=connected.calls.length;
- await connected.timer();
- assert.equal(connected.calls.length,afterStop,'Stopped sync must never contact the API');
- const declined=setup({connected:true,approved:false});
- await declined.button.onclick();
- assert(!declined.calls.some(c=>c.url.endsWith('/api/sharing/summary')));
- assert(!declined.storage.has('baken-friend-cloud-consent:'+ID));
- const testing=setup({mode:'test'});
- assert.equal(testing.button.onclick,null,'Test mode must never wire synchronization');
- assert.equal(testing.calls.length,0);
- console.log('PASS: consent-gated nine-metric sync, API failure, throttle, no raw bets, test mode isolation');
-})().catch(e=>{console.error(e);process.exitCode=1});
+{
+ const t=setup();assert.equal(t.events.requests,0);assert.equal(t.events.timers,0);
+ assert.equal(t.button.disabled,false);assert.equal(typeof t.button.listener,'function');
+ t.button.listener();assert.equal(t.events.confirmations,1);
+ assert.equal(t.events.opened.length,1);assert.equal(t.events.opened[0].target,'_blank');
+ assert.equal(t.events.opened[0].rel,'noopener noreferrer');
+ const url=t.events.opened[0].href;
+ assert(url.startsWith('https://baken-king-account-bridge.vercel.app/#score='));
+ const data=JSON.parse(decodeURIComponent(url.split('#score=')[1]));
+ assert.equal(data.v,1);assert.deepEqual(Object.keys(data.metrics).sort(),Object.keys(METRICS).sort());
+ assert.equal(t.events.requests,0);assert.equal(t.storage.size,1);
+}
+{
+ const t=setup({approved:false});t.button.listener();
+ assert.equal(t.events.opened.length,0);assert.equal(t.events.requests,0);
+}
+{
+ const t=setup({mode:'test'});assert.equal(t.button.disabled,true);
+ t.button.listener();assert.equal(t.events.opened.length,0);
+}
+{
+ const t=setup({metrics:{...METRICS,bets:[1]}});t.button.listener();
+ assert.equal(t.events.opened.length,0,'Wager details must never be passed to account bridge');
+}
+{
+ const t=setup({host:'baken-king-app-next.vercel.app'});
+ assert.equal(t.button.listener,null,'Vercel version owns its own authenticated sync');
+}
+console.log('PASS: consent-only aggregate handoff, no automatic cloud upload, and test-mode isolation');
