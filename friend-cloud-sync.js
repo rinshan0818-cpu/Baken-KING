@@ -57,6 +57,27 @@
   if(metrics.hitRaceCount>metrics.settledRaceCount||metrics.settledRaceCount>metrics.purchasedRaceCount)throw Error('レース数が正しくありません');
   return metrics;
  }
+ function friendProjection(summary){
+  if(!summary||typeof summary!=='object')return null;
+  const metrics={profit:summary.profitYen,roi:summary.roiPercent==null?null:Math.round(summary.roiPercent*10)/10,
+   stake:summary.stakeYen,paid:summary.returnedYen,races:summary.purchasedRaceCount,
+   hitRaces:summary.hitRaceCount,raceRate:summary.raceHitRatePercent==null?null:Math.round(summary.raceHitRatePercent*10)/10,
+   maxPayout:summary.maxPayoutYen,settled:summary.settledTicketCount};
+  if(typeof bkScoreValid!=='function'||!bkScoreValid(metrics))throw Error('友達の集計結果を確認できません');
+  return {version:1,metrics,nickname:'友達'};
+ }
+ async function updateSelectedFriend(identity){
+  const owner=localStorage.getItem('baken-king-friend-score-owner-v1');
+  const friend=localStorage.getItem('baken-king-friend-score-friend-id-v1');
+  if(owner!==identity.user.id||!uuid.test(friend||'')||friend===owner)return false;
+  const result=await request(identity,'GET','/api/sharing/summary/'+friend);
+  const received=friendProjection(result.summary);
+  if(!received)return false;
+  // Only the nine public metrics are cached; no tickets, funds, or JWT.
+  localStorage.setItem('baken-king-friend-score-v1',JSON.stringify(received));
+  if(typeof bkRenderFriendCompare==='function')bkRenderFriendCompare();
+  return true;
+ }
  async function sync(manual){
   // No background authentication/network calls until a user has first opted in.
   if(!manual&&localStorage.getItem('baken-friend-cloud-ever-opted-in')!=='1')return;
@@ -84,12 +105,16 @@
    const name=(localStorage.getItem('baken-king-nickname-v1')||'プレイヤー').trim().slice(0,16)||'プレイヤー';
    await request(identity,'POST','/api/sharing/profile',{displayName:name});
    await request(identity,'POST','/api/sharing/summary',{metrics:summary});
+   // A friend's read is best-effort. It must never undo the successful
+   // publication or replace a last-good comparison on network failure.
+   let friendUpdated=false;
+   try{friendUpdated=await updateSelectedFriend(identity)}catch{}
    localStorage.setItem(consentKey,'1');
    localStorage.setItem('baken-friend-cloud-ever-opted-in','1');
    updateStop();
    lastSuccessThisSession=Date.now();
    localStorage.setItem(lastKey,String(lastSuccessThisSession));
-   label('9項目の成績を同期しました（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）');
+   label((friendUpdated?'自分と友達の成績を更新しました':'自分の9項目を同期しました')+'（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）');
   }catch(e){
    if(manual)label(e instanceof TypeError?'接続できません。ログイン状態と通信環境を確認してください。':e.message);
    else label('自動同期できませんでした。次回また確認します。');
