@@ -20,5 +20,5 @@ const full=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),
 assert(full.includes('const bkHistoryTargetTab=document.querySelector(\'section[data-tab="data"] [data-data-panel="records"]\')'),'History must live in records only');
 assert(full.includes("label.textContent='精算履歴'"),'History label should be unique');
 
-assert(html.includes('const raceStats=bkRaceStats(allBets)'),'Must reuse existing race statistics for consistency');
-assert(html.includes('const maxPayout=resolved.length?Math.max'),'Must compute highest payout from resolved bets');
+assert(html.includes('const race=bkRaceStats(bets)'),'Must reuse existing race statistics for consistency');
+assert(html.includes('maxPayout:resolved.length?Math.max'),'Must compute highest payout from resolved bets');
