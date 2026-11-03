@@ -13,6 +13,13 @@
  const status=document.getElementById('bkFriendSyncStatus');
  if(!button||!status||localStorage.getItem('baken-king-mode-v1')==='test')return;
  const label=t=>{status.textContent=t};
+ // Stopping sync does not delete already published aggregate data; explain it.
+ const stop=document.createElement('button');
+ stop.id='bkFriendSyncStop';stop.type='button';stop.className='outline';
+ stop.textContent='自動同期を停止';
+ stop.style.marginLeft='8px';
+ button.insertAdjacentElement('afterend',stop);
+ const updateStop=()=>{stop.disabled=localStorage.getItem('baken-friend-cloud-ever-opted-in')!=='1'};
  let busy=false,lastSuccessThisSession=0;
  async function auth(){
   const res=await fetch(authBase+'/get-session',{credentials:'include',cache:'no-store'});
@@ -79,6 +86,7 @@
    await request(identity,'POST','/api/sharing/summary',{metrics:summary});
    localStorage.setItem(consentKey,'1');
    localStorage.setItem('baken-friend-cloud-ever-opted-in','1');
+   updateStop();
    lastSuccessThisSession=Date.now();
    localStorage.setItem(lastKey,String(lastSuccessThisSession));
    label('9項目の成績を同期しました（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）');
@@ -90,6 +98,16 @@
  button.disabled=false;
  button.textContent='今すぐ更新';
  button.onclick=()=>sync(true);
+ stop.onclick=()=>{
+  if(!confirm('今後の30分自動同期を停止しますか？すでに公開した成績は削除されません。'))return;
+  // Disables all automatic uploads on this device. Manual publishing requires
+  // explicit reconfirmation after the account-specific consent is cleared.
+  localStorage.removeItem('baken-friend-cloud-ever-opted-in');
+  // Clear remembered per-user consent keys without touching betting records.
+  for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('baken-friend-cloud-consent:'))localStorage.removeItem(k)}
+  updateStop();label('自動同期を停止しました。すでに公開した成績は残ります。');
+ };
+ updateStop();
  const timer=()=>{if(document.visibilityState==='visible')sync(false)};
  // No background execution promise: browser timers run only while app is active.
  setInterval(timer,60*1000);
