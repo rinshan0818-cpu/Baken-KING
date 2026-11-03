@@ -4,7 +4,9 @@
 let handler,bootError;
 const requireEnv=names=>names.every(name=>typeof process.env[name]==='string'&&process.env[name].trim()!=='');
 function initialize(){
- const required=['SHARING_DATABASE_URL','SHARING_BACKUP_ENCRYPTION_KEY','NEON_AUTH_BASE_URL','NEON_AUTH_JWKS_URL'];
+ const required=['SHARING_DATABASE_URL','NEON_AUTH_BASE_URL','NEON_AUTH_JWKS_URL'];
+ // Personal account backups are a separate, opt-in feature. They remain
+ // unavailable until SHARING_BACKUP_ENCRYPTION_KEY is configured.
  if(process.env.SHARING_AUTH_PROVIDER!=='neon'||!requireEnv(required))return null;
  const {Pool}=require('pg');
  const {createSharingApi}=require('./app.cjs');
