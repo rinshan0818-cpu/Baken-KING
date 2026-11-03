@@ -6,7 +6,7 @@ module.exports=(req,res)=>{
  const url=new URL(req.url,'https://baken.invalid');
  if(url.pathname==='/api/index'){
   const route=url.searchParams.get('bk_route');
-  if(typeof route!=='string'||!/^sharing(?:\/[a-z0-9-]+)*(?:\/[0-9a-f-]{36})?(?:\/respond)?$|^account\/backup$/i.test(route)){
+  if(typeof route!=='string'||!/^sharing(?:\/[a-z0-9-]+)*(?:\/[0-9a-f-]{36})?(?:\/respond)?$|^account\/backup$|^monitor\/scheduler-union$/i.test(route)){
    res.statusCode=404;res.setHeader('Cache-Control','no-store');
    return res.end(JSON.stringify({error:'Not found'}));
   }
