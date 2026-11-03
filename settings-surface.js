@@ -97,6 +97,35 @@
   nickPanel.append(nickTitle,nickInfo,nickInput,nickSave,nickStatus);
   groups.general.prepend(nickPanel);
 
+  // Account backup: show a safe transition path. Cloud write/read are NOT wired yet.
+  // Reuse the app's existing, validated local backup and restore controls.
+  const backupPanel=document.createElement('section');
+  backupPanel.id='bkAccountBackupPanel';backupPanel.className='card bk-settings-item';
+  const backupHeading=document.createElement('h3');backupHeading.textContent='アカウントとバックアップ';
+  const backupInfo=document.createElement('p');backupInfo.className='muted';
+  backupInfo.textContent='現在は端末保存です。ログインとクラウドの紐づけは準備中で、馬券・残高・精算履歴は自動送信されません。';
+  const backupState=document.createElement('p');backupState.id='bkAccountBackupState';backupState.className='muted';
+  if(testing)backupState.textContent='テストモード：アカウントへの登録対象外です。';
+  else{
+   try{
+    const data=JSON.parse(localStorage.getItem('keiba-demo-v1')||'null');
+    const count=Array.isArray(data?.bets)?data.bets.length:0;
+    backupState.textContent='この端末：馬券 '+count+' 件 / クラウド：未接続';
+   }catch{backupState.textContent='この端末：保存状況を確認できません / クラウド：未接続'}
+  }
+  const backupActions=document.createElement('div');backupActions.className='row';
+  const localExport=document.createElement('button');localExport.type='button';localExport.className='alt';
+  localExport.textContent='端末データをファイル保存';localExport.disabled=testing;
+  localExport.onclick=()=>document.getElementById('backup')?.click();
+  const localImport=document.createElement('button');localImport.type='button';localImport.className='outline';
+  localImport.textContent='ファイルから復元';localImport.disabled=testing;
+  localImport.onclick=()=>document.getElementById('restore')?.click();
+  backupActions.append(localExport,localImport);
+  const cloudNote=document.createElement('p');cloudNote.className='muted';
+  cloudNote.textContent='クラウド保存・復元：未提供。本人確認済みのログイン後、初回バックアップを明示的に承認する方式で追加予定です。既存の端末データは自動上書きしません。';
+  backupPanel.append(backupHeading,backupInfo,backupState,backupActions,cloudNote);
+  groups.general.append(backupPanel);
+
   const adminNotice=document.createElement('p');
   adminNotice.className='muted bk-admin-note';
   adminNotice.textContent='管理機能は整理して表示しているだけです。複数アカウント導入時に、認証とサーバー側のアクセス制限を追加します。';
