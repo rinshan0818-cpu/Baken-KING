@@ -26,6 +26,8 @@ on:
       - 'friends-policy.js'
       - 'tests/friends-policy.test.cjs'
       - 'tests/sharing-schema.test.cjs'
+      - 'tests/sharing-rls-staging.test.cjs'
+      - 'docs/sharing-rls-staging.sql'
       - 'docs/sharing-schema-p1.sql'
       - 'sharing-server/**'
       - 'tests/sharing-neon-store.test.cjs'
@@ -86,6 +88,8 @@ jobs:
         run: node tests/sharing-friend-http.test.cjs
       - name: Test server-only friend invitation and approval SQL
         run: node tests/sharing-friendship-store.test.cjs
+      - name: Test staged sharing RLS authorization contract
+        run: node tests/sharing-rls-staging.test.cjs
       - name: Test sharing schema security defaults
         run: node tests/sharing-schema.test.cjs
       - name: Test friend approval and revocation policy
