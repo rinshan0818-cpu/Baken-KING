@@ -13,14 +13,14 @@ async function invoke(handler,headers={},method='GET'){
  await handler({method,headers},res);
  return out;
 }
-function connection({role='baken_monitor_scheduler',races=[race],failure=false}={}){
+function connection({role='baken_monitor_scheduler',races=[race],failure=false,bypass=false,superuser=false}={}){
  let queries=0,releases=0;
  const connect=async()=>({
   async query(q){
    queries++;
    if(failure)throw Error('Postgres unavailable');
    if(q.includes('session_user AS login_role'))return {rows:[{
-    login_role:role,current_role:role,is_superuser:false,bypass_rls:false
+    login_role:role,current_role:role,is_superuser:superuser,bypass_rls:bypass
    }]};
    if(q.includes('bk_monitor_union_for_scheduler'))return {rows:[{targets:races}]};
    throw Error('Unexpected query');
@@ -72,4 +72,14 @@ test('database outage returns 503 and releases connection',async()=>{
  const db=connection({failure:true}),h=createSchedulerUnionHttp({token,connect:db.connect});
  assert.equal((await invoke(h,{authorization:'Bearer '+token})).statusCode,503);
  assert.equal(db.releases,1);
+});
+test('Neon-created scheduler roles with BYPASSRLS are rejected',async()=>{
+ for(const privilege of [{bypass:true},{superuser:true}]){
+  const db=connection(privilege);
+  const h=createSchedulerUnionHttp({token,connect:db.connect});
+  const result=await invoke(h,{authorization:'Bearer '+token});
+  assert.equal(result.statusCode,503);
+  assert.equal(db.queries,1); // no read of any account race
+  assert.equal(db.releases,1);
+ }
 });
