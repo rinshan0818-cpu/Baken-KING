@@ -18,7 +18,7 @@
  const API='https://baken-king-sharing-api.vercel.app';
  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
  const $=id=>document.getElementById(id);
- let user=null,token=null,busy=false;
+ let user=null,token=null,busy=false,selectedFriendId=null;
  const status=m=>{$('status').hidden=false;$('status').textContent=m};
  const friendly=e=>e?.status===503?'共有APIは現在準備中です。データは送信されていません。':e?.status===401?'ログインし直してください。':e?.status===403?'操作できません。申請・友達IDを確認してください。':e?.message||'通信に失敗しました。';
  async function authCall(path){
@@ -54,8 +54,8 @@
    return entry((incoming?'受信：':'送信：')+display(incoming?r.senderId:r.recipientId),incoming?[['承認',async()=>{await request('POST','/api/sharing/invitations/'+r.id+'/respond',{accepted:true});await refresh();status('承認しました。')}],['拒否',async()=>{await request('POST','/api/sharing/invitations/'+r.id+'/respond',{accepted:false});await refresh();status('申請を拒否しました。')}]]:[]);
   }));
   fillList('friends',(data.friends||[]).map(f=>entry('友達：'+display(f.id),[
-   ['成績を見る',async()=>{const result=await request('GET','/api/sharing/summary/'+f.id);renderSummary(result.summary);status('成績を更新しました。')}],
-   ['解除',async()=>{if(!confirm('この友達との共有を解除しますか？'))return;await request('DELETE','/api/sharing/friends/'+f.id);await refresh();$('comparison').textContent='友達を選択してください。';status('友達を解除しました。')}]
+   ['成績を見る',async()=>{const result=await request('GET','/api/sharing/summary/'+f.id);selectedFriendId=f.id;renderSummary(result.summary);status('成績を更新しました。')}],
+   ['解除',async()=>{if(!confirm('この友達との共有を解除しますか？'))return;await request('DELETE','/api/sharing/friends/'+f.id);if(localStorage.getItem('baken-king-friend-score-friend-id-v1')===f.id){localStorage.removeItem('baken-king-friend-score-v1');localStorage.removeItem('baken-king-friend-score-owner-v1');localStorage.removeItem('baken-king-friend-score-friend-id-v1')}await refresh();$('comparison').textContent='友達を選択してください。';status('友達を解除しました。')}]
   ])));
  }
  const yen=n=>typeof n==='number'?n.toLocaleString('ja-JP')+'円':'—';
@@ -72,12 +72,17 @@
   const valid=Object.values(metrics).every(v=>v===null||(typeof v==='number'&&Number.isFinite(v)));
   if(valid&&metrics.profit===metrics.paid-metrics.stake){
    localStorage.setItem('baken-king-friend-score-v1',JSON.stringify({version:1,metrics,nickname:'友達'}));
+   localStorage.setItem('baken-king-friend-score-owner-v1',user.id);
+   localStorage.setItem('baken-king-friend-score-friend-id-v1',selectedFriendId||'');
    const note=document.createElement('p');note.textContent='アプリの「データ」タブの比較表にも反映しました。';el.append(note);
   }
  }
  $('connect').onclick=()=>operation(async()=>{
   const result=(await authCall('/get-session')).data;user=result?.user||result?.data?.user||null;
   if(!user||!UUID.test(user.id)||user.emailVerified!==true)throw Error('メール確認済みのログインが必要です。');
+  // Never display a prior account's cached nine-field comparison.
+  const cachedOwner=localStorage.getItem('baken-king-friend-score-owner-v1');
+  if(cachedOwner&&cachedOwner!==user.id){localStorage.removeItem('baken-king-friend-score-v1');localStorage.removeItem('baken-king-friend-score-owner-v1');localStorage.removeItem('baken-king-friend-score-friend-id-v1')}
   $('myId').textContent='友達ID：'+user.id;$('nickname').value=localStorage.getItem('baken-king-nickname-v1')||user.name||'プレイヤー';
   // Validate the API before showing controls. No writes on connect.
   await refresh();$('app').hidden=false;status('友達管理に接続しました。');
