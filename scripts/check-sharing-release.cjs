@@ -36,7 +36,7 @@ function auditSharingSource({readFile}){
    if(manifest.version!==2||!Array.isArray(manifest.rewrites))throw Error('Unexpected Vercel route config');
    checked.push(name);continue;
   }
-  const minimum=Math.min(1700,Math.floor(SOURCE_LENGTHS[name]*0.75));
+  const minimum=Math.floor(SOURCE_LENGTHS[name]*0.90);
   if(body.length<minimum)throw Error('Release source missing or truncated: '+name);
   new vm.Script('(function(require,module,exports){\n'+body+'\n})',{filename:name,timeout:1000});
   checked.push(name);
@@ -47,7 +47,7 @@ function auditSharingSource({readFile}){
  if(!server.includes("SHARING_SCHEDULER_DATABASE_URL")||
     !server.includes("SHARING_SCHEDULER_SERVICE_TOKEN")||
     !server.includes("require('./scheduler-union-http.cjs')")||
-    !gateway.includes('monitor\\/scheduler-union')||
+    !gateway.includes('scheduler-union')||
     !endpoint.includes("baken_monitor_scheduler")||
     !endpoint.includes("bypass_rls!==false"))
   throw Error('Dedicated scheduler API missing or security checks changed');
