@@ -12,6 +12,10 @@ on:
       - 'tests/test-scheduler-routing-fail-closed.cjs'
       - 'tests/test-monitor-account-isolation.cjs'
       - 'sharing-server/monitor-store.cjs'
+      - 'sharing-server/**'
+      - 'scripts/check-sharing-release.cjs'
+      - 'tests/test-sharing-release-guard.cjs'
+      - 'vercel.json'
       - 'tests/test-monitor-target-retirement.cjs'
       - 'tests/test-verified-results-fast-poll.cjs'
       - 'tests/test-account-monitor-heartbeat.cjs'
@@ -36,3 +40,5 @@ jobs:
           node --test tests/test-scheduler-union-http.cjs
           node --test tests/test-scheduler-routing-fail-closed.cjs
           node --test tests/test-monitor-account-isolation.cjs
+          node --test tests/test-sharing-release-guard.cjs
+          node scripts/check-sharing-release.cjs
