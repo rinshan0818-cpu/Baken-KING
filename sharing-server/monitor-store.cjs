@@ -3,18 +3,26 @@
 // No stakes, picks, balances, or wallet history can be accepted.
 const VENUES=new Set(['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉']);
 function validateTargets(value,now=new Date()){
- if(!Array.isArray(value)||value.length>36)throw Error('Invalid target count');
+ if(!Array.isArray(value)||value.length>108)throw Error('Invalid target count');
  const today=new Date(now.getTime()+9*3600000).toISOString().slice(0,10);
  const oldest=new Date(Date.parse(today+'T00:00:00Z')-2*86400000).toISOString().slice(0,10);
  const newest=new Date(Date.parse(today+'T00:00:00Z')+7*86400000).toISOString().slice(0,10);
- const ids=new Set();
+ const ids=new Set(),dates=new Map();
  return value.map(x=>{
   if(!x||Array.isArray(x)||Object.keys(x).sort().join(',')!=='date,raceNumber,venue')throw Error('Unexpected target fields');
   if(typeof x.date!=='string'||!/^20\d{2}-\d{2}-\d{2}$/.test(x.date)||x.date<oldest||x.date>newest)throw Error('Target date out of range');
+  // Reject non-existent dates, such as February 30, not merely bad strings.
+  const parsedDate=new Date(x.date+'T00:00:00Z');
+  if(!Number.isFinite(parsedDate.getTime())||parsedDate.toISOString().slice(0,10)!==x.date)
+   throw Error('Invalid calendar date');
   if(!VENUES.has(x.venue)||!Number.isInteger(x.raceNumber)||x.raceNumber<1||x.raceNumber>12)throw Error('Invalid race identity');
   const id=x.date+'|'+x.venue+'|'+x.raceNumber;
   if(ids.has(id))throw Error('Duplicate race');
   ids.add(id);
+  const count=(dates.get(x.date)||0)+1;
+  if(count>36||(!dates.has(x.date)&&dates.size>=3))
+   throw Error('Daily monitored race capacity exceeded');
+  dates.set(x.date,count);
   return {date:x.date,venue:x.venue,raceNumber:x.raceNumber};
  });
 }
