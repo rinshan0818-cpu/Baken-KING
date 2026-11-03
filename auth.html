@@ -4,7 +4,7 @@
 <style>
 :root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif}*{box-sizing:border-box}body{margin:0;background:#f4f7f6;color:#142b28;padding:calc(28px + env(safe-area-inset-top)) 18px 40px}.wrap{max-width:430px;margin:auto}.eyebrow{font-size:12px;letter-spacing:.14em;color:#52716d;font-weight:700}h1{font-size:25px;margin:12px 0}p{font-size:14px;line-height:1.7;color:#526763}#account{white-space:pre-line}.panel{background:white;padding:22px;border:1px solid #dfe9e6;border-radius:18px;box-shadow:0 5px 25px #173b3010}label{display:block;font-weight:650;font-size:13px;margin:17px 0 7px}input{font:inherit;font-size:16px;border:1px solid #b8cbc5;border-radius:11px;padding:13px;width:100%;background:white}button{font:inherit;cursor:pointer;padding:13px 16px;border-radius:11px;border:0;font-weight:700}button.primary{background:#0f6654;color:white;width:100%;margin-top:20px}button.secondary{background:#eaf2ef;color:#175344;width:100%;margin-top:10px}button:disabled{opacity:.5;cursor:wait}#status{font-size:13px;white-space:pre-wrap;border-radius:10px;background:#edf3f0;padding:12px;margin-top:15px;line-height:1.6}#status[hidden],#signedIn[hidden],#formPanel[hidden],#verification[hidden]{display:none}.warn{color:#755a25;font-size:12px;margin:18px 0}a{color:#126858}.muted{font-size:12px}
 </style></head><body><main class="wrap"><div class="eyebrow">BAKEN-KING · PHASE 1</div><h1>アカウント接続テスト</h1>
-<p>Neon Auth の登録・ログインを独立して検証するための画面です。馬券・残高・精算履歴や馬券・残高・精算履歴にはアクセスしません。ログアウト時はこの端末に残った友達比較キャッシュのみ消去します。</p>
+<p>Neon Auth の登録・ログインを独立して検証するための画面です。馬券・残高・精算履歴にはアクセスしません。ログアウト時はこの端末に残った友達比較キャッシュのみ消去します。</p>
 <section class="panel"><div id="formPanel"><form id="authForm">
 <label for="email">メールアドレス</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254">
 <label for="password">パスワード</label><input id="password" name="password" type="password" autocomplete="current-password" required minlength="8">
@@ -12,12 +12,21 @@
 </form></div><div id="signedIn" hidden><strong>ログイン中</strong><p id="account"></p><button class="secondary" id="logout" type="button">ログアウト</button></div>
 <div id="verification"><label for="otp">メール確認コード（6桁）</label><input id="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="6桁のコード"><button class="secondary" id="sendOtp" type="button">確認コードをメールで送信</button><button class="primary" id="verifyOtp" type="button">コードを確認する</button><p class="muted">メール認証がNeon側で有効になっている場合に使用します。コードの有効期限は15分です。</p></div><div id="status" role="status" aria-live="polite" hidden></div></section>
 <p class="warn">試験用画面です。アカウント認証後も共有DBへの書込み・30分同期は行いません。GitHub PagesとNeon Authが異なるオリジンのため、iPhoneではCookie制限によりログイン状態が維持できない場合があります。</p>
+<p id="inviteReturn" hidden><a id="returnLink" href="./friends.html">友達申請に戻る</a></p>
 <p><a href="./">Baken-KINGに戻る</a></p></main>
 <script>
 (()=>{'use strict';
 const authUrl='https://ep-curly-boat-a170oecz.neonauth.ap-southeast-1.aws.neon.tech/baken_sharing/auth';
 const $=id=>document.getElementById(id),status=$('status'),login=$('login'),signup=$('signup'),logout=$('logout');
 let busy=false;
+const returnValue=new URL(location.href).searchParams.get('return');
+if(returnValue&&/^friends\.html\?invite=[0-9a-f-]{36}$/i.test(returnValue)){
+ const friendId=returnValue.split('=')[1];
+ if(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(friendId)){
+  $('returnLink').href='./friends.html?invite='+encodeURIComponent(friendId);
+  $('inviteReturn').hidden=false;
+ }
+}
 function showStatus(message){status.hidden=false;status.textContent=message}
 function view(user){$('formPanel').hidden=!!user;$('signedIn').hidden=!user;$('verification').hidden=user?.emailVerified===true;$('account').textContent=user?('メールアドレス: '+String(user.email||'登録済み')+'\nメール確認: '+(user.emailVerified===true?'確認済み':'未確認')):'';if(user?.email&&$('email').value==='')$('email').value=user.email}
 async function call(path,data){const opts={method:data===undefined?'GET':'POST',credentials:'include',headers:{'Accept':'application/json'},cache:'no-store'};if(data!==undefined){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(data)}
