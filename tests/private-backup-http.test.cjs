@@ -6,6 +6,7 @@ const payload={format:'BAKEN_KING_BACKUP',schemaVersion:2,exportedAt:'2026-11-03
 const rows=new Map(),calls=[];
 const client={async query(sql,params=[]){
  calls.push([sql,params]);
+ if(sql.startsWith('SELECT session_user AS role,'))return {rows:[{role:'baken_sharing_limited',bypass:false}]};
  if(sql==='SELECT current_user AS role')return {rows:[{role:'baken_sharing_api'}]};
  if(sql.startsWith('INSERT INTO sharing_users'))return {rows:[]};
  if(sql.startsWith('INSERT INTO sharing_private_backups')){
