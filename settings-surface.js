@@ -120,7 +120,20 @@
   const localImport=document.createElement('button');localImport.type='button';localImport.className='outline';
   localImport.textContent='ファイルから復元';localImport.disabled=testing;
   localImport.onclick=()=>document.getElementById('restore')?.click();
-  backupActions.append(localExport,localImport);
+  // Keep the read-only verification action next to export/restore.
+  // Move, rather than clone, the already wired controls so event handlers
+  // and the selected file stay on the same elements.
+  const verifyButton=document.getElementById('bkVerifyBackup');
+  const verifyFile=document.getElementById('bkVerifyBackupFile');
+  const verifyResult=document.getElementById('bkVerifyBackupResult');
+  if(verifyButton&&verifyFile&&verifyResult){
+   verifyButton.textContent='保存ファイルを検証';
+   verifyButton.disabled=testing;
+   backupActions.append(verifyButton,verifyFile);
+  }
+  backupActions.prepend(localExport);
+  backupActions.append(localImport);
+  if(verifyResult)backupPanel.append(verifyResult);
   const cloudNote=document.createElement('p');cloudNote.className='muted';
   cloudNote.textContent='クラウド保存・復元：未提供。本人確認済みのログイン後、初回バックアップを明示的に承認する方式で追加予定です。既存の端末データは自動上書きしません。';
   backupPanel.append(backupHeading,backupInfo,backupState,backupActions,cloudNote);
