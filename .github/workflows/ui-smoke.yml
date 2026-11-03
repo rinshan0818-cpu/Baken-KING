@@ -16,6 +16,8 @@ on:
       - 'tests/race-settlement.test.cjs'
       - 'race-settlement.js'
       - 'friends-share.js'
+      - 'friends.html'
+      - 'tests/friends-page.test.cjs'
       - 'friend-sync.js'
       - 'friend-score-wire.js'
       - 'tests/friend-score-wire.test.cjs'
@@ -104,6 +106,8 @@ jobs:
         run: node tests/sharing-neon-store.test.cjs
       - name: Test server sharing access guard
         run: node tests/sharing-server.test.cjs
+      - name: Test friend management page security and structure
+        run: node tests/friends-page.test.cjs
       - name: Test friend HTTP routes and request validation
         run: node tests/sharing-friend-http.test.cjs
       - name: Test server-only friend invitation and approval SQL
