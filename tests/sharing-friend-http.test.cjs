@@ -7,6 +7,8 @@ let events=[];
 const service={
  writeSummary:async()=>({}),readSummary:async()=>({}),
  me:async req=>{events.push('me');return {id:A}},
+ register:async(req,name)=>{events.push(['register',name]);return {id:A,displayName:name}},
+ connections:async req=>{events.push('connections');return {invitations:[],friends:[]}},
  invite:async(req,id)=>{events.push(['invite',id]);return {id:B,status:'pending'}},
  respond:async(req,id,accepted)=>{events.push(['respond',id,accepted]);return {status:'accepted'}},
  revoke:async(req,id)=>{events.push(['revoke',id]);return {ok:true}}
@@ -21,6 +23,11 @@ async function send(method,url,obj,origin='https://rinshan0818-cpu.github.io'){
 (async()=>{
  assert.equal((await send('GET','/api/sharing/me')).status,200);
  assert.deepEqual(events.pop(),'me');
+ assert.equal((await send('POST','/api/sharing/profile',{displayName:'Shoma'})).status,200);
+ assert.deepEqual(events.pop(),['register','Shoma']);
+ assert.equal((await send('POST','/api/sharing/profile',{displayName:'A',actorId:B})).status,400);
+ assert.equal((await send('GET','/api/sharing/connections')).status,200);
+ assert.equal(events.pop(),'connections');
  assert.equal((await send('POST','/api/sharing/invitations',{recipientId:B})).status,200);
  assert.deepEqual(events.pop(),['invite',B]);
  assert.equal((await send('POST','/api/sharing/invitations',{recipientId:B,actorId:A})).status,400);
