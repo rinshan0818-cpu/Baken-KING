@@ -18,7 +18,7 @@
  const API='https://baken-king-sharing-api.vercel.app';
  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
  const $=id=>document.getElementById(id);
- let user=null,token=null,busy=false,selectedFriendId=null;
+ let user=null,token=null,busy=false,selectedFriendId=null,profileReady=false;
  const status=m=>{$('status').hidden=false;$('status').textContent=m};
  const friendly=e=>e?.status===503?'共有APIは現在準備中です。データは送信されていません。':e?.status===401?'ログインし直してください。':e?.status===403?'操作できません。申請・友達IDを確認してください。':e?.message||'通信に失敗しました。';
  async function authCall(path){
@@ -93,12 +93,16 @@
   const cachedOwner=localStorage.getItem('baken-king-friend-score-owner-v1');
   if(cachedOwner&&cachedOwner!==user.id){localStorage.removeItem('baken-king-friend-score-v1');localStorage.removeItem('baken-king-friend-score-owner-v1');localStorage.removeItem('baken-king-friend-score-friend-id-v1')}
   $('myId').textContent='友達ID：'+user.id;$('nickname').value=localStorage.getItem('baken-king-nickname-v1')||user.name||'プレイヤー';
-  // Validate the API before showing controls. No writes on connect.
-  await refresh();$('app').hidden=false;status('友達管理に接続しました。');
+  // Verify registration before offering an ID that cannot receive requests.
+  // Connecting never creates an account record without the user's action.
+  const me=await request('GET','/api/sharing/me');
+  profileReady=!!me?.user?.profile;
+  await refresh();$('app').hidden=false;
+  status(profileReady?'友達管理に接続しました。':'まず「プロフィールを登録・更新」を押してください。登録後に友達IDを送れます。');
  });
- $('register').onclick=()=>operation(async()=>{const name=$('nickname').value.trim();if(!name||name.length>16)throw Error('1～16文字の名前を入力してください');await request('POST','/api/sharing/profile',{displayName:name});status('プロフィールを登録しました。')});
- $('invite').onclick=()=>operation(async()=>{const id=$('recipient').value.trim();if(!UUID.test(id)||id===user.id)throw Error('正しい友達IDを入力してください');await request('POST','/api/sharing/invitations',{recipientId:id});await refresh();status('友達申請を送信しました。')});
+ $('register').onclick=()=>operation(async()=>{const name=$('nickname').value.trim();if(!name||name.length>16)throw Error('1～16文字の名前を入力してください');await request('POST','/api/sharing/profile',{displayName:name});profileReady=true;status('プロフィールを登録しました。友達IDをコピーして相手に送れます。')});
+ $('invite').onclick=()=>operation(async()=>{if(!profileReady)throw Error('まずプロフィールを登録してください');const id=$('recipient').value.trim();if(!UUID.test(id)||id===user.id)throw Error('正しい友達IDを入力してください');await request('POST','/api/sharing/invitations',{recipientId:id});await refresh();status('友達申請を送信しました。')});
  $('refresh').onclick=()=>operation(async()=>{await refresh();status('友達一覧を更新しました。')});
- $('copyId').onclick=()=>operation(async()=>{await navigator.clipboard.writeText(user.id);status('友達IDをコピーしました。')});
+ $('copyId').onclick=()=>operation(async()=>{if(!profileReady)throw Error('まずプロフィールを登録してください');await navigator.clipboard.writeText(user.id);status('友達IDをコピーしました。')});
 })();
 </script></body></html>
