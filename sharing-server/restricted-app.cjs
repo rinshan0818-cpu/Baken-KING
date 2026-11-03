@@ -7,6 +7,7 @@ const {createFriendshipStore}=require('./friendship-store.cjs');
 const {createSharingService}=require('./service.cjs');
 const {createSharingHttpHandler}=require('./http.cjs');
 const {createPrivateBackupHandler}=require('./private-backup-http.cjs');
+const {createMonitorHttp}=require('./monitor-http.cjs');
 function createRestrictedSharingHandler({authenticate,pool,allowedOrigins,encryptionKey}){
  if(typeof authenticate!=='function'||!pool||typeof pool.connect!=='function')throw Error('Verified auth and private DB pool required');
  const methods=['me','register','connections','invite','respond','revoke','writeSummary','readSummary'];
@@ -27,7 +28,9 @@ function createRestrictedSharingHandler({authenticate,pool,allowedOrigins,encryp
  }
  const sharing=createSharingHttpHandler(service,{allowedOrigins});
  const backup=encryptionKey?createPrivateBackupHandler({authenticate,pool,encryptionKey,allowedOrigins}):null;
+ const monitor=createMonitorHttp({authenticate,pool,allowedOrigins});
  return (req,res)=>{
+  if(new URL(req.url,'https://baken.invalid').pathname==='/api/sharing/monitor-targets')return monitor(req,res);
   if(new URL(req.url,'https://baken.invalid').pathname==='/api/account/backup'){
    if(!backup){res.statusCode=503;res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({error:'Backup unavailable'}));return}
    return backup(req,res);
