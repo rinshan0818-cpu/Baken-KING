@@ -51,6 +51,8 @@
   return metrics;
  }
  async function sync(manual){
+  // No background authentication/network calls until a user has first opted in.
+  if(!manual&&!Object.keys(localStorage).some(k=>k.startsWith('baken-friend-cloud-consent:')&&localStorage.getItem(k)==='1'))return;
   if(busy)return;
   busy=true;button.disabled=true;
   try{
