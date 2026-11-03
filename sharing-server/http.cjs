@@ -27,6 +27,12 @@ function createSharingHttpHandler(service,{allowedOrigins=[]}={}){
     try{return JSON.parse(raw)}catch{const e=Error('Bad JSON');e.status=400;throw e}
    }
    const validUUID=v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+   if(path==='/api/sharing/profile'&&req.method==='POST'){
+    const body=await readJson();
+    if(!body||Array.isArray(body)||Object.keys(body).length!==1||typeof body.displayName!=='string'||!body.displayName.trim()||body.displayName.trim().length>16)return send(res,400,{error:'Invalid display name'});
+    return send(res,200,{ok:true,profile:await service.register(req,body.displayName.trim())});
+   }
+   if(path==='/api/sharing/connections'&&req.method==='GET')return send(res,200,{ok:true,...await service.connections(req)});
    if(path==='/api/sharing/me'&&req.method==='GET')return send(res,200,{ok:true,user:await service.me(req)});
    if(path==='/api/sharing/invitations'&&req.method==='POST'){
     const body=await readJson();
