@@ -21,12 +21,8 @@ function createMonitorStore(db){
  if(!db||typeof db.query!=='function')throw Error('Restricted DB required');
  return Object.freeze({
   async replace(actor,targets){
-   // Serialize concurrent writers to enforce five-account cap. Actor is
-   // trusted only after verified authentication + SET LOCAL RLS identity.
-   await db.query('SELECT pg_advisory_xact_lock(674905, 51022)');
-   const {rows:counts}=await db.query('SELECT COUNT(*)::int AS count FROM sharing_monitor_targets');
-   const {rows:owned}=await db.query('SELECT 1 FROM sharing_monitor_targets WHERE owner_id=$1::uuid',[actor]);
-   if(!owned.length&&targets.length&&counts[0].count>=5){const e=Error('Account limit reached');e.status=403;throw e}
+   // Per-account INSERT/UPDATE is enforced by PostgreSQL RLS.
+   // A global 5-account quota needs a separately audited privileged check.
    if(!targets.length){
     await db.query('DELETE FROM sharing_monitor_targets WHERE owner_id=$1::uuid',[actor]);
     return {registered:0};
