@@ -61,7 +61,16 @@
  const yen=n=>typeof n==='number'?n.toLocaleString('ja-JP')+'円':'—';
  function renderSummary(s){
   const el=$('comparison');el.replaceChildren();
-  if(!s){el.textContent='相手の成績はまだ登録されていません。';return}
+  if(!s){
+   // An existing comparison must never be mistaken for a newly selected
+   // friend who has not yet published any scores.
+   const cachedId=localStorage.getItem('baken-king-friend-score-friend-id-v1');
+   if(cachedId&&cachedId!==selectedFriendId){
+    localStorage.removeItem('baken-king-friend-score-v1');
+    localStorage.removeItem('baken-king-friend-score-friend-id-v1');
+   }
+   el.textContent='相手の成績はまだ登録されていません。';return;
+  }
   const fields=[['収支',yen(s.profitYen)],['回収率',s.roiPercent==null?'—':s.roiPercent+'%'],['購入金額',yen(s.stakeYen)],['払戻金額',yen(s.returnedYen)],['精算済み馬券数',s.settledTicketCount+'件'],['購入レース数',s.purchasedRaceCount+'R'],['的中レース数',s.hitRaceCount+'R'],['レース的中率',s.raceHitRatePercent==null?'—':s.raceHitRatePercent+'%'],['最高払戻金',yen(s.maxPayoutYen)]];
   const ul=document.createElement('ul');for(const [k,v] of fields)ul.append(entry(k+'：'+v));el.append(ul);
   // Only the nine public summary fields are passed to the existing comparison
