@@ -5,8 +5,8 @@ const HOST='baken-king-app-next.vercel.app';
 const authRoutes={GET:['get-session'],POST:['sign-in/email','sign-out']};
 const uuid='[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
 function allowSharing(method,route){
- if(method==='GET')return route==='me'||route==='connections'||new RegExp('^summary/'+uuid+'$','i').test(route);
- if(method==='POST')return route==='profile'||route==='summary'||route==='invitations'||new RegExp('^invitations/'+uuid+'/respond$','i').test(route);
+ if(method==='GET')return route==='me'||route==='connections'||route==='monitor-targets'||new RegExp('^summary/'+uuid+'$','i').test(route);
+ if(method==='POST')return route==='profile'||route==='summary'||route==='monitor-targets'||route==='invitations'||new RegExp('^invitations/'+uuid+'/respond$','i').test(route);
  if(method==='DELETE')return new RegExp('^friends/'+uuid+'$','i').test(route);
  return false;
 }
