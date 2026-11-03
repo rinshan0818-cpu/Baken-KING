@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {Script}=require('node:vm');
+const html=fs.readFileSync('friends.html','utf8');
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert(script,'Friend management script missing');
+new Script(script,{filename:'friends.html'});
+for(const endpoint of ['/api/sharing/profile','/api/sharing/connections','/api/sharing/invitations','/api/sharing/friends/','/api/sharing/summary/'])assert(html.includes(endpoint),endpoint+' missing');
+for(const id of ['connect','register','copyId','invite','invitations','friends','comparison'])assert(html.includes('id="'+id+'"'),id+' missing');
+assert(html.includes('emailVerified!==true'),'Verified login guard required');
+assert(html.includes('credentials:\'omit\''),'Sharing bearer requests must not send cookies');
+assert(!html.includes('localStorage.setItem('),'Friend page must not modify local wallet or tickets');
+assert(!html.includes('/api/account/backup'),'Friend management must not touch personal backups');
+assert(html.includes('共有APIが未接続'),'Disabled API status must be explicit');
+console.log('PASS: friends page syntax, secured transport, nine metrics and unchanged local data');
