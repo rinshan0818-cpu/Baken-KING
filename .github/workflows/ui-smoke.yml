@@ -19,6 +19,8 @@ on:
       - 'friends.html'
       - 'tests/friends-page.test.cjs'
       - 'friend-sync.js'
+      - 'friend-cloud-sync.js'
+      - 'tests/friend-cloud-sync-consent.test.cjs'
       - 'friend-score-wire.js'
       - 'tests/friend-score-wire.test.cjs'
       - 'tests/friend-cloud-snapshot.test.cjs'
@@ -132,6 +134,8 @@ jobs:
         run: node tests/friend-cloud-snapshot.test.cjs
       - name: Test nine-metric cloud payload mapping
         run: node tests/friend-score-wire.test.cjs
+      - name: Test opt-in nine-metric cloud sync and privacy boundaries
+        run: node tests/friend-cloud-sync-consent.test.cjs
       - name: Test manual and thirty-minute sync scheduling
         run: node tests/friend-sync.test.cjs
       - name: Test manual friend score exchange
