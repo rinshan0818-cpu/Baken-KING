@@ -33,7 +33,7 @@
  window.BakenRefreshVerifiedResults=fetchResults;
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')fetchResults()});
  window.addEventListener('focus',fetchResults);
- window.addEventListener('baken:account-changed',fetchResults);
+ window.addEventListener('baken:account-changed',()=>{lastData='';fetchResults()});
  window.addEventListener('baken:wagers-updated',()=>{lastData=''});
  setInterval(fetchResults,5*60*1000);
  fetchResults();
