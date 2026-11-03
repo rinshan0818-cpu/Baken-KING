@@ -54,7 +54,7 @@
   }catch(e){panel.textContent='レース監視登録を確認できません：'+e.message}
   finally{busy=false;if(resync){resync=false;queueMicrotask(sync)}}
  }
- for(const type of ['baken:wagers-updated','baken:cards-imported','bk:auth-checked'])window.addEventListener(type,sync);
+ for(const type of ['baken:wagers-updated','baken:cards-imported','baken:account-changed'])window.addEventListener(type,sync);
  window.addEventListener('focus',sync);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync()});
  setInterval(sync,5*60000);
