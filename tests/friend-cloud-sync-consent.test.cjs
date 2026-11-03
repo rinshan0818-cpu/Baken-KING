@@ -32,7 +32,7 @@ function setup({connected=false,approved=true,mode='production'}={}){
  const initial=setup();
  assert.equal(initial.calls.length,0,'Boot must not contact auth or API without consent');
  assert.equal(initial.button.disabled,false);
- await initial.timer()();
+ await initial.timer();
  assert.equal(initial.calls.length,0,'Timer must not request auth before consent');
  await initial.button.onclick();
  assert(!initial.calls.some(c=>c.url.endsWith('/api/sharing/summary')),'API 503 must never upload data');
@@ -50,7 +50,7 @@ function setup({connected=false,approved=true,mode='production'}={}){
  assert(!upload.opts.body.includes('balance'),'No wallet allowed');
  assert.equal(upload.opts.credentials,'omit');
  const before=connected.calls.length;
- await connected.timer()();
+ await connected.timer();
  assert.equal(connected.calls.length,before,'30 minute window must throttle subsequent uploads');
  const declined=setup({connected:true,approved:false});
  await declined.button.onclick();
