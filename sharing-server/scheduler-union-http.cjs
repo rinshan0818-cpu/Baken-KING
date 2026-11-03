@@ -11,8 +11,8 @@ function equalBearer(actual,secret){
  return crypto.timingSafeEqual(a,b);
 }
 function validateUnion(value){
- if(!Array.isArray(value)||value.length>36)throw Error('Invalid union size');
- const seen=new Set();
+ if(!Array.isArray(value)||value.length>108)throw Error('Invalid union size');
+ const seen=new Set(),byDate=new Map();
  return value.map(x=>{
   if(!x||Array.isArray(x)||Object.keys(x).sort().join(',')!=='date,raceNumber,venue'||
      typeof x.date!=='string'||!/^20\d{2}-\d{2}-\d{2}$/.test(x.date)||
@@ -21,6 +21,10 @@ function validateUnion(value){
   const key=x.date+'|'+x.venue+'|'+x.raceNumber;
   if(seen.has(key))throw Error('Duplicate union target');
   seen.add(key);
+  const dailyCount=(byDate.get(x.date)||0)+1;
+  if(dailyCount>36||(!byDate.has(x.date)&&byDate.size>=3))
+   throw Error('Daily monitor union limit exceeded');
+  byDate.set(x.date,dailyCount);
   return {date:x.date,venue:x.venue,raceNumber:x.raceNumber};
  });
 }
