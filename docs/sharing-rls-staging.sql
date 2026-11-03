@@ -58,12 +58,20 @@ CREATE POLICY bk_request_recipient_update ON public.sharing_requests FOR UPDATE 
 
 CREATE POLICY bk_friend_member_read ON public.sharing_friendships FOR SELECT TO baken_sharing_api
  USING (user_low=public.bk_actor_id() OR user_high=public.bk_actor_id());
--- Insertion is reserved for the accepted invitation transaction; the API
--- currently performs INSERT directly. This policy alone cannot establish
--- that both people consented. Before using this script, replace direct
--- friendship INSERT with a carefully scoped, atomic SECURITY DEFINER
--- function that validates the accepted request and its recipient.
--- Deliberately NO INSERT policy here; accepted links remain denied.
+-- Only the recipient of an accepted invitation can create that pair.
+-- The acceptance CTE and insertion must execute in a single SQL statement.
+CREATE POLICY bk_friend_approved_insert ON public.sharing_friendships
+ FOR INSERT TO baken_sharing_api
+ WITH CHECK (
+   public.bk_actor_id() IN (user_low,user_high)
+   AND EXISTS (
+    SELECT 1 FROM public.sharing_requests r
+    WHERE r.status='accepted'
+      AND r.recipient_id=public.bk_actor_id()
+      AND LEAST(r.sender_id,r.recipient_id)=user_low
+      AND GREATEST(r.sender_id,r.recipient_id)=user_high
+   )
+ );
 CREATE POLICY bk_friend_member_remove ON public.sharing_friendships FOR DELETE TO baken_sharing_api
  USING (user_low=public.bk_actor_id() OR user_high=public.bk_actor_id());
 
@@ -78,6 +86,6 @@ CREATE POLICY bk_snapshot_self_update ON public.sharing_snapshots FOR UPDATE TO 
  USING (owner_id=public.bk_actor_id()) WITH CHECK (owner_id=public.bk_actor_id());
 
 COMMIT;
--- DO NOT RUN on production until invitation acceptance is redesigned for
--- narrow privilege and transaction tests prove self-write/friend-read
--- and stranger-denied behavior.
+-- DO NOT RUN on production until an isolated branch validates all RLS
+-- interactions including invitation acceptance, friend removal, upsert,
+-- no-actor access, malicious actor context, and stranger-denied behavior.
