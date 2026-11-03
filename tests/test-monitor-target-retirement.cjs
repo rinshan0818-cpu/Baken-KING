@@ -42,3 +42,27 @@ test('settled and manually processed races are excluded',()=>{
  assert.equal(extract([wager('2026-11-07','東京',11,{status:'settled'})],cards).length,0);
  assert.equal(extract([wager('2026-11-07','東京',11,{specialManualResult:true})],cards).length,0);
 });
+
+test('adding a second race after purchase registers both, without duplicating the first',()=>{
+ const cards=[card('2026-11-07','東京',11),card('2026-11-07','京都',9)];
+ const first=[wager('2026-11-07','東京',11)];
+ assert.equal(extract(first,cards).length,1);
+ const next=[...first,wager('2026-11-07','京都',9)];
+ const selected=extract(next,cards);
+ assert.equal(selected.length,2);
+ assert.equal(new Set(selected.map(x=>x.date+'|'+x.venue+'|'+x.raceNumber)).size,2);
+});
+test('result-ready one ticket retains race only if another pending ticket still needs it',()=>{
+ const cards=[card('2026-11-07','東京',11)];
+ const pending=wager('2026-11-07','東京',11);
+ const complete=wager('2026-11-07','東京',11,{officialReady:true});
+ assert.equal(extract([pending,complete],cards).length,1);
+ assert.equal(extract([complete],cards).length,0);
+});
+test('after all races settle, registration becomes an empty list',()=>{
+ const cards=[card('2026-11-07','東京',11),card('2026-11-08','京都',1)];
+ const bets=[wager('2026-11-07','東京',11),wager('2026-11-08','京都',1)];
+ assert.equal(extract(bets,cards).length,2);
+ const settled=bets.map(b=>({...b,status:'settled'}));
+ assert.equal(extract(settled,cards).length,0);
+});
