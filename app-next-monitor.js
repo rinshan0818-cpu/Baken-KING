@@ -5,6 +5,11 @@
 (()=>{
  'use strict';
  if(location.hostname!=='baken-king-app-next.vercel.app')return;
+ // Load account-authenticated verified result polling in the same-origin app.
+ const resultScript=document.createElement('script');
+ resultScript.src='./app-next-results.js?v=1';
+ resultScript.async=true;
+ document.head.append(resultScript);
  if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const CONFIG='keiba-demo-v1',CARDS='baken-king-personal-cards-v1';
  const account=document.getElementById('bkAccountSettings');
