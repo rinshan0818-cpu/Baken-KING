@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>Baken-KING｜友達管理</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;color:#173733;background:#f3f7f5}*{box-sizing:border-box}body{margin:0;padding:calc(20px + env(safe-area-inset-top)) 16px 40px}.wrap{max-width:530px;margin:auto}h1{font-size:25px;margin:12px 0 6px}h2{font-size:18px;margin:0 0 12px}p{font-size:13px;line-height:1.7;color:#576c66}a{color:#166b56}.card{background:white;border:1px solid #dce7e2;border-radius:16px;padding:17px;margin:13px 0}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1 1 auto}button,input{font:inherit;font-size:15px;border-radius:10px;padding:11px}input{width:100%;border:1px solid #a5bcb2;margin:5px 0 10px}button{border:0;background:#086c54;color:white;font-weight:700;cursor:pointer}button.secondary{background:#e5efea;color:#1a6250}button:disabled{opacity:.5;cursor:not-allowed}.mini{font-size:12px;color:#64776e}#status{white-space:pre-wrap;background:#e9f2ed;padding:12px;border-radius:10px;margin:15px 0;line-height:1.5}ul{list-style:none;padding:0;margin:0}li{border-top:1px solid #edf2ee;padding:12px 0}li p{margin:4px 0}.entry-actions{display:flex;gap:7px;margin-top:7px}.entry-actions button{font-size:12px;flex:1}#app[hidden],#status[hidden]{display:none}.pill{display:inline-block;background:#e9f1ec;padding:5px 9px;border-radius:99px;color:#315c4c;font-size:12px}
+</style></head><body><main class="wrap">
+<p><a href="./">Baken-KINGに戻る</a></p><h1>友達管理</h1><p>メールログインで友達を登録し、成績を比較するための画面です。馬券・残高・精算履歴そのものは友達に公開しません。</p>
+<div class="card"><span class="pill">準備中・先行画面</span><p>共有APIが未接続の間は登録できません。現在使える比較コードはアプリの「データ」タブで引き続き利用できます。</p><div class="row"><button id="connect">ログイン状態を確認</button><a href="./auth.html">ログイン・メール確認</a></div><div id="status" role="status" aria-live="polite">まだ接続していません。</div></div>
+<div id="app" hidden>
+<section class="card"><h2>自分のプロフィール</h2><p id="myId" class="mini"></p><label for="nickname">表示名（16文字以内）</label><input id="nickname" maxlength="16" autocomplete="nickname"><button id="register" type="button">プロフィールを登録・更新</button><div class="row"><button id="copyId" class="secondary" type="button">自分の友達IDをコピー</button><button id="refresh" class="secondary" type="button">一覧を更新</button></div></section>
+<section class="card"><h2>友達を追加</h2><p>相手から教えてもらった友達IDを入力して申請します。</p><label for="recipient">友達ID</label><input id="recipient" type="text" autocapitalize="off" spellcheck="false" placeholder="例：xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><button id="invite" type="button">友達申請を送る</button></section>
+<section class="card"><h2>届いた申請</h2><ul id="invitations"><li class="mini">まだありません。</li></ul></section>
+<section class="card"><h2>友達一覧</h2><ul id="friends"><li class="mini">まだありません。</li></ul></section>
+<section class="card"><h2>9項目の成績比較</h2><p>友達の成績が登録されるとここに表示します。購入内容は表示しません。</p><div id="comparison" class="mini">友達を選択してください。</div></section>
+</div></main>
+<script>
+(()=>{'use strict';
+ const AUTH='https://ep-curly-boat-a170oecz.neonauth.ap-southeast-1.aws.neon.tech/baken_sharing/auth';
+ const API='https://baken-king-sharing-api.vercel.app';
+ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+ const $=id=>document.getElementById(id);
+ let user=null,token=null,busy=false;
+ const status=m=>{$('status').hidden=false;$('status').textContent=m};
+ const friendly=e=>e?.status===503?'共有APIは現在準備中です。データは送信されていません。':e?.status===401?'ログインし直してください。':e?.status===403?'操作できません。申請・友達IDを確認してください。':e?.message||'通信に失敗しました。';
+ async function authCall(path){
+  const res=await fetch(AUTH+path,{credentials:'include',cache:'no-store',headers:{Accept:'application/json'}});
+  if(!res.ok)throw Error('認証状態を確認できません');
+  return {response:res,data:await res.json()};
+ }
+ async function getToken(){
+  const {response,data}=await authCall('/token');
+  const jwt=data?.token||data?.data?.token||response.headers.get('set-auth-jwt');
+  if(typeof jwt!=='string'||jwt.split('.').length!==3)throw Error('ログイントークンを取得できません。再ログインしてください。');
+  return jwt;
+ }
+ async function request(method,path,body){
+  if(!user)throw Error('ログインが必要です');
+  token=await getToken();
+  const res=await fetch(API+path,{method,credentials:'omit',cache:'no-store',redirect:'error',headers:{Authorization:'Bearer '+token,Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok||data.ok!==true){const e=Error(data.error||'APIエラー');e.status=res.status;throw e}
+  return data;
+ }
+ async function operation(fn){if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;try{await fn()}catch(e){status(friendly(e))}finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false}}
+ function entry(text,actions){
+  const li=document.createElement('li'),info=document.createElement('p');info.textContent=text;li.append(info);
+  if(actions?.length){const row=document.createElement('div');row.className='entry-actions';for(const [name,fn] of actions){const b=document.createElement('button');b.textContent=name;b.type='button';b.onclick=()=>operation(fn);row.append(b)}li.append(row)}return li;
+ }
+ function fillList(id,items){const el=$(id);el.replaceChildren(...(items.length?items:[entry('まだありません。')]))}
+ const display=(id)=>id.slice(0,8)+'…';
+ async function refresh(){
+  const data=await request('GET','/api/sharing/connections');
+  fillList('invitations',(data.invitations||[]).map(r=>{
+   const incoming=r.recipientId===user.id;
+   return entry((incoming?'受信：':'送信：')+display(incoming?r.senderId:r.recipientId),incoming?[['承認',async()=>{await request('POST','/api/sharing/invitations/'+r.id+'/respond',{accepted:true});await refresh();status('承認しました。')}],['拒否',async()=>{await request('POST','/api/sharing/invitations/'+r.id+'/respond',{accepted:false});await refresh();status('申請を拒否しました。')}]]:[]);
+  }));
+  fillList('friends',(data.friends||[]).map(f=>entry('友達：'+display(f.id),[
+   ['成績を見る',async()=>{const result=await request('GET','/api/sharing/summary/'+f.id);renderSummary(result.summary);status('成績を更新しました。')}],
+   ['解除',async()=>{if(!confirm('この友達との共有を解除しますか？'))return;await request('DELETE','/api/sharing/friends/'+f.id);await refresh();$('comparison').textContent='友達を選択してください。';status('友達を解除しました。')}]
+  ])));
+ }
+ const yen=n=>typeof n==='number'?n.toLocaleString('ja-JP')+'円':'—';
+ function renderSummary(s){
+  const el=$('comparison');el.replaceChildren();
+  if(!s){el.textContent='相手の成績はまだ登録されていません。';return}
+  const fields=[['収支',yen(s.profitYen)],['回収率',s.roiPercent==null?'—':s.roiPercent+'%'],['購入金額',yen(s.stakeYen)],['払戻金額',yen(s.returnedYen)],['精算済み馬券数',s.settledTicketCount+'件'],['購入レース数',s.purchasedRaceCount+'R'],['的中レース数',s.hitRaceCount+'R'],['レース的中率',s.raceHitRatePercent==null?'—':s.raceHitRatePercent+'%'],['最高払戻金',yen(s.maxPayoutYen)]];
+  const ul=document.createElement('ul');for(const [k,v] of fields)ul.append(entry(k+'：'+v));el.append(ul);
+ }
+ $('connect').onclick=()=>operation(async()=>{
+  const result=(await authCall('/get-session')).data;user=result?.user||result?.data?.user||null;
+  if(!user||!UUID.test(user.id)||user.emailVerified!==true)throw Error('メール確認済みのログインが必要です。');
+  $('myId').textContent='友達ID：'+user.id;$('nickname').value=localStorage.getItem('baken-king-nickname-v1')||user.name||'プレイヤー';
+  // Validate the API before showing controls. No writes on connect.
+  await refresh();$('app').hidden=false;status('友達管理に接続しました。');
+ });
+ $('register').onclick=()=>operation(async()=>{const name=$('nickname').value.trim();if(!name||name.length>16)throw Error('1～16文字の名前を入力してください');await request('POST','/api/sharing/profile',{displayName:name});status('プロフィールを登録しました。')});
+ $('invite').onclick=()=>operation(async()=>{const id=$('recipient').value.trim();if(!UUID.test(id)||id===user.id)throw Error('正しい友達IDを入力してください');await request('POST','/api/sharing/invitations',{recipientId:id});await refresh();status('友達申請を送信しました。')});
+ $('refresh').onclick=()=>operation(async()=>{await refresh();status('友達一覧を更新しました。')});
+ $('copyId').onclick=()=>operation(async()=>{await navigator.clipboard.writeText(user.id);status('友達IDをコピーしました。')});
+})();
+</script></body></html>
