@@ -22,9 +22,9 @@ function createFriendshipStore(db){
   async listConnections(actor){
    const user=validId(actor);
    const pending=await db.query("SELECT id,sender_id,recipient_id,status,created_at FROM sharing_requests WHERE (sender_id=$1::uuid OR recipient_id=$1::uuid) AND status='pending' ORDER BY created_at DESC LIMIT 50",[user]);
-   const friends=await db.query("SELECT CASE WHEN user_low=$1::uuid THEN user_high ELSE user_low END AS id,created_at FROM sharing_friendships WHERE user_low=$1::uuid OR user_high=$1::uuid ORDER BY created_at DESC LIMIT 50",[user]);
+   const friends=await db.query("SELECT CASE WHEN f.user_low=$1::uuid THEN f.user_high ELSE f.user_low END AS id,u.display_name,f.created_at FROM sharing_friendships f JOIN sharing_users u ON u.id=CASE WHEN f.user_low=$1::uuid THEN f.user_high ELSE f.user_low END WHERE f.user_low=$1::uuid OR f.user_high=$1::uuid ORDER BY f.created_at DESC LIMIT 50",[user]);
    return {invitations:pending.rows.map(r=>({id:r.id,senderId:r.sender_id,recipientId:r.recipient_id,status:r.status,createdAt:r.created_at})),
-    friends:friends.rows.map(r=>({id:r.id,createdAt:r.created_at}))};
+    friends:friends.rows.map(r=>({id:r.id,displayName:r.display_name,createdAt:r.created_at}))};
   },
   async createInvitation(actor,recipient){
    const a=validId(actor),b=validId(recipient);if(a===b)forbidden();
