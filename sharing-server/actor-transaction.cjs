@@ -10,6 +10,9 @@ async function withActorTransaction(pool,actor,fn){
  let begun=false;
  try{
   await client.query('BEGIN');begun=true;
+  // Never process sharing queries using the DB owner or a BYPASSRLS role.
+  const role=await client.query('SELECT current_user AS role');
+  if(role.rows?.[0]?.role!=='baken_sharing_api')throw Error('Restricted sharing DB role required');
   // Transaction-local setting: never carry over to a different request.
   await client.query("SELECT set_config('bk.actor_id',$1,true)",[actor]);
   const result=await fn(Object.freeze({query:(sql,params)=>client.query(sql,params)}));
