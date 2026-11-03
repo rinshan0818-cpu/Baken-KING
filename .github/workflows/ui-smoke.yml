@@ -36,6 +36,7 @@ on:
       - 'tests/sharing-server.test.cjs'
       - 'tests/sharing-friendship-store.test.cjs'
       - 'tests/sharing-friend-http.test.cjs'
+      - 'tests/sharing-actor-transaction.test.cjs'
       - 'tests/sharing-jwt-auth.test.cjs'
       - 'tests/sharing-neon-auth.test.cjs'
       - 'tests/friends-share.test.cjs'
@@ -88,6 +89,8 @@ jobs:
         run: node tests/sharing-friend-http.test.cjs
       - name: Test server-only friend invitation and approval SQL
         run: node tests/sharing-friendship-store.test.cjs
+      - name: Test restricted actor-bound DB transactions
+        run: node tests/sharing-actor-transaction.test.cjs
       - name: Test staged sharing RLS authorization contract
         run: node tests/sharing-rls-staging.test.cjs
       - name: Test sharing schema security defaults
