@@ -100,3 +100,14 @@ test('more than three race dates fail closed even below 108 total',async()=>{
  const db=connection({races:four}),h=createSchedulerUnionHttp({token,connect:db.connect});
  assert.equal((await invoke(h,{authorization:'Bearer '+token})).statusCode,503);
 });
+
+test('three separate JRA race dates fit 108 identities without duplicates',async()=>{
+ const all=['2026-11-07','2026-11-08','2026-11-09'].flatMap(date=>
+  ['東京','京都','阪神'].flatMap(venue=>
+   Array.from({length:12},(_,i)=>({date,venue,raceNumber:i+1}))));
+ const db=connection({races:all}),h=createSchedulerUnionHttp({token,connect:db.connect});
+ const result=await invoke(h,{authorization:'Bearer '+token});
+ assert.equal(result.statusCode,200);
+ assert.equal(result.body.targets.length,108);
+ assert.equal(new Set(result.body.targets.map(t=>t.date+'|'+t.venue+'|'+t.raceNumber)).size,108);
+});
