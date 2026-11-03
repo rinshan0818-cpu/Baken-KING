@@ -10,6 +10,12 @@ async function withActorTransaction(pool,actor,fn){
  let begun=false;
  try{
   await client.query('BEGIN');begun=true;
+  // Verify the actual LOGIN role BEFORE switching: a privileged Neon
+  // Console/API role may bypass RLS even if SET LOCAL ROLE later succeeds.
+  const login=await client.query(`SELECT session_user AS role,
+   (SELECT rolbypassrls FROM pg_roles WHERE rolname=session_user) AS bypass`);
+  if(login.rows?.[0]?.role!=='baken_sharing_limited'||login.rows[0].bypass!==false)
+   throw Error('Least-privileged sharing login required');
   // The login role has LOGIN but no table privileges; switch to the NOLOGIN
   // RLS role inside this transaction before ANY user-scoped query.
   await client.query('SET LOCAL ROLE baken_sharing_api');
