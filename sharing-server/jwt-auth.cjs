@@ -4,7 +4,11 @@
 const crypto=require('node:crypto');
 function createJwtAuthenticator({issuer,audience,publicKey,clock=()=>Math.floor(Date.now()/1000)}){
  if(typeof issuer!=='string'||!issuer||typeof audience!=='string'||!audience||!publicKey)throw Error('JWT configuration required');
- const key=crypto.createPublicKey(publicKey);
+ // Node.js 24 no longer accepts an already-public KeyObject via createPublicKey.
+ // Accept only a public KeyObject or material from which a public key can be parsed.
+ if(publicKey instanceof crypto.KeyObject && publicKey.type!=='public')
+  throw Error('JWT verifier requires a public signing key');
+ const key=publicKey instanceof crypto.KeyObject ? publicKey : crypto.createPublicKey(publicKey);
  function invalid(){const e=new Error('Unauthenticated');e.status=401;throw e}
  return async function authenticate(request){
   const auth=request?.headers?.authorization||request?.headers?.Authorization;
