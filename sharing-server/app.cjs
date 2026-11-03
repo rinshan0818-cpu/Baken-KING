@@ -22,7 +22,7 @@ function createSharingApi({env,db}){
   :createJwtAuthenticator({issuer,audience,publicKey});
  if(neon){
   // Neon Auth mode MUST use an actor-bound transaction and restricted pg pool.
-  return createRestrictedSharingHandler({authenticate,pool:db,allowedOrigins:['https://rinshan0818-cpu.github.io']});
+  return createRestrictedSharingHandler({authenticate,pool:db,allowedOrigins:['https://rinshan0818-cpu.github.io'],encryptionKey:env.SHARING_BACKUP_ENCRYPTION_KEY});
  }
  const store={...createSharingStore(db),...createFriendshipStore(db)};
  const service=createSharingService({authenticate,store});
