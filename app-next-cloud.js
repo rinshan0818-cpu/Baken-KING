@@ -7,6 +7,18 @@
  if(location.hostname!=='baken-king-app-next.vercel.app')return;
  const $=id=>document.getElementById(id);
  const account=$('bkAccountSettings'),sync=$('bkFriendSyncNow'),status=$('bkFriendSyncStatus');
+ // On this same-origin preview, replace stale GitHub Pages handoff guidance.
+ const exchange=document.querySelector('.bk-compare-exchange');
+ if(exchange){
+  const introductory=exchange.querySelector(':scope > p.muted');
+  if(introductory)introductory.textContent='ログイン後はアカウントの表示名と友達の成績が自動反映されます。友達登録はアカウント設定から行えます。';
+  const link=exchange.querySelector(':scope > a.official');
+  if(link){link.href='#';link.hidden=true;link.setAttribute('aria-hidden','true')}
+  const details=exchange.querySelector('details');
+  const note=details?.querySelector('p.muted');
+  if(note)note.textContent='今すぐ同期で自分の9項目を共有します。初回の承認後はアプリを開いている間、30分間隔で自動同期します。馬券の買い目・残高・履歴は送信しません。';
+ }
+ 
  if(!account||!sync||!status)return;
  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
  const interval=30*60*1000;
