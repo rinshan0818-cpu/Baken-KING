@@ -4,6 +4,8 @@
 */
 (function(){
  'use strict';
+ // Vercel same-origin preview uses app-next-cloud.js, not fragment handoff.
+ if(location.hostname==='baken-king-app-next.vercel.app')return;
  const button=document.getElementById('bkFriendSyncNow');
  const status=document.getElementById('bkFriendSyncStatus');
  if(!button||!status)return;
