@@ -18,6 +18,13 @@ const baseSelector='main.wrap > [data-tab]';
   await page.goto(origin,{waitUntil:'domcontentloaded'});
   await page.waitForSelector('[data-nav="home"].active');
 
+  // Release-preparation contract: no beta stamp in the normal app.
+  // The isolated test mode remains available through Settings.
+  assert.doesNotMatch(await page.title(),/beta|ベータ/i);
+  assert.equal(await page.locator('.bk-header-status').isVisible(),false,'Beta badge must be hidden in normal mode');
+  assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('bk-test-mode')),false,
+    'A fresh production session must not start in test mode');
+
   // Freeze the design contract: five tabs, predicted ◎, sideways ticket icon.
   assert.deepEqual(await page.locator('.bottom-nav [data-nav]').evaluateAll(nodes=>nodes.map(n=>n.dataset.nav)),approvedTabs);
   assert.equal(await page.locator('[data-nav="predict"] svg circle').count(),2,'Prediction icon must remain ◎');
