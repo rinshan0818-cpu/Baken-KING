@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0B2D5B"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>Baken-KING | v5.82 Beta</title><link rel="manifest" href="./manifest.webmanifest"><link rel="preload" href="./ticket-template-v2.png" as="image"><link rel="icon" type="image/svg+xml" href="./icon.svg?v=3.7"><link rel="apple-touch-icon" sizes="512x512" href="./baken_king_icon_512.png?v=3.8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Baken-KING"><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0B2D5B"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>Baken-KING | v5.83 Beta</title><link rel="manifest" href="./manifest.webmanifest"><link rel="preload" href="./ticket-template-v2.png" as="image"><link rel="icon" type="image/svg+xml" href="./icon.svg?v=3.7"><link rel="apple-touch-icon" sizes="512x512" href="./baken_king_icon_512.png?v=3.8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Baken-KING"><style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;color:#17251f;background:#f4f6f4}*{box-sizing:border-box}body{margin:0}.top{background:#10251e;color:white;padding:22px 18px 26px}.wrap{max-width:760px;margin:auto;padding:0 14px 35px}h1{font-size:22px;margin:0 0 8px}h2{font-size:18px;margin:0 0 14px}.muted{color:#64736a;font-size:12px}.top .muted{color:#c4d6c9}.pill{display:inline-block;background:#f7e8b6;color:#544019;padding:5px 9px;border-radius:50px;font-size:12px;font-weight:700}.card{background:white;border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 3px 16px #0a25100c}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:#edf4ee;border-radius:12px;padding:12px}.stat strong{display:block;font-size:20px;margin-top:5px}.label{font-size:12px;color:#506158}button,select,input{font:inherit}button{border:0;border-radius:10px;padding:11px 14px;background:#176d45;color:white;font-weight:700;cursor:pointer}button:disabled{background:#a9b7ae}button.alt{background:#e6eee8;color:#194d34}button.danger{background:#a13e36}button.outline{background:white;border:1px solid #d0ded3;color:#175e3d}.official{display:inline-block;padding:11px 13px;border:1px solid #c9ded1;border-radius:10px;color:#175e3d;text-decoration:none;font-size:13px;font-weight:700}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.space{justify-content:space-between}.horse{padding:11px 9px;border:1px solid #dbe5de;border-radius:9px;background:white;color:#17251f;min-width:0;text-align:left}.horse.on{background:#dcf4e4;border-color:#167346}.horses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.num{font-weight:800;font-size:18px;margin-right:6px}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form>div{min-width:0}select,input{width:100%;border:1px solid #ccd9d0;border-radius:10px;padding:12px;background:white}small{font-size:12px}.alert{background:#fff4da;border:1px solid #f1d594;border-radius:10px;padding:12px;font-size:13px;line-height:1.6}.line{border-bottom:1px solid #edf1ed;padding:10px 0;font-size:14px}.tag{background:#e8f1ea;color:#276341;padding:3px 8px;border-radius:20px;font-size:11px}.negative{color:#aa4136}.positive{color:#167346}.footer{font-size:12px;color:#65736b;line-height:1.6;margin-top:20px}#toast{position:fixed;bottom:18px;left:5%;right:5%;max-width:500px;margin:auto;background:#142e21;color:white;padding:14px;border-radius:12px;display:none;z-index:2}@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.horses{grid-template-columns:repeat(3,1fr)}}
 [data-tab][hidden]{display:none!important}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;justify-content:space-around;background:#fff;border-top:1px solid #dce8df;padding:7px 4px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -3px 15px #10251e10}.bottom-nav button{flex:1;background:transparent;color:#64736a;border-radius:9px;padding:5px 1px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}.bottom-nav button span{font-size:22px;line-height:24px}.bottom-nav button.active{color:#176d45;background:#edf5ee}.wrap{padding-bottom:115px}#toast{bottom:95px}@media(max-width:370px){.bottom-nav button{font-size:10px}}
 /* v3.8: iPhone layout stability and touch targets */
@@ -3291,9 +3291,20 @@ $('restore').onchange=async e=>{
 $('resetDemo').onclick=()=>{if(!confirm('全記録を完全に削除します。よろしいですか？'))return;s=initial();selected=[];save()};render();
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{});}
-const APP_VERSION='v5.82';
+const APP_VERSION='v5.83';
 const updateButton=document.getElementById('checkUpdate');
 let latestUpdateUrl='';
+// Auto-apply only before the user starts interacting in this app session.
+// Never reload during a ticket purchase, settlement or form input.
+let bkUpdateUserInteracted=false;
+let bkUpdateApplying=false;
+for(const eventName of ['pointerdown','keydown','input','change','touchstart']){
+ document.addEventListener(eventName,()=>{bkUpdateUserInteracted=true},{capture:true,passive:true});
+}
+function bkCanAutoApplyUpdate(){
+ return !bkUpdateUserInteracted&&!bkUpdateApplying&&!document.hidden&&
+   !document.querySelector('dialog[open],input:focus,textarea:focus,select:focus,[contenteditable="true"]:focus');
+}
 async function checkForUpdate(silent=false){
  const label=document.getElementById('updateStatus');
  if(!silent)label.textContent='確認中…';
@@ -3308,6 +3319,7 @@ async function checkForUpdate(silent=false){
    label.textContent='最新版 '+match[1]+' が利用できます';
    updateButton.textContent='最新版に更新';
    updateButton.onclick=applyAppUpdate;
+   if(silent&&bkCanAutoApplyUpdate())await applyAppUpdate(true);
   }else{
    label.textContent='最新版です（'+APP_VERSION+'）';
    updateButton.textContent='最新版を確認';
@@ -3315,7 +3327,9 @@ async function checkForUpdate(silent=false){
   }
  }catch(e){if(!silent)label.textContent='確認できませんでした。通信状況を確認してください';}
 }
-async function applyAppUpdate(){
+async function applyAppUpdate(automatic=false){
+ if(bkUpdateApplying||(automatic&&!bkCanAutoApplyUpdate()))return;
+ bkUpdateApplying=true;
  const label=document.getElementById('updateStatus');
  updateButton.disabled=true;updateButton.textContent='更新中…';label.textContent='最新版を読み込んでいます…';
  try{
@@ -3332,8 +3346,8 @@ async function applyAppUpdate(){
   location.replace(target);
  }catch(e){
   label.textContent=e.message==='stale'?'新しい画面を取得できません。Safariで開き直してお試しください。':'更新できませんでした。通信状況を確認してください。';
-  updateButton.disabled=false;updateButton.textContent='再試行';updateButton.onclick=applyAppUpdate;
- }
+  updateButton.disabled=false;updateButton.textContent='再試行';updateButton.onclick=()=>applyAppUpdate(false);
+ }finally{bkUpdateApplying=false;}
 }
 updateButton.onclick=()=>checkForUpdate(false);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkForUpdate(true)});
