@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const html=fs.readFileSync('auth.html','utf8');
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert(script,'Login page must retain its isolated script');
+new (require('node:vm').Script)(script,{filename:'auth.html'});
+for(const endpoint of ['/sign-in/email','/sign-up/email','/get-session','/sign-out','/email-otp/send-verification-otp','/email-otp/verify-email'])assert(html.includes(endpoint),endpoint+' missing');
+assert(html.includes('emailVerified'),'Verification state must be shown');
+assert(html.includes('inputmode="numeric"'),'OTP input required');
+assert(!html.includes('localStorage.'),'Auth must not modify local ticket storage');
+assert(!html.includes('sharing_snapshots'),'Auth must not write friend data directly');
+console.log('PASS: independent account page syntax and OTP verification controls');
