@@ -7,7 +7,7 @@ let owner=null,registered=false;
 async function req(method,path,body){
  const options={method,credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}};
  if(body){options.headers['Content-Type']='application/json';options.body=JSON.stringify(body)}
- const r=await fetch('/api/friends/'+path,options),j=await r.json().catch(()=>({}));
+ const r=await fetch('/api/auth/friends/'+path,options),j=await r.json().catch(()=>({}));
  if(!r.ok||j.ok!==true)throw Error(r.status===401?'ログインが必要です':'友達APIに接続できません（'+r.status+'）');
  return j;
 }
