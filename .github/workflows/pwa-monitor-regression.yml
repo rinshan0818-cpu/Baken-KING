@@ -1,0 +1,28 @@
+name: PWA monitoring and verified-result regression
+on:
+  push:
+    paths:
+      - 'app-next-monitor.js'
+      - 'app-next-results.js'
+      - 'monitor-target-export.js'
+      - 'tests/test-monitor-target-retirement.cjs'
+      - 'tests/test-verified-results-fast-poll.cjs'
+      - 'tests/test-account-monitor-heartbeat.cjs'
+      - '.github/workflows/pwa-monitor-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  monitoring-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify pending-only polling, subscription updates and target retirement
+        run: |
+          node --test tests/test-verified-results-fast-poll.cjs
+          node --test tests/test-account-monitor-heartbeat.cjs
+          node --test tests/test-monitor-target-retirement.cjs
