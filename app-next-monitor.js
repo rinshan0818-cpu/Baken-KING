@@ -19,7 +19,8 @@
  panel.id='bkAccountMonitorStatus';
  panel.textContent='レースの監視登録：ログイン状態を確認中';
  account.append(panel);
- let busy=false,resync=false,last='';
+ let busy=false,resync=false,last='',lastSyncedAt=0;
+ const HEARTBEAT_MS=30*60*1000;
  function read(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch{return null}}
  async function status(){
   const r=await fetch('/api/auth/get-session',{credentials:'same-origin',cache:'no-store'});
@@ -41,11 +42,11 @@
   busy=true;
   try{
    const id=await status();
-   if(!id){panel.textContent='レースの監視登録：ログインすると利用できます';return}
+   if(!id){last='';lastSyncedAt=0;panel.textContent='レースの監視登録：ログインすると利用できます';return}
    const targets=current();
    if(targets===null){panel.textContent='レースの監視登録：出馬表の読み込み待ち';return}
    const key=id+':'+JSON.stringify(targets);
-   if(last===key)return;
+   if(last===key&&Date.now()-lastSyncedAt<HEARTBEAT_MS)return;
    const result=await fetch('/api/auth/friends/monitor-targets',{
     method:'POST',credentials:'same-origin',cache:'no-store',
     headers:{'Content-Type':'application/json',Accept:'application/json'},
@@ -55,6 +56,7 @@
    if(!result.ok||data.ok!==true||data.registered!==targets.length)
     throw Error('HTTP '+result.status);
    last=key;
+   lastSyncedAt=Date.now();
    panel.textContent='監視候補 '+targets.length+'レースをアカウントに登録済み（共通JRA監視への接続は準備中）';
   }catch(e){panel.textContent='レース監視登録を確認できません：'+e.message}
   finally{busy=false;if(resync){resync=false;queueMicrotask(sync)}}
