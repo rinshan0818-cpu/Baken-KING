@@ -17,7 +17,13 @@ async function load(){
  const me=await req('GET','me');owner=me.user?.id;
  if(!UUID.test(owner||''))throw Error('友達IDを取得できません');
  registered=!!me.user?.profile;
- $('profileStatus').textContent=registered?'登録済み':'最初にプロフィールを登録してください';
+ $('profileStatus').textContent=registered?'プロフィール登録済み':'最初にプロフィールを登録してください';
+ try{
+  const own=(await req('GET','summary/'+owner)).summary;
+  $('profileStatus').textContent+='／成績：'+(own?'登録済み（'+(own.updatedAt?new Date(own.updatedAt).toLocaleString('ja-JP'):'日時不明')+'更新）':'未登録');
+ }catch{
+  $('profileStatus').textContent+='／成績：確認できません';
+ }
  $('friendId').textContent='友達ID：'+owner;
  $('nickname').value=me.user.profile?.displayName||'プレイヤー';
  const c=await req('GET','connections');
