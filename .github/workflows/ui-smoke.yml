@@ -5,6 +5,8 @@ on:
     paths:
       - 'index.html'
       - 'account-backup.js'
+      - 'account-backup-transport.js'
+      - 'tests/account-backup-transport.test.cjs'
       - 'tests/account-backup.test.cjs'
       - 'tests/account-backup-ui.test.cjs'
       - 'tests/browser_smoke.cjs'
@@ -73,6 +75,8 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/baken-server.log 2>&1 &
           sleep 2
+      - name: Test JWT-only backup transport
+        run: node tests/account-backup-transport.test.cjs
       - name: Test safe account backup coordinator
         run: node tests/account-backup.test.cjs
       - name: Test account backup UI and local export
