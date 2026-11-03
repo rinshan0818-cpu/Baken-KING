@@ -62,7 +62,7 @@ test('reject data with additional ticket information',async()=>{
 });
 test('reject duplicate races or more than 36 race identities',async()=>{
  const full=['東京','京都','阪神'].flatMap(venue=>Array.from({length:12},(_,i)=>({...race,venue,raceNumber:i+1})));
- for(const races of [[race,race],[...full,{date:'2026-11-08',venue:'東京',raceNumber:1}]]){
+ for(const races of [[race,race],[...full,{date:'2026-11-07',venue:'福島',raceNumber:1}]]){
   const db=connection({races});
   const h=createSchedulerUnionHttp({token,connect:db.connect});
   assert.equal((await invoke(h,{authorization:'Bearer '+token})).statusCode,503);
@@ -82,4 +82,21 @@ test('Neon-created scheduler roles with BYPASSRLS are rejected',async()=>{
   assert.equal(db.queries,1); // no read of any account race
   assert.equal(db.releases,1);
  }
+});
+
+test('two independent three-venue dates permit 72 races with no personal fields',async()=>{
+ const twoDays=['2026-11-07','2026-11-08'].flatMap(date=>
+  ['東京','京都','阪神'].flatMap(venue=>
+   Array.from({length:12},(_,i)=>({date,venue,raceNumber:i+1}))));
+ const db=connection({races:twoDays}),h=createSchedulerUnionHttp({token,connect:db.connect});
+ const result=await invoke(h,{authorization:'Bearer '+token});
+ assert.equal(result.statusCode,200);
+ assert.equal(result.body.targets.length,72);
+ assert.equal(result.body.targets.every(t=>Object.keys(t).sort().join(',')==='date,raceNumber,venue'),true);
+});
+test('more than three race dates fail closed even below 108 total',async()=>{
+ const four=['2026-11-07','2026-11-08','2026-11-09','2026-11-10']
+  .map(date=>({date,venue:'東京',raceNumber:1}));
+ const db=connection({races:four}),h=createSchedulerUnionHttp({token,connect:db.connect});
+ assert.equal((await invoke(h,{authorization:'Bearer '+token})).statusCode,503);
 });
