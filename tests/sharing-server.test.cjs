@@ -30,7 +30,7 @@ const stranger={method:'GET',verifiedSession:{id:'33333333-3333-4333-8333-333333
  await service.respond({...bob,method:'POST'},'invite_123',true);
  assert.deepEqual(events[1],['respond','22222222-2222-4222-8222-222222222222','invite_123',true]);
  await assert.rejects(service.respond({...bob,method:'POST'},'invite_123','yes'),/Forbidden/);
- await service.revoke({...alice,method:'POST'},bob.verifiedSession.id);
+ await service.revoke({...alice,method:'DELETE'},bob.verifiedSession.id);
  assert.equal(events.length,3);
  console.log('PASS: sharing API service denies unauthenticated/unverified/non-friend access');
 })().catch(e=>{console.error(e);process.exitCode=1});
