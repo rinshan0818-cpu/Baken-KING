@@ -13,6 +13,19 @@ function createFriendshipStore(db){
    const {rows}=await db.query('SELECT display_name FROM sharing_users WHERE id=$1::uuid',[validId(actor)]);
    return rows[0]?{displayName:rows[0].display_name}:null;
   },
+  async ensureOwnProfile(actor,displayName='プレイヤー'){
+   const id=validId(actor);
+   if(typeof displayName!=='string'||!displayName.trim()||displayName.trim().length>16)forbidden();
+   const {rows}=await db.query('INSERT INTO sharing_users(id,display_name) VALUES($1::uuid,$2) ON CONFLICT(id) DO UPDATE SET display_name=excluded.display_name RETURNING id,display_name',[id,displayName.trim()]);
+   return {id:rows[0].id,displayName:rows[0].display_name};
+  },
+  async listConnections(actor){
+   const user=validId(actor);
+   const pending=await db.query("SELECT id,sender_id,recipient_id,status,created_at FROM sharing_requests WHERE (sender_id=$1::uuid OR recipient_id=$1::uuid) AND status='pending' ORDER BY created_at DESC LIMIT 50",[user]);
+   const friends=await db.query("SELECT CASE WHEN user_low=$1::uuid THEN user_high ELSE user_low END AS id,created_at FROM sharing_friendships WHERE user_low=$1::uuid OR user_high=$1::uuid ORDER BY created_at DESC LIMIT 50",[user]);
+   return {invitations:pending.rows.map(r=>({id:r.id,senderId:r.sender_id,recipientId:r.recipient_id,status:r.status,createdAt:r.created_at})),
+    friends:friends.rows.map(r=>({id:r.id,createdAt:r.created_at}))};
+  },
   async createInvitation(actor,recipient){
    const a=validId(actor),b=validId(recipient);if(a===b)forbidden();
    // The unique pending-pair index also rejects simultaneous opposite-direction requests.
@@ -20,14 +33,12 @@ function createFriendshipStore(db){
    try{
     const {rows}=await db.query(`INSERT INTO sharing_requests(id,sender_id,recipient_id)
      SELECT $1::uuid,$2::uuid,$3::uuid
-     WHERE EXISTS(SELECT 1 FROM sharing_users WHERE id=$2::uuid)
-       AND EXISTS(SELECT 1 FROM sharing_users WHERE id=$3::uuid)
-       AND NOT EXISTS(SELECT 1 FROM sharing_friendships
-        WHERE user_low=LEAST($2::uuid,$3::uuid) AND user_high=GREATEST($2::uuid,$3::uuid))
+     WHERE NOT EXISTS(SELECT 1 FROM sharing_friendships
+      WHERE user_low=LEAST($2::uuid,$3::uuid) AND user_high=GREATEST($2::uuid,$3::uuid))
      RETURNING id,status`,[id,a,b]);
     if(!rows.length)forbidden();
     return {id:rows[0].id,status:rows[0].status};
-   }catch(e){if(e.code==='23505')forbidden();throw e}
+   }catch(e){if(e.code==='23505'||e.code==='23503')forbidden();throw e}
   },
   async respondToInvitation(actor,requestId,accepted){
    const user=validId(actor),req=validId(requestId);
