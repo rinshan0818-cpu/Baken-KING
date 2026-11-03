@@ -6,15 +6,18 @@ const db={async query(sql,params){calls.push({sql,params});return {rows:rows.shi
 const store=createFriendshipStore(db);
 (async()=>{
  rows=[[{display_name:'Alice'}]];assert.deepEqual(await store.getOwnProfile(A),{displayName:'Alice'});
+ rows=[[{id:A,display_name:'Alice'}]];assert.deepEqual(await store.ensureOwnProfile(A,'Alice'),{id:A,displayName:'Alice'});
+ rows=[[{id:A,sender_id:A,recipient_id:B,status:'pending',created_at:'now'}],[{id:B,created_at:'now'}]];
+ const connections=await store.listConnections(A);assert.equal(connections.invitations.length,1);assert.equal(connections.friends.length,1);
  await assert.rejects(store.createInvitation(A,A),/Forbidden/);
  await assert.rejects(store.createInvitation('fake',B),/Invalid identifier/);
  rows=[[{id:A,status:'pending'}]];await store.createInvitation(A,B);
  assert.match(calls.at(-1).sql,/NOT EXISTS\(SELECT 1 FROM sharing_friendships/);
  assert.deepEqual(calls.at(-1).params.slice(1),[A,B]);
  rows=[[]];await assert.rejects(store.createInvitation(A,B),/Forbidden/);
- rows=[[{id:B}]];await store.respondToInvitation(B,A,true);
- assert.match(calls.at(-1).sql,/recipient_id=\$2::uuid AND status='pending'/);
- assert.match(calls.at(-1).sql,/ON CONFLICT \(user_low,user_high\) DO NOTHING/);
+ rows=[[{id:B,sender_id:A,recipient_id:B}],[{user_low:A}]];await store.respondToInvitation(B,A,true);
+ assert.match(calls.at(-2).sql,/recipient_id=\$2::uuid AND status='pending'/);
+ assert.match(calls.at(-1).sql,/ON CONFLICT\(user_low,user_high\) DO NOTHING/);
  rows=[[]];await assert.rejects(store.respondToInvitation(A,B,true),/Forbidden/);
  rows=[[{id:A,status:'rejected'}]];assert.equal((await store.respondToInvitation(B,A,false)).status,'rejected');
  rows=[[]];await assert.rejects(store.respondToInvitation(A,B,false),/Forbidden/);
