@@ -24,5 +24,5 @@ assert(html.includes("localStorage.removeItem('baken-king-friend-score-v1'"),'Un
 assert(!html.includes("localStorage.setItem('keiba-demo-v1'"),'Friend page must not modify local wallet or tickets');
 assert(!html.includes("localStorage.setItem('baken-king-test-state-v1'"),'Friend page must not modify test wallet');
 assert(!html.includes('/api/account/backup'),'Friend management must not touch personal backups');
-assert(html.includes('共有APIが未接続'),'Disabled API status must be explicit');
+assert(html.includes('友達APIに接続できません'),'Unavailable sharing API status must be explicit');
 console.log('PASS: friends page syntax, secured transport, nine metrics and unchanged local data');
