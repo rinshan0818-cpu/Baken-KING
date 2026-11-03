@@ -9,11 +9,24 @@
  const state=document.createElement('p');state.className='muted';state.id='bkAccountResultStatus';
  state.textContent='確定結果の自動取得：確認中';
  account.append(state);
- let busy=false,again=false,lastData='';
+ let busy=false,again=false,lastData='',lastCheckedAt=0;
+ const ACTIVE_MS=60*1000,IDLE_MS=5*60*1000;
+ function hasPendingWagers(){
+  try{
+   const state=JSON.parse(localStorage.getItem('keiba-demo-v1')||'null');
+   return Array.isArray(state?.bets)&&state.bets.some(b=>
+    b&&b.status==='pending'&&b.officialReady!==true&&b.specialManualResult!==true&&
+    typeof b.realRaceId==='string'&&b.realRaceId.length>0);
+  }catch{return false}
+ }
+ function tick(){
+  if(hasPendingWagers()||Date.now()-lastCheckedAt>=IDLE_MS)fetchResults();
+ }
  async function fetchResults(){
   if(document.visibilityState==='hidden')return;
   if(busy){again=true;return}
   busy=true;
+  lastCheckedAt=Date.now();
   try{
    const r=await fetch('/api/auth/friends/verified-results',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
    if(r.status===401){state.textContent='確定結果の自動取得：ログイン後に利用できます';return}
@@ -35,6 +48,8 @@
  window.addEventListener('focus',fetchResults);
  window.addEventListener('baken:account-changed',()=>{lastData='';fetchResults()});
  window.addEventListener('baken:wagers-updated',()=>{lastData=''});
- setInterval(fetchResults,5*60*1000);
+ // Check the already verified server feed more frequently only while a wager
+ // still awaits official results. JRA scraping cadence is unchanged.
+ setInterval(tick,ACTIVE_MS);
  fetchResults();
 })();
