@@ -41,6 +41,7 @@ on:
       - 'tests/sharing-friend-http.test.cjs'
       - 'tests/sharing-actor-transaction.test.cjs'
       - 'tests/private-backup.test.cjs'
+      - 'tests/private-backup-http.test.cjs'
       - 'docs/sharing-private-backup-staging.sql'
       - 'tests/sharing-jwt-auth.test.cjs'
       - 'tests/sharing-neon-auth.test.cjs'
@@ -102,6 +103,8 @@ jobs:
         run: node tests/sharing-friend-http.test.cjs
       - name: Test server-only friend invitation and approval SQL
         run: node tests/sharing-friendship-store.test.cjs
+      - name: Test account backup API authorization and conflict handling
+        run: node tests/private-backup-http.test.cjs
       - name: Test encrypted private account backup and conflict prevention
         run: node tests/private-backup.test.cjs
       - name: Test restricted actor-bound DB transactions
