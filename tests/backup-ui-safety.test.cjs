@@ -1,0 +1,18 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {Script}=require('node:vm');
+const html=fs.readFileSync('index.html','utf8');
+const settings=fs.readFileSync('settings-surface.js','utf8');
+const scripts=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)].map(m=>m[1]);
+for(const script of scripts)new Script(script);
+new Script(settings);
+assert(html.includes('id="bkVerifyBackup"'));
+assert(html.includes('id="bkVerifyBackupFile"'));
+assert(html.includes("bkValidatedExtras(payload.extras)"));
+assert(html.includes("if(blob.size>5_000_000)"));
+assert(html.includes("if(!bkValidBackupState(payload.state))"));
+assert(html.includes('現在のデータは変更していません。'));
+assert(settings.includes("backupActions.append(verifyButton,verifyFile)"));
+assert(settings.includes("backupPanel.append(verifyResult)"));
+console.log('PASS: backup download and read-only verification UI invariants');
