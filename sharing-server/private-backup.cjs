@@ -15,9 +15,22 @@ function createPrivateBackupStore(db,keyHex){
  const revision=rev=>{if(!Number.isSafeInteger(rev)||rev<1)invalid('Invalid revision');return rev};
  function validatePayload(payload){
   if(!payload||typeof payload!=='object'||Array.isArray(payload)||payload.format!=='BAKEN_KING_BACKUP'||payload.schemaVersion!==2||!payload.state||!Array.isArray(payload.state.bets)||!payload.extras||typeof payload.extras!=='object'||Array.isArray(payload.extras))invalid('Unsupported backup');
-  if(payload.state.bets.length>100000)invalid('Too many tickets');
+  const state=payload.state;
+  if(state.bets.length>100000||!Array.isArray(state.seasons)||state.seasons.length>10000)invalid('Invalid backup state');
+  for(const k of ['balance','totalStake','totalPaid','grants','season','bankrupt','manualRestarts']){
+   if(!Number.isSafeInteger(state[k])||state[k]<0)invalid('Invalid '+k);
+  }
+  if(state.season<1||state.bets.some(b=>!b||typeof b!=='object'||Array.isArray(b)||
+   !Number.isSafeInteger(b.stake)||b.stake<0||
+   !['pending','settled','paid','lost','refunded','final'].includes(b.status)||
+   (b.paid!=null&&(!Number.isSafeInteger(b.paid)||b.paid<0))))invalid('Invalid bet records');
   const allowed=new Set(['baken-king-tags-v1','baken-king-real-notes-v1','baken-king-imported-race-v1','baken-king-imported-race-drafts-v1','baken-king-personal-cards-v1']);
   if(Object.keys(payload.extras).some(k=>!allowed.has(k)))invalid('Unexpected extra data');
+  for(const [k,v] of Object.entries(payload.extras)){
+   if(k==='baken-king-tags-v1'&&(!v||typeof v!=='object'||Array.isArray(v)))invalid('Invalid tags');
+   if((k==='baken-king-real-notes-v1'||k==='baken-king-imported-race-drafts-v1')&&(!Array.isArray(v)||v.length>100))invalid('Invalid entries');
+   if(k==='baken-king-personal-cards-v1'&&(!v||!Array.isArray(v.races)||v.races.length>108))invalid('Invalid race cards');
+  }
   const raw=Buffer.from(JSON.stringify(payload),'utf8');
   if(raw.length>MAX_BYTES)invalid('Backup too large');
   return raw;
