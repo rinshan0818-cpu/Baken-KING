@@ -1,0 +1,59 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const {createMonitorStore,validateTargets}=require('../sharing-server/monitor-store.cjs');
+const U1='00000000-0000-4000-8000-000000000001';
+const U2='00000000-0000-4000-8000-000000000002';
+const d='2026-11-07';
+const race=(venue,raceNumber,date=d)=>({date,venue,raceNumber});
+// Simulates actor-local PostgreSQL operations, NOT a replacement for live RLS checks.
+function dbFixture(){
+ const data=new Map(),operations=[];
+ return {data,operations,db:{
+  async query(sql,params){
+   operations.push({sql,params});
+   if(sql.startsWith('DELETE FROM sharing_monitor_targets')){
+    data.delete(params[0]);return {rows:[]};
+   }
+   if(sql.includes('INSERT INTO sharing_monitor_targets')){
+    data.set(params[0],JSON.parse(params[1]));return {rows:[]};
+   }
+   if(sql.startsWith('SELECT targets,updated_at')){
+    return {rows:data.has(params[0])?[{targets:data.get(params[0]),updated_at:'2026-11-07T01:00:00Z'}]:[]};
+   }
+   throw Error('Unexpected operation');
+  }
+ }};
+}
+test('two accounts keep independent records for same JRA race',async()=>{
+ const fixture=dbFixture(),store=createMonitorStore(fixture.db);
+ await store.replace(U1,[race('東京',11)]);
+ await store.replace(U2,[race('東京',11),race('京都',10)]);
+ assert.deepEqual((await store.own(U1)).targets,[race('東京',11)]);
+ assert.deepEqual((await store.own(U2)).targets,[race('東京',11),race('京都',10)]);
+ assert.equal(fixture.data.size,2);
+ assert(fixture.operations.every(op=>op.params[0]===U1||op.params[0]===U2));
+});
+test('deleting one account never removes the other shared race',async()=>{
+ const fixture=dbFixture(),store=createMonitorStore(fixture.db);
+ await store.replace(U1,[race('東京',11)]);
+ await store.replace(U2,[race('東京',11)]);
+ await store.replace(U1,[]);
+ assert.deepEqual((await store.own(U1)).targets,[]);
+ assert.deepEqual((await store.own(U2)).targets,[race('東京',11)]);
+ assert.equal(fixture.data.size,1);
+});
+test('replacing an account subscription cannot overwrite another account',async()=>{
+ const fixture=dbFixture(),store=createMonitorStore(fixture.db);
+ await store.replace(U1,[race('東京',11)]);
+ await store.replace(U2,[race('京都',1)]);
+ await store.replace(U1,[race('東京',9)]);
+ assert.deepEqual((await store.own(U2)).targets,[race('京都',1)]);
+ assert.deepEqual((await store.own(U1)).targets,[race('東京',9)]);
+});
+test('validator rejects money, selections, and duplicate targets',()=>{
+ const now=new Date('2026-11-03T12:00:00+09:00');
+ assert.throws(()=>validateTargets([{...race('東京',11),stakeYen:100}],now),/fields/);
+ assert.throws(()=>validateTargets([{...race('東京',11),picks:[1,2,3]}],now),/fields/);
+ assert.throws(()=>validateTargets([race('東京',11),race('東京',11)],now),/Duplicate/);
+});
