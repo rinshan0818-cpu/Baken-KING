@@ -50,6 +50,7 @@
   login.hidden=!!user;email.hidden=!!user;password.hidden=!!user;logout.hidden=!user;nickInput.hidden=!user;saveName.hidden=!user;
   if(!user){window.BakenCloudNickname=null;window.dispatchEvent(new Event('baken:nickname-changed'));}
   accountStatus.textContent=user?'ログイン中：'+(user.email||'確認済み'):'未ログイン（馬券データは端末に保存）';
+  window.dispatchEvent(new Event('baken:account-changed'));
  }
  async function loadUser(){
   const auth=await api('GET','get-session');
