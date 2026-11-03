@@ -30,7 +30,7 @@ function createSharingService({authenticate,store}){
    return store.respondToInvitation(actor,requestId,accepted); // Atomic recipient-only update.
   },
   async revoke(request,friendId){
-   requireMethod('POST',request.method);
+   requireMethod('DELETE',request.method);
    const actor=await identity(request);
    return store.revokeFriendship(actor,friendId);
   },
