@@ -85,17 +85,12 @@
   modeNote.textContent='本番とテストは別々に端末内保存します。テスト中は本番の結果監視・プッシュ通知処理を起動せず、テスト馬券もサーバーへ送信しません。モード切替後は自動で画面を再読み込みします。';
   modePanel.append(modeTitle,modeCurrent,actions,modeNote);
   groups.general.prepend(modePanel);
-  // Nickname is local-only; it never modifies bets or the wallet.
-  const nickKey='baken-king-nickname-v1';
-  const nickPanel=document.createElement('section');nickPanel.className='card bk-settings-item';
-  const nickTitle=document.createElement('h3');nickTitle.textContent='ニックネーム';
-  const nickInfo=document.createElement('p');nickInfo.className='muted';nickInfo.textContent='友達比較で表示する名前です（最大16文字）。';
-  const nickInput=document.createElement('input');nickInput.id='bkNicknameInput';nickInput.type='text';nickInput.maxLength=16;nickInput.placeholder='自分';nickInput.value=localStorage.getItem(nickKey)||'';
-  const nickSave=document.createElement('button');nickSave.type='button';nickSave.id='bkNicknameSave';nickSave.textContent='名前を保存';
-  const nickStatus=document.createElement('p');nickStatus.className='muted';nickStatus.id='bkNicknameStatus';
-  nickSave.onclick=()=>{const name=nickInput.value.trim();if(name.length>16){nickStatus.textContent='16文字以内にしてください';return}try{if(name)localStorage.setItem(nickKey,name);else localStorage.removeItem(nickKey);nickStatus.textContent='保存しました';window.dispatchEvent(new Event('baken:nickname-changed'))}catch{nickStatus.textContent='保存に失敗しました'}};
-  nickPanel.append(nickTitle,nickInfo,nickInput,nickSave,nickStatus);
-  groups.general.prepend(nickPanel);
+  // The cloud profile is the only editable nickname. Preserve the old
+  // local nickname key for backward compatibility, without a second editor.
+  const nicknameHint=document.createElement('p');
+  nicknameHint.className='muted';
+  nicknameHint.textContent='表示名の変更は「アカウント・友達管理」に統一しました。ここでの入力は不要です。';
+  groups.general.prepend(nicknameHint);
 
   // Account backup: show a safe transition path. Cloud write/read are NOT wired yet.
   // Reuse the app's existing, validated local backup and restore controls.
