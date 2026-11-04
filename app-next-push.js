@@ -8,7 +8,9 @@
  const panel=document.querySelector('.bk-push-panel');
  if(!panel)return;
  // Legacy device-token UI remains for GitHub Pages only.
- for(const node of [...panel.children].slice(2,6))node.hidden=true;
+ for(const node of [...panel.children].slice(2,6)){
+  node.hidden=true;node.style.display='none';node.setAttribute('aria-hidden','true');
+ }
  const box=document.createElement('div');
  box.className='bk-account-push';
  const summary=document.createElement('p');summary.className='muted';
