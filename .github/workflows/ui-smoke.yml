@@ -10,6 +10,13 @@ on:
       - 'tests/account-backup.test.cjs'
       - 'tests/account-backup-ui.test.cjs'
       - 'tests/browser_smoke.cjs'
+      - 'tests/monitor-flow-contract.test.cjs'
+      - 'app-next-monitor.js'
+      - 'app-next-results.js'
+      - 'app-next-cards.js'
+      - 'app-next-push.js'
+      - 'shared-settlement-chime.js'
+      - 'sw.js'
       - 'tests/ui_regression.cjs'
       - 'tests/storage_regression.cjs'
       - 'tests/settlement_backup_regression.cjs'
@@ -88,6 +95,8 @@ jobs:
         run: node tests/account-backup.test.cjs
       - name: Test account backup UI and local export
         run: node tests/account-backup-ui.test.cjs
+      - name: Verify race card to settlement and notification flow contracts
+        run: node --test tests/monitor-flow-contract.test.cjs
       - name: Test race selection in Chromium
         run: node tests/browser_smoke.cjs
       - name: Test approved tab UI and state isolation
