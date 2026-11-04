@@ -8,6 +8,21 @@ const assert=require('node:assert/strict');
   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
   await page.locator('[data-nav="settings"]').first().click();
   // Backups are now shown exactly once in the Data management section.
+  const snapshot=await page.evaluate(()=>({
+   root:!!document.getElementById('bkSettingsSurface'),
+   newSeason:!!document.getElementById('newSeason'),
+   backup:!!document.getElementById('backup'),
+   restore:!!document.getElementById('restore'),
+   verify:!!document.getElementById('bkVerifyBackup'),
+   verifyResult:!!document.getElementById('bkVerifyBackupResult'),
+   panels:[...document.querySelectorAll('#bkSettingsSurface details.bk-settings-fold')].map(el=>({
+    label:el.querySelector('summary')?.textContent,
+    backup:!!el.querySelector('#bkSingleBackupPanel'),
+    count:el.querySelectorAll('section.card').length
+   }))
+  }));
+  console.log('SETTINGS LAYOUT SNAPSHOT',JSON.stringify(snapshot));
+  assert.ok(snapshot.panels.some(x=>x.backup),'The single backup panel was not generated');
   const data=page.locator('#bkSettingsSurface details.bk-settings-fold').filter({has:page.locator('#bkSingleBackupPanel')});
   await data.locator('summary').click();
   const panel=data.locator('#bkSingleBackupPanel');
