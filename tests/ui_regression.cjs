@@ -58,7 +58,7 @@ const baseSelector='main.wrap > [data-tab]';
     storageControls:['backup','bkVerifyBackup','bkVerifyBackupFile','bkVerifyBackupResult','restore'].map(id=>root.querySelectorAll('#'+id).length),
     backupGroup:parent(item('backup')),restoreGroup:parent(labelForRestore),
     verifyGroup:parent(item('bkVerifyBackup')),
-    seasonGroup:parent([...root.querySelectorAll('section.card')].find(el=>el.querySelector('h2')?.textContent==='シーズン・記録管理')),
+    seasonGroup:parent(item('seasons')),
     resetCount:document.querySelectorAll('#resetDemo, #newSeason').length,
     retiredRaceLabel:document.body.textContent.includes('従来のレース別収支を表示'),
     accountGroup:parent(item('bkAccountSettings')),
