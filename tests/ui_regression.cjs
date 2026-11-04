@@ -33,6 +33,19 @@ const baseSelector='main.wrap > [data-tab]';
   assert.equal(await page.locator('#homeToPredict, #homeToPayout, #homeRecent').count(),0,'Removed home controls reappeared');
   assert.equal(await page.locator('#autumnFixtureCard .bk-race-eyebrow').isVisible(),false,'Duplicate race date row returned');
 
+  // Comparison colors must be explained before account and synchronization actions.
+  const friendComparisonOrder=await page.evaluate(()=>{
+   const table=document.querySelector('.bk-compare-row[role="row"]')?.parentElement;
+   const legend=document.querySelector('.bk-compare-legend');
+   const note=document.querySelector('.bk-compare-note');
+   const exchange=document.querySelector('.bk-compare-exchange');
+   return !!(table && legend && note && exchange &&
+    (table.compareDocumentPosition(legend)&Node.DOCUMENT_POSITION_FOLLOWING) &&
+    (legend.compareDocumentPosition(note)&Node.DOCUMENT_POSITION_FOLLOWING) &&
+    (note.compareDocumentPosition(exchange)&Node.DOCUMENT_POSITION_FOLLOWING));
+  });
+  assert.equal(friendComparisonOrder,true,'Friend comparison legend and explanatory note must precede account/sync controls');
+
   // Friend-facing release must not expose old administration or test controls.
   const freshBets=await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')||'null')?.bets||[]);
   assert.equal(freshBets.length,0,'A fresh user should not inherit old demo bets');
