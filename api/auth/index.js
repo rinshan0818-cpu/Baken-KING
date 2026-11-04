@@ -35,7 +35,7 @@ module.exports=async(req,res)=>{
  // POST and DELETE are never accepted as cross-origin requests.
  if(req.method!=='GET'&&req.headers.origin!=='https://'+HOST)return respond(res,403,{error:'Origin required'});
  let body;
- if(req.method==='POST'){
+ if(req.method==='POST'||(isPush&&req.method==='DELETE')){
   if(!String(req.headers['content-type']||'').toLowerCase().startsWith('application/json'))return respond(res,415,{error:'JSON required'});
   const parts=[];let size=0;
   for await(const chunk of req){size+=chunk.length;if(size>4096)return respond(res,413,{error:'Too large'});parts.push(chunk)}
