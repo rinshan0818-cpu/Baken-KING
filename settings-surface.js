@@ -93,14 +93,14 @@
   groups.admin.prepend(modePanel);
   // Keep one set of original backup controls and move the elements, never clone them.
   // The original handlers are retained, including backup verification and restore.
-  const season=document.getElementById('newSeason')?.closest('section.card');
-  const originalBackup=document.getElementById('backup');
-  const originalRestore=document.getElementById('restore')?.closest('label');
-  const verifyButton=document.getElementById('bkVerifyBackup');
-  const verifyFile=document.getElementById('bkVerifyBackupFile');
-  const verifyResult=document.getElementById('bkVerifyBackupResult');
-  const csv=document.getElementById('csv');
-  const diagnostics=document.getElementById('bkCopyNavLog');
+  const season=root.querySelector('#newSeason')?.closest('section.card');
+  const originalBackup=root.querySelector('#backup');
+  const originalRestore=root.querySelector('#restore')?.closest('label');
+  const verifyButton=root.querySelector('#bkVerifyBackup');
+  const verifyFile=root.querySelector('#bkVerifyBackupFile');
+  const verifyResult=root.querySelector('#bkVerifyBackupResult');
+  const csv=root.querySelector('#csv');
+  const diagnostics=root.querySelector('#bkCopyNavLog');
   if(season&&originalBackup&&originalRestore&&verifyButton&&verifyFile&&verifyResult){
    const backupPanel=document.createElement('section');
    backupPanel.id='bkSingleBackupPanel';
