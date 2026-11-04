@@ -10,6 +10,7 @@ on:
       - 'tests/account-backup.test.cjs'
       - 'tests/account-backup-ui.test.cjs'
       - 'tests/browser_smoke.cjs'
+      - 'tests/friends-inline-back.test.cjs'
       - 'tests/friend-startup-release-version.test.cjs'
       - 'tests/friends-post-login-return.test.cjs'
       - 'tests/friend-auth-data-tabs.test.cjs'
@@ -115,6 +116,8 @@ jobs:
         run: node tests/friends-post-login-return.test.cjs
       - name: Check faster friend loading and public v1.00 markers
         run: node tests/friend-startup-release-version.test.cjs
+      - name: Check embedded friend back navigation
+        run: node tests/friends-inline-back.test.cjs
       - name: Test race selection in Chromium
         run: node tests/browser_smoke.cjs
       - name: Test approved tab UI and state isolation

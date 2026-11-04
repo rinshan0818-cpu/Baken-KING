@@ -181,14 +181,20 @@
       setTimeout(resize,250);
      }catch{}
     });
-    open.addEventListener('click',()=>{
-     const show=frame.hidden;
+    const setFriendsVisible=show=>{
      frame.hidden=!show;
      frame.style.display=show?'block':'none';
      fallback.hidden=!show;
      open.textContent=show?'友達管理を閉じる':'友達管理を表示';
      if(show&&!frame.getAttribute('src'))frame.src='./friends.html';
      if(show)resize();
+    };
+    open.addEventListener('click',()=>setFriendsVisible(frame.hidden));
+    window.addEventListener('message',event=>{
+     if(event.origin!==location.origin||event.source!==frame.contentWindow)return;
+     if(event.data?.type!=='BAKEN_CLOSE_INLINE_FRIENDS')return;
+     setFriendsVisible(false);
+     open.scrollIntoView({block:'nearest'});
     });
     accountCard.append(frame,fallback);
    }
