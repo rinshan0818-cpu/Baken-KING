@@ -126,7 +126,7 @@
   catch(e){audioStatus.textContent='音源を解除できません：'+e.message}
  });
  window.addEventListener('baken:new-settlement-ready',event=>{
-  if(localStorage.getItem(CHIME_KEY)==='on'&&document.visibilityState==='visible'&&Number(event.detail?.count)>0)
+  if(location.hostname!=='baken-king-app-next.vercel.app'&&localStorage.getItem(CHIME_KEY)==='on'&&document.visibilityState==='visible'&&Number(event.detail?.count)>0)
    playSound().catch(()=>{audioStatus.textContent='自動再生できませんでした。試聴して音声を有効化してください。'});
  });
  restoreCustomSound();
