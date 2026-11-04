@@ -18,6 +18,10 @@
  const pushScript=document.createElement('script');
  pushScript.src='./app-next-push.js?v=1';pushScript.async=true;
  document.head.append(pushScript);
+ const sharedSoundScript=document.createElement('script');
+ sharedSoundScript.src='./shared-settlement-chime.js?v=1';
+ sharedSoundScript.async=true;
+ document.head.append(sharedSoundScript);
  if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const CONFIG='keiba-demo-v1',CARDS='baken-king-personal-cards-v1';
  const account=document.getElementById('bkAccountSettings');
