@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {Script}=require('node:vm');
+const html=fs.readFileSync('friends.html','utf8');
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert(script,'Friend management inline script required');
+new Script(script);
+assert(html.includes("Promise.all([request('GET','/api/sharing/me'),refresh()])"),'Profile and friend list must be requested concurrently');
+assert(html.includes("$('app').hidden=false;"),'Authenticated friend panel should become available during loading');
+assert(html.includes("status('友達情報を読み込んでいます…')"),'Show truthful loading state during requests');
+assert(html.includes("credentials:'same-origin'"),'Do not regress first-party session cookie handling');
+const index=fs.readFileSync('index.html','utf8');
+for(const line of ['<title>Baken-KING | v1.00</title>','現在 v1.00',"const APP_VERSION='v1.00';"])assert(index.includes(line),'Version marker is not aligned: '+line);
+assert(!index.includes('v5.90'),'Previous public version must not remain');
+console.log('PASS: friend load sequence and three v1.00 release markers');
