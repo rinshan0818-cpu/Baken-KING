@@ -33,6 +33,18 @@ const baseSelector='main.wrap > [data-tab]';
   assert.equal(await page.locator('#homeToPredict, #homeToPayout, #homeRecent').count(),0,'Removed home controls reappeared');
   assert.equal(await page.locator('#autumnFixtureCard .bk-race-eyebrow').isVisible(),false,'Duplicate race date row returned');
 
+  // Friend-facing release must not expose old administration or test controls.
+  const freshBets=await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')||'null')?.bets||[]);
+  assert.equal(freshBets.length,0,'A fresh user should not inherit old demo bets');
+  await page.locator('.bk-settings-trigger[data-nav="settings"]').click();
+  await page.waitForFunction(()=>document.getElementById('bkSettingsSurface')?.hidden===false);
+  const leakedTools=await page.evaluate(()=>({
+   folds:[...document.querySelectorAll('#bkSettingsSurface details.bk-settings-fold')].filter(el=>el.textContent.includes('管理・接続設定')&&getComputedStyle(el).display!=='none').length,
+   mode:!!document.querySelector('.bk-mode-panel')?.getClientRects().length
+  }));
+  assert.equal(leakedTools.folds,0,'Old admin settings visible to public users');
+  assert.equal(leakedTools.mode,false,'Test-mode switch visible to public users');
+  await page.locator('.bk-settings-trigger[data-nav="settings"]').click();
   const initialState=await page.evaluate(()=>localStorage.getItem('keiba-demo-v1'));
   for(const tab of approvedTabs){
    await page.locator('.bottom-nav [data-nav="'+tab+'"]').click();
