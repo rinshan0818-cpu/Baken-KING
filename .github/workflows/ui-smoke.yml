@@ -10,6 +10,9 @@ on:
       - 'tests/account-backup.test.cjs'
       - 'tests/account-backup-ui.test.cjs'
       - 'tests/browser_smoke.cjs'
+      - 'tests/friend-auth-data-tabs.test.cjs'
+      - 'friends.html'
+      - 'auth.html'
       - 'tests/expired-cards.test.cjs'
       - 'tests/monitor-flow-contract.test.cjs'
       - 'app-next-monitor.js'
@@ -104,6 +107,8 @@ jobs:
         run: node --test tests/settings-release-simplification.test.cjs
       - name: Test expired race cards without losing stored wagers
         run: node tests/expired-cards.test.cjs
+      - name: Test first-party friend login and mobile analytics tabs
+        run: node --test tests/friend-auth-data-tabs.test.cjs
       - name: Test race selection in Chromium
         run: node tests/browser_smoke.cjs
       - name: Test approved tab UI and state isolation
