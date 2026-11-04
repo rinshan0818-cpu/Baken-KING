@@ -40,6 +40,8 @@ on:
       - 'tests/friend-score-exchange.test.cjs'
       - 'tests/friend-nickname.test.cjs'
       - 'settings-surface.js'
+      - 'app-next-push.js'
+      - 'tests/settings-release-simplification.test.cjs'
       - 'friends-policy.js'
       - 'tests/friends-policy.test.cjs'
       - 'tests/sharing-schema.test.cjs'
@@ -97,6 +99,8 @@ jobs:
         run: node tests/account-backup-ui.test.cjs
       - name: Verify race card to settlement and notification flow contracts
         run: node --test tests/monitor-flow-contract.test.cjs
+      - name: Test settings simplification and on-off push controls
+        run: node --test tests/settings-release-simplification.test.cjs
       - name: Test race selection in Chromium
         run: node tests/browser_smoke.cjs
       - name: Test approved tab UI and state isolation

@@ -13,7 +13,7 @@
   const sections=[
    {id:'account',name:'アカウント・友達',hint:'ログイン・表示名・友達登録・成績共有',open:false},
    {id:'general',name:'通知・アプリ',hint:'プッシュ通知・共通チャイム・更新',open:true},
-   {id:'data',name:'データ管理',hint:'バックアップ・復元・履歴・シーズン',open:false},
+   {id:'data',name:'データ管理',hint:'バックアップ・復元・購入履歴',open:false},
    {id:'admin',name:'管理・接続設定',hint:'出馬表・結果取得・診断（管理者向け）',open:false}
   ];
   const groups={};
@@ -137,10 +137,61 @@
   }
   // Debug logs are administrator-only. Never show a diagnostic button to friends.
   if(diagnostics)groups.admin.append(diagnostics);
-  // A season is distinct from backups; only automatic rollover is available.
-  if(season){
-   const title=season.querySelector('h2');
-   if(title)title.textContent='シーズン・記録管理';
+  // Automatic season rollover still runs in the application. Hide only its
+  // now-empty information card; keep the live #seasons node and its writers.
+  if(season){season.hidden=true;season.style.display='none';}
+  // Friend administration stays on the same app origin and may be opened
+  // inside Settings. Keep the existing friends.html logic and session intact.
+  const accountCard=root.querySelector('#bkAccountSettings');
+  if(accountCard){
+   const external=accountCard.querySelector('a[href*="baken-king-account-bridge.vercel.app"]');
+   const oldNote=[...accountCard.querySelectorAll('p.muted')].find(p=>p.textContent.includes('現在は別の配信元'));
+   if(oldNote)oldNote.textContent='友達の登録・申請・承認・成績確認は、この設定画面から操作できます。馬券や残高は端末内に保存されます。';
+   if(external){
+    const open=document.createElement('button');
+    open.type='button';open.className='outline';open.id='bkFriendsInlineToggle';
+    open.textContent='友達管理を表示';
+    external.replaceWith(open);
+    const frame=document.createElement('iframe');
+    frame.id='bkFriendsInlineFrame';
+    frame.title='友達管理';
+    frame.loading='lazy';
+    frame.hidden=true;
+    frame.style.cssText='display:none;width:100%;border:0;border-radius:14px;background:white;min-height:700px;';
+    const fallback=document.createElement('p');
+    fallback.className='muted';
+    fallback.textContent='画面内で操作できない場合は ';
+    const link=document.createElement('a');
+    link.href='./friends.html';link.textContent='友達管理を直接開く';
+    fallback.append(link);fallback.hidden=true;
+    const resize=()=>{
+     try{
+      if(frame.contentWindow?.location.origin!==location.origin)return;
+      const height=frame.contentDocument?.documentElement?.scrollHeight||0;
+      if(height>0){const desired=Math.min(Math.max(height+24,700),4500)+'px';if(frame.style.height!==desired)frame.style.height=desired;}
+     }catch{}
+    };
+    frame.addEventListener('load',()=>{
+     resize();
+     try{
+      const doc=frame.contentDocument;
+      if(!doc)return;
+      const observer=new MutationObserver(resize);
+      observer.observe(doc.body,{childList:true,subtree:true,characterData:true});
+      setTimeout(resize,250);
+     }catch{}
+    });
+    open.addEventListener('click',()=>{
+     const show=frame.hidden;
+     frame.hidden=!show;
+     frame.style.display=show?'block':'none';
+     fallback.hidden=!show;
+     open.textContent=show?'友達管理を閉じる':'友達管理を表示';
+     if(show&&!frame.getAttribute('src'))frame.src='./friends.html';
+     if(show)resize();
+    });
+    accountCard.append(frame,fallback);
+   }
   }
   const adminNotice=document.createElement('p');
   adminNotice.className='muted bk-admin-note';
