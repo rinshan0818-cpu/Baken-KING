@@ -75,6 +75,47 @@ async function checkOperation(spec){
   return 'error';
  }
 }
+function showRunTime(value){
+ const stamp=typeof value==='string'?Date.parse(value):NaN;
+ return Number.isFinite(stamp)?new Date(stamp).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'記録なし';
+}
+async function checkMonitorHistory(){
+ $('opsRunBadge').className='operation-badge pending';
+ $('opsRunBadge').textContent='履歴取得中';
+ $('opsRunDetail').textContent='非公開の実行履歴を確認しています。';
+ for(const id of ['opsLastRun','opsLastSuccess','opsLastError'])$(id).textContent='取得中';
+ try{
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),15000);
+  let response;
+  try{response=await fetch('/api/auth/admin/monitor-status',{
+   credentials:'same-origin',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}})}
+  finally{clearTimeout(timeout)}
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const payload=await response.json();
+  if(payload?.ok!==true||payload.source!=='github-actions')throw Error('応答形式が不正');
+  $('opsLastRun').textContent=showRunTime(payload.lastRun?.at);
+  $('opsLastSuccess').textContent=showRunTime(payload.lastSuccess?.at);
+  const err=payload.lastFailure;
+  $('opsLastError').textContent=err
+   ?showRunTime(err.at)+' / '+(err.step?'失敗工程：'+err.step:err.conclusion||'失敗')
+   :'取得範囲に失敗記録なし';
+  const latest=payload.lastRun;
+  const running=latest&&['queued','in_progress','waiting','pending','requested'].includes(latest.status);
+  const failed=latest&&['failure','timed_out','action_required'].includes(latest.conclusion);
+  const badge=$('opsRunBadge');
+  badge.className='operation-badge '+(failed?'error':running?'waiting':latest?.conclusion==='success'?'ok':'unknown');
+  badge.textContent=failed?'直近実行失敗':running?'ジョブ実行中':latest?.conclusion==='success'?'直近実行成功':'実行履歴なし';
+  $('opsRunDetail').textContent=latest
+   ?'GitHub Actionsの直近実行履歴です。対象レースの確認やJRA取得の成否は別途検証が必要です。'
+   :'直近50件の検索範囲に手動・外部起動による実行がありません。';
+ }catch(e){
+  $('opsRunBadge').className='operation-badge unknown';
+  $('opsRunBadge').textContent='履歴取得不可';
+  $('opsRunDetail').textContent='履歴APIを取得できません（'+(e?.name==='AbortError'?'時間切れ':e.message)+'）。監視停止と断定はできません。';
+  for(const id of ['opsLastRun','opsLastSuccess','opsLastError'])$(id).textContent='取得不可';
+ }
+}
 async function checkOperations(){
  $('operationOverview').textContent='接続状態を確認中…';
  const checks=await Promise.all(operationSpecs.map(checkOperation));
@@ -128,7 +169,7 @@ $('recheck').onclick=async()=>{
   $('opsAuthDetail').textContent='本人アカウントの管理権限を確認しました。';
   $('switchMode').disabled=false;$('clearTest').disabled=false;$('clearProduction').disabled=false;
   localState();
-  await checkOperations();
+  await Promise.all([checkOperations(),checkMonitorHistory()]);
  }catch(e){
   enabled=false;$('authStatus').textContent=e.message;$('storageStatus').textContent='権限を確認できません';
   $('opsAuthBadge').className='operation-badge error';$('opsAuthBadge').textContent='認証エラー';
