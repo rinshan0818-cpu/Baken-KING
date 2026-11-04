@@ -4,6 +4,7 @@ const SHARING='https://baken-king-sharing-api.vercel.app';
 const VERIFIED='https://baken-king-monitor-bridge.vercel.app/api/account-verified-results';
 const CARDS='https://baken-king-monitor-bridge.vercel.app/api/account-race-cards';
 const HOST='baken-king-app-next.vercel.app';
+const ADMIN_PAGE=require('./admin-page.cjs').HTML;
 const authRoutes={GET:['get-session'],POST:['sign-in/email','sign-out']};
 const uuid='[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
 function allowSharing(method,route){
@@ -22,9 +23,11 @@ module.exports=async(req,res)=>{
  const route=u.searchParams.get('auth_route');
  const friend=u.searchParams.get('sharing_route');
  const isResult=req.method==='GET'&&friend==='verified-results';
+ const adminPage=req.method==='GET'&&route==='admin';
+ const adminStatus=req.method==='GET'&&route==='admin/status';
  const isCards=req.method==='GET'&&friend==='race-cards';
  const isFriend=typeof friend==='string'&&allowSharing(req.method,friend);
- if(!isFriend&&!isResult&&!isCards&&!authRoutes[req.method]?.includes(route))return respond(res,404,{error:'Not found'});
+ if(!isFriend&&!isResult&&!isCards&&!adminPage&&!adminStatus&&!authRoutes[req.method]?.includes(route))return respond(res,404,{error:'Not found'});
  if(req.headers.host!==HOST)return respond(res,403,{error:'Forbidden'});
  if(req.headers.origin&&req.headers.origin!=='https://'+HOST)return respond(res,403,{error:'Forbidden'});
  // POST and DELETE are never accepted as cross-origin requests.
@@ -37,6 +40,25 @@ module.exports=async(req,res)=>{
   body=Buffer.concat(parts);
  }
  try{
+  if(adminPage||adminStatus){
+   if(!req.headers.cookie)return respond(res,401,{error:'Login required'});
+   const session=await fetch(AUTH+'/get-session',{
+    method:'GET',redirect:'error',signal:AbortSignal.timeout(8000),
+    headers:{Cookie:req.headers.cookie,Accept:'application/json'}
+   });
+   if(!session.ok)return respond(res,401,{error:'Login required'});
+   const data=await session.json();
+   const user=data?.user||data?.data?.user;
+   const expected=process.env.BK_ADMIN_USER_ID;
+   if(typeof expected!=='string'||!/^[0-9a-f-]{36}$/i.test(expected)||
+      !user||user.emailVerified!==true||user.id!==expected)
+    return respond(res,403,{error:'Forbidden'});
+   if(adminStatus)return respond(res,200,{ok:true,admin:true});
+   res.setHeader('Content-Type','text/html; charset=utf-8');
+   res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
+   res.statusCode=200;
+   return res.end(ADMIN_PAGE);
+  }
   if(isFriend||isResult||isCards){
    if(!req.headers.cookie)return respond(res,401,{error:'Login required'});
    const tokenResponse=await fetch(AUTH+'/token',{method:'GET',redirect:'error',signal:AbortSignal.timeout(8000),headers:{Cookie:req.headers.cookie,Accept:'application/json'}});

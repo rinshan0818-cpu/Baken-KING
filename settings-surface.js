@@ -16,9 +16,11 @@
    {id:'admin',name:'管理・接続設定',hint:'出馬表・結果取得・診断（管理者向け）',open:false}
   ];
   const groups={};
+  let adminFold=null;
   for(const section of sections){
    const details=document.createElement('details');
    details.className='bk-settings-fold';details.open=section.open;
+   if(section.id==='admin'){adminFold=details;details.hidden=true;}
    const summary=document.createElement('summary');
    const label=document.createElement('span');label.className='bk-settings-fold-label';label.textContent=section.name;
    const hint=document.createElement('span');hint.className='bk-settings-fold-hint';hint.textContent=section.hint;
@@ -84,7 +86,9 @@
   const modeNote=document.createElement('p');modeNote.className='bk-mode-note';
   modeNote.textContent='本番とテストは別々に端末内保存します。テスト中は本番の結果監視・プッシュ通知処理を起動せず、テスト馬券もサーバーへ送信しません。モード切替後は自動で画面を再読み込みします。';
   modePanel.append(modeTitle,modeCurrent,actions,modeNote);
-  groups.general.prepend(modePanel);
+  // Development tools remain mounted for compatibility but are not shown
+  // in the public settings surface; the owner has a gated /api/auth/admin page.
+  groups.admin.prepend(modePanel);
   // The cloud profile is the only editable nickname. Preserve the old
   // local nickname key for backward compatibility, without a second editor.
   const nicknameHint=document.createElement('p');
@@ -139,6 +143,29 @@
   adminNotice.textContent='管理機能は整理して表示しているだけです。複数アカウント導入時に、認証とサーバー側のアクセス制限を追加します。';
   groups.admin.prepend(adminNotice);
   main.append(root);
+  // Only the signed-in, server-authorized owner can see the management link.
+  if(location.hostname==='baken-king-app-next.vercel.app'){
+   const wrap=document.createElement('p');
+   wrap.id='bkAdminOwnerLink';wrap.hidden=true;
+   const link=document.createElement('a');
+   link.href='/api/auth/admin';link.className='official';
+   link.textContent='管理者ページを開く';
+   wrap.append(link);
+   groups.general.prepend(wrap);
+   let sequence=0;
+   const refreshAdmin=async()=>{
+    const current=++sequence;
+    wrap.hidden=true;
+    try{
+     const r=await fetch('/api/auth/admin/status',{credentials:'same-origin',cache:'no-store'});
+     if(!r.ok||current!==sequence)return;
+     const data=await r.json();
+     if(current===sequence&&data.ok===true&&data.admin===true)wrap.hidden=false;
+    }catch{}
+   };
+   window.addEventListener('baken:account-changed',refreshAdmin);
+   refreshAdmin();
+  }
   // If the legacy settings view was open when this script initialized,
   // preserve it rather than resetting the active tab.
   const settingsActive=document.querySelector('[data-nav="settings"]')?.classList.contains('active');
