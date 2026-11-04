@@ -1333,6 +1333,42 @@ body.bk-payout-locked .bk-win-hero{margin:3px 0 10px!important;padding:12px 10px
 .bk-push-sound-toggle{display:grid!important;grid-template-columns:22px minmax(0,1fr);align-items:start;column-gap:11px;width:100%;max-width:100%;margin:0 0 14px;font-size:14px;line-height:1.6;color:#173353;white-space:normal}
 .bk-push-sound-toggle input[type=checkbox]{box-sizing:border-box!important;appearance:auto!important;-webkit-appearance:checkbox!important;display:block!important;position:static!important;width:21px!important;height:21px!important;min-width:21px!important;max-width:21px!important;min-height:21px!important;margin:1px 0 0!important;padding:0!important;flex:none!important}
 .bk-push-sound-toggle span{display:block;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;writing-mode:horizontal-tb!important}
+
+/* Shared chime: override generic input width:100% to prevent mobile layout collapse. */
+.bk-push-panel .bk-shared-sound-box{
+  display:block;width:100%;max-width:100%;min-width:0;
+  margin-top:16px;padding:14px 12px;border:1px solid #dce5f1;
+  border-radius:12px;background:#f7f9fc;box-sizing:border-box;
+}
+.bk-push-panel .bk-shared-sound-box h4{margin:0 0 12px;font-size:16px;line-height:1.5}
+.bk-push-panel .bk-shared-sound-box label{
+  display:grid!important;grid-template-columns:24px minmax(0,1fr);
+  align-items:start!important;gap:10px!important;
+  width:100%;max-width:100%;min-width:0;margin:0 0 12px;
+  font-size:14px;line-height:1.6;white-space:normal;
+}
+.bk-push-panel .bk-shared-sound-box label input[type=checkbox]{
+  box-sizing:border-box!important;appearance:auto!important;
+  -webkit-appearance:checkbox!important;display:block!important;
+  position:static!important;width:22px!important;height:22px!important;
+  min-width:22px!important;max-width:22px!important;
+  min-height:22px!important;max-height:22px!important;
+  padding:0!important;margin:2px 0 0!important;
+  flex:none!important;
+}
+.bk-push-panel .bk-shared-sound-box label span{
+  display:block;min-width:0;max-width:100%;width:auto!important;
+  white-space:normal;word-break:normal;overflow-wrap:break-word;
+  writing-mode:horizontal-tb!important;
+}
+.bk-push-panel .bk-shared-sound-box .muted{
+  margin:9px 0;line-height:1.7;overflow-wrap:break-word;
+}
+.bk-push-panel .bk-shared-sound-box button{
+  display:inline-block;width:auto;max-width:100%;margin:8px 0;
+  font-size:14px;line-height:1.4;white-space:normal;
+}
+
 .bk-push-file-label{display:block;position:relative;width:max-content;max-width:100%;border:1px solid #b7cbe7;border-radius:10px;padding:12px 13px;background:white;color:#164477;font-weight:700;font-size:13px;cursor:pointer}
 .bk-push-file-input{position:absolute!important;inset:0!important;opacity:0!important;width:100%!important;height:100%!important;cursor:pointer}
 .bk-push-sound-name{margin:9px 0;color:#435875;font-size:12px;overflow-wrap:anywhere}

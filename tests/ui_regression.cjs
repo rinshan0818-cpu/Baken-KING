@@ -44,6 +44,25 @@ const baseSelector='main.wrap > [data-tab]';
   }));
   assert.equal(leakedTools.folds,0,'Old admin settings visible to public users');
   assert.equal(leakedTools.mode,false,'Test-mode switch visible to public users');
+  // Regression: global input {width:100%} must never squash the shared chime label.
+  const sharedLayout=await page.evaluate(()=>{
+   const panel=document.querySelector('.bk-push-panel');
+   if(!panel)return {error:'push panel missing'};
+   const wrap=document.createElement('div');
+   wrap.className='bk-shared-sound-box';
+   wrap.innerHTML='<h4>精算準備の共通チャイム</h4><label style="display:flex;gap:10px;align-items:center"><input type="checkbox"><span>アプリ使用中に精算待ちになったら音を鳴らす</span></label><p class="muted">音源は全ユーザー共通です。</p><button type="button">チャイムを試聴</button>';
+   panel.append(wrap);
+   const label=wrap.querySelector('label'),check=wrap.querySelector('input'),caption=wrap.querySelector('span');
+   const outer=wrap.getBoundingClientRect(),i=check.getBoundingClientRect(),t=caption.getBoundingClientRect();
+   const out={box:outer.width,check:i.width,text:t.width,height:label.getBoundingClientRect().height,
+    horizontal:getComputedStyle(caption).writingMode==='horizontal-tb'};
+   wrap.remove();
+   return out;
+  });
+  assert.ok(!sharedLayout.error,'Shared chime test panel missing: '+JSON.stringify(sharedLayout));
+  assert.ok(sharedLayout.check>=18&&sharedLayout.check<=26,'Shared chime checkbox width broken: '+JSON.stringify(sharedLayout));
+  assert.ok(sharedLayout.text>110&&sharedLayout.horizontal,'Shared chime text collapsed into vertical columns: '+JSON.stringify(sharedLayout));
+  assert.ok(sharedLayout.height<130,'Shared chime created giant whitespace: '+JSON.stringify(sharedLayout));
   await page.locator('.bk-settings-trigger[data-nav="settings"]').click();
   const initialState=await page.evaluate(()=>localStorage.getItem('keiba-demo-v1'));
   for(const tab of approvedTabs){
