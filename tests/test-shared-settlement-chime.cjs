@@ -21,3 +21,11 @@ test('notification sound and iOS Web Push remain independent',()=>{
  assert.ok(script.includes('iPhone側の設定'));
  assert.ok(script.includes('音源は全ユーザー共通'));
 });
+
+test('shared MP3 asset is present and has a valid encoded audio header',()=>{
+ const data=fs.readFileSync('settlement-chime.mp3');
+ assert.ok(data.length>1024&&data.length<5*1024*1024);
+ const id3=data.subarray(0,3).toString('ascii')==='ID3';
+ const frame=data[0]===255&&(data[1]&224)===224;
+ assert.ok(id3||frame,'MP3 must contain ID3 or MPEG frame sync');
+});
