@@ -11,6 +11,9 @@ const assert=require('node:assert/strict');
   const snapshot=await page.evaluate(()=>({
    root:!!document.getElementById('bkSettingsSurface'),
    newSeason:!!document.getElementById('newSeason'),
+   seasonClosest:!!document.getElementById('newSeason')?.closest('section.card'),
+   restoreLabel:!!document.getElementById('restore')?.closest('label'),
+   verifyFile:!!document.getElementById('bkVerifyBackupFile'),
    backup:!!document.getElementById('backup'),
    restore:!!document.getElementById('restore'),
    verify:!!document.getElementById('bkVerifyBackup'),
