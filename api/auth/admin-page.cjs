@@ -25,9 +25,18 @@ const HTML=String.raw`<!doctype html>
 <p class="muted">通常の馬券・残高・精算履歴・シーズン記録をこの端末から削除し、初期状態へ戻します。自動的なリセットには使われません。削除前に通常アプリの「データ管理」からバックアップを保存してください。</p>
 <div class="actions"><button id="clearProduction" type="button" disabled>この端末の全記録を削除</button></div>
 <p id="clearProductionStatus" role="status" class="muted">本人認証の確認が必要です。</p></section>
-<section><h2>接続・運用</h2>
-<p class="muted">出馬表・結果・監視はアプリの共通APIを使用します。GitHubやVercelの秘密鍵はここに表示しません。</p>
-<div class="actions"><button id="recheck" type="button" class="secondary">状態を再確認</button>
-<a href="/">通常アプリで動作確認</a></div></section>
+<section id="adminOperations"><h2>接続・運用</h2>
+<p class="muted">この端末から各APIに接続して、現在取得できる情報を確認します。結果はこの画面を開いた時点の状態です。</p>
+<div id="operationOverview" class="operation-overview" role="status" aria-live="polite">接続状態を確認中…</div>
+<div class="operation-list">
+<div class="operation-item"><div class="operation-line"><strong>管理者認証</strong><span id="opsAuthBadge" class="operation-badge pending">確認中</span></div><p id="opsAuthDetail" class="muted">管理者ログインを確認します。</p></div>
+<div class="operation-item"><div class="operation-line"><strong>出馬表の配信</strong><span id="opsCardsBadge" class="operation-badge pending">未確認</span></div><p id="opsCardsDetail" class="muted">当日分の配信APIを確認します。</p></div>
+<div class="operation-item"><div class="operation-line"><strong>確定結果の配信</strong><span id="opsResultsBadge" class="operation-badge pending">未確認</span></div><p id="opsResultsDetail" class="muted">検証済み結果の配信APIを確認します。</p></div>
+<div class="operation-item"><div class="operation-line"><strong>監視対象の登録</strong><span id="opsMonitorBadge" class="operation-badge pending">未確認</span></div><p id="opsMonitorDetail" class="muted">アカウントの登録済みレースを確認します。</p></div>
+<div class="operation-item"><div class="operation-line"><strong>5分監視の実行状況</strong><span class="operation-badge unknown">未確認</span></div><p class="muted">定期監視ジョブが実際に動いたかは、このAPI接続検査だけでは判断できません。11月7日の実レースで結果更新まで確認します。</p></div>
+</div>
+<p id="opsCheckedAt" class="muted">最終確認：まだ確認していません</p>
+<div class="actions"><button id="recheck" type="button" class="secondary">接続状態を更新</button><a href="/">通常アプリで動作確認</a></div>
+<p class="muted">通信エラーと「当日データがまだない状態」は区別して表示します。ここでは馬券や残高を変更せず、秘密鍵も表示しません。</p></section>
 </main><script src="/admin-panel.js" defer></script></body></html>`;
 module.exports={HTML};
