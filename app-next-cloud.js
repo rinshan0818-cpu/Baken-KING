@@ -116,7 +116,12 @@
    password.value='';await loadUser();
   }catch(e){accountStatus.textContent=e.message||'ログインに失敗しました'}
  };
- logout.onclick=async()=>{try{await api('POST','sign-out',{});setUser(null);window.BakenCloudNickname=null;window.dispatchEvent(new Event('baken:nickname-changed'));friend=null;message('ログアウトしました')}catch(e){accountStatus.textContent=e.message}};
+ logout.onclick=async()=>{try{
+  if(typeof window.BakenReleaseAccountPush==='function'){
+   const stopped=await window.BakenReleaseAccountPush();
+   if(!stopped)throw Error('通知の停止を確認できません。通知設定を確認してからログアウトしてください');
+  }
+  await api('POST','sign-out',{});setUser(null);window.BakenCloudNickname=null;window.dispatchEvent(new Event('baken:nickname-changed'));friend=null;message('ログアウトしました')}catch(e){accountStatus.textContent=e.message}};
  refreshButton.onclick=()=>loadUser().catch(e=>message(e.message));
  sync.onclick=()=>publish(true);
  sync.textContent='自分の9項目を今すぐ同期';
