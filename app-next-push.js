@@ -113,7 +113,9 @@
   if(busy)return false;
   busy=true;
   try{
-   const reg=registration||await navigator.serviceWorker.ready;
+   if(!('serviceWorker' in navigator)||!('PushManager' in window))return true;
+   const reg=registration||await navigator.serviceWorker.getRegistration();
+   if(!reg)return true;
    const sub=await reg.pushManager.getSubscription();
    if(sub){await api('DELETE',{endpoint:sub.endpoint});await sub.unsubscribe()}
    lastSignature='';status.textContent='この端末の通知を停止しました';
