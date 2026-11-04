@@ -83,7 +83,7 @@ async function checkMonitorHistory(){
  $('opsRunBadge').className='operation-badge pending';
  $('opsRunBadge').textContent='履歴取得中';
  $('opsRunDetail').textContent='非公開の実行履歴を確認しています。';
- for(const id of ['opsLastRun','opsLastSuccess','opsLastError'])$(id).textContent='取得中';
+ for(const id of ['opsLastRun','opsLastSuccess','opsLastError','opsLastPoll','opsPolledCount'])$(id).textContent='取得中';
  try{
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),15000);
@@ -100,6 +100,17 @@ async function checkMonitorHistory(){
   $('opsLastError').textContent=err
    ?showRunTime(err.at)+' / '+(err.step?'失敗工程：'+err.step:err.conclusion||'失敗')
    :'取得範囲に失敗記録なし';
+  const poll=payload.pollEvidence;
+  if(poll?.status==='report_available'){
+   $('opsLastPoll').textContent=showRunTime(poll.checkedAt);
+   $('opsPolledCount').textContent=Number.isInteger(poll.targets)?poll.targets+'レース':'取得形式不明';
+  }else if(poll?.status==='no_recent_poll_report'){
+   $('opsLastPoll').textContent='直近24時間に記録なし';
+   $('opsPolledCount').textContent='監視実行を確認できず';
+  }else{
+   $('opsLastPoll').textContent='取得不可';
+   $('opsPolledCount').textContent='確認できません';
+  }
   const latest=payload.lastRun;
   const running=latest&&['queued','in_progress','waiting','pending','requested'].includes(latest.status);
   const failed=latest&&['failure','timed_out','action_required'].includes(latest.conclusion);
