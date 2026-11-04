@@ -33,7 +33,7 @@ const HTML=String.raw`<!doctype html>
 <div class="operation-item"><div class="operation-line"><strong>出馬表の配信</strong><span id="opsCardsBadge" class="operation-badge pending">未確認</span></div><p id="opsCardsDetail" class="muted">当日分の配信APIを確認します。</p></div>
 <div class="operation-item"><div class="operation-line"><strong>確定結果の配信</strong><span id="opsResultsBadge" class="operation-badge pending">未確認</span></div><p id="opsResultsDetail" class="muted">検証済み結果の配信APIを確認します。</p></div>
 <div class="operation-item"><div class="operation-line"><strong>監視対象の登録</strong><span id="opsMonitorBadge" class="operation-badge pending">未確認</span></div><p id="opsMonitorDetail" class="muted">アカウントの登録済みレースを確認します。</p></div>
-<div class="operation-item"><div class="operation-line"><strong>5分監視の実行状況</strong><span class="operation-badge unknown">未確認</span></div><p class="muted">定期監視ジョブが実際に動いたかは、このAPI接続検査だけでは判断できません。11月7日の実レースで結果更新まで確認します。</p></div>
+<div class="operation-item"><div class="operation-line"><strong>5分監視の実行履歴</strong><span id="opsRunBadge" class="operation-badge unknown">未取得</span></div><p id="opsRunDetail" class="muted">GitHub Actionsの実行履歴を読み込みます。</p><div class="ops-history"><div><span>最終実行</span><strong id="opsLastRun">未取得</strong></div><div><span>最終成功</span><strong id="opsLastSuccess">未取得</strong></div><div><span>直近エラー</span><strong id="opsLastError">未取得</strong></div></div><p class="muted">ワークフローの成功はJRA結果の取得成功とは限りません。対象なし・監視時間外の場合もあります。</p></div>
 </div>
 <p id="opsCheckedAt" class="muted">最終確認：まだ確認していません</p>
 <div class="actions"><button id="recheck" type="button" class="secondary">接続状態を更新</button><a href="/">通常アプリで動作確認</a></div>
