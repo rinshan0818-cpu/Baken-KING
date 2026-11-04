@@ -16,8 +16,8 @@
  const summary=document.createElement('p');summary.className='muted';
  summary.textContent='ログイン済みのアカウントで通知を管理します。旧端末トークンの設定は不要です。';
  const actions=document.createElement('div');actions.className='row';
- const enable=document.createElement('button');enable.type='button';enable.textContent='通知を有効にする';
- const disable=document.createElement('button');disable.type='button';disable.className='outline';disable.textContent='通知を停止';
+ const enable=document.createElement('button');enable.type='button';enable.textContent='通知をオン';
+ const disable=document.createElement('button');disable.type='button';disable.className='outline';disable.textContent='通知をオフ';
  const test=document.createElement('button');test.type='button';test.className='outline';test.textContent='通知表示をテスト';
  actions.append(enable,disable,test);
  const status=document.createElement('p');status.className='muted';status.setAttribute('aria-live','polite');
@@ -89,8 +89,8 @@
    if(Notification.permission==='denied'){status.textContent='iPhoneの設定で通知が拒否されています';return}
    const sub=await registration.pushManager.getSubscription();
    enable.disabled=false;disable.disabled=!sub;test.disabled=Notification.permission!=='granted'||!sub;
-   enable.textContent=sub?'通知を更新':'通知を有効にする';
-   status.textContent=sub?'通知登録の更新が可能です':'通知はまだ有効ではありません';
+   enable.textContent='通知をオン';
+   status.textContent=sub?'通知はオンです':'通知はオフです';
    if(sub)await syncExisting(true);
   }catch(e){status.textContent='通知サーバーの確認に失敗：'+e.message}
  }
@@ -105,7 +105,7 @@
    const data=await api('POST',{subscription:subscription.toJSON(),targets:list});
    if(data.ok!==true||data.registered!==list.length)throw Error('登録に失敗しました');
    lastSignature=(owner||'')+':'+JSON.stringify(list)+':'+subscription.endpoint;
-   status.textContent='通知を有効にしました（'+list.length+'レース）';
+   status.textContent='通知をオンにしました（監視候補 '+list.length+'レース）';
   }catch(e){status.textContent='通知の有効化に失敗：'+e.message}
   finally{enable.disabled=false;refresh()}
  };
@@ -118,7 +118,7 @@
    if(!reg)return true;
    const sub=await reg.pushManager.getSubscription();
    if(sub){await api('DELETE',{endpoint:sub.endpoint});await sub.unsubscribe()}
-   lastSignature='';status.textContent='この端末の通知を停止しました';
+   lastSignature='';status.textContent='この端末の通知をオフにしました';
    return true;
   }catch(e){status.textContent='通知の停止に失敗：'+e.message;return false}
   finally{busy=false}
