@@ -94,3 +94,16 @@ test('record deletion belongs exclusively to owner HTML and requires new authori
  assert.ok(admin.includes("localStorage.setItem(LIVE,JSON.stringify(initialWallet()))"));
  assert.ok(!admin.includes('localStorage.clear('));
 });
+
+test('administrator operations panel separates API checks from unverified scheduler runs',()=>{
+ const page=require('../api/auth/admin-page.cjs').HTML;
+ const script=fs.readFileSync('admin-panel.js','utf8');
+ for(const id of ['operationOverview','opsAuthBadge','opsCardsBadge','opsResultsBadge','opsMonitorBadge','opsCheckedAt'])
+  assert.ok(page.includes('id="'+id+'"'),'Missing operations indicator: '+id);
+ assert.match(page,/5分監視の実行状況/);
+ assert.match(page,/定期監視ジョブが実際に動いたか/);
+ for(const path of ['/api/auth/friends/race-cards','/api/auth/friends/verified-results','/api/auth/friends/monitor-targets'])
+  assert.ok(script.includes(path),'Missing read-only check: '+path);
+ assert.ok(script.includes("method:'GET'")===false,'GET is the implicit read-only method');
+ assert.ok(!script.includes("localStorage.removeItem(LIVE)"));
+});
