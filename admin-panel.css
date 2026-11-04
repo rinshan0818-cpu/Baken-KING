@@ -1,1 +1,13 @@
 :root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;background:#f3f6fa;color:#18324b}*{box-sizing:border-box}body{margin:0}main{max-width:670px;margin:0 auto;padding:24px 16px 45px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}header small{color:#567192;font-weight:750}h1{margin:6px 0 0;font-size:25px}h2{font-size:18px;margin:0 0 12px}section{background:#fff;border:1px solid #dce7f3;border-radius:14px;padding:20px;margin:13px 0;box-shadow:0 3px 12px #122a4a09}.muted{color:#5f7184;font-size:13px;line-height:1.7}.actions{display:flex;gap:10px;flex-wrap:wrap}button,a{font:inherit}button{border:0;background:#173d70;color:#fff;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}button.secondary{background:#e7edf5;color:#173d70}a{color:#17558c;text-decoration:none;font-weight:700}header a{font-size:13px}#storageStatus{white-space:pre-line;background:#f6f8fb;padding:12px;border-radius:9px;line-height:1.9;font-size:14px}[hidden]{display:none!important}
+#adminOperations .operation-overview{background:#edf3fa;border-radius:11px;padding:14px;font-weight:750;line-height:1.55;margin:14px 0}
+.operation-list{display:grid;gap:10px;margin:12px 0}
+.operation-item{border:1px solid #e0e8f0;border-radius:11px;padding:12px 13px;background:#fcfdff}
+.operation-item p{margin:8px 0 0}
+.operation-line{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap}
+.operation-line strong{font-size:14px}
+.operation-badge{font-size:12px;font-weight:750;border-radius:99px;padding:5px 10px;white-space:nowrap;background:#eef1f5;color:#4b6076}
+.operation-badge.ok{background:#dff3e9;color:#176843}
+.operation-badge.waiting{background:#fff1d8;color:#835b11}
+.operation-badge.error{background:#fae4e4;color:#9d2b33}
+.operation-badge.pending,.operation-badge.unknown{background:#edf1f6;color:#5d7085}
+#opsCheckedAt{font-variant-numeric:tabular-nums}
