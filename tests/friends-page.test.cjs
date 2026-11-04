@@ -16,7 +16,9 @@ assert(html.includes("encodeURIComponent(id)"),'Friend invite URL must safely en
 assert(!html.includes('準備中・先行画面'),'Obsolete preview label must be removed');
 assert(html.includes('if(!profileReady)throw Error'),'Invitation must require explicit profile registration');
 assert(html.includes('cachedId!==selectedFriendId'),'Do not show unrelated friend comparison after switching friends');
-assert(html.includes('credentials:\'omit\''),'Sharing bearer requests must not send cookies');
+assert(html.includes("fetch('/api/auth/friends/'+route"),'Friend sharing must use the same-origin proxy');
+assert(html.includes("credentials:'same-origin'"),'Friend sharing uses protected same-origin session cookies');
+assert(!html.includes('Authorization:\'Bearer '),'Browser must not manage a sharing bearer token');
 assert(html.includes("localStorage.setItem('baken-king-friend-score-v1'"),'Friend summary must be reflected into data tab');
 assert(html.includes("cachedOwner!==user.id"),'Different accounts must not reuse a cached friend comparison');
 assert(html.includes("baken-king-friend-score-friend-id-v1"),'Friend cache must record which friend is compared');
