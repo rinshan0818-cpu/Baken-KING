@@ -3,6 +3,10 @@ on:
   push:
     paths:
       - 'app-next-monitor.js'
+      - 'app-next-cards.js'
+      - 'api/auth/index.js'
+      - 'race-card-auto-sync.js'
+      - 'tests/test-account-race-cards-proxy.cjs'
       - 'app-next-results.js'
       - 'monitor-target-export.js'
       - 'sharing-server/scheduler-union-http.cjs'
@@ -36,6 +40,7 @@ jobs:
         run: |
           node --test tests/test-verified-results-fast-poll.cjs
           node --test tests/test-account-monitor-heartbeat.cjs
+          node --test tests/test-account-race-cards-proxy.cjs
           node --test tests/test-monitor-target-retirement.cjs
           node --test tests/test-scheduler-union-http.cjs
           node --test tests/test-scheduler-routing-fail-closed.cjs
