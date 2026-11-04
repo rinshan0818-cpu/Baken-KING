@@ -69,7 +69,7 @@
     throw Error('HTTP '+result.status);
    last=key;
    lastSyncedAt=Date.now();
-   panel.textContent='監視候補 '+targets.length+'レースをアカウントに登録済み（共通JRA監視に接続済み）';
+   panel.textContent='監視候補 '+targets.length+'レースをアカウントに登録済み（JRA監視への引き渡しは別途確認）';
   }catch(e){panel.textContent='レース監視登録を確認できません：'+e.message}
   finally{busy=false;if(resync){resync=false;queueMicrotask(sync)}}
  }
