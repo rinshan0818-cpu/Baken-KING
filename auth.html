@@ -16,7 +16,7 @@
 <p><a href="./">Baken-KINGに戻る</a></p></main>
 <script>
 (()=>{'use strict';
-const authUrl='https://ep-curly-boat-a170oecz.neonauth.ap-southeast-1.aws.neon.tech/baken_sharing/auth';
+const authUrl=location.hostname==='baken-king-app-next.vercel.app'?'/api/auth':'https://ep-curly-boat-a170oecz.neonauth.ap-southeast-1.aws.neon.tech/baken_sharing/auth';
 const $=id=>document.getElementById(id),status=$('status'),login=$('login'),signup=$('signup'),logout=$('logout');
 let busy=false;
 const returnValue=new URL(location.href).searchParams.get('return');
