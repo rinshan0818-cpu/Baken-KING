@@ -168,7 +168,7 @@
      try{
       if(frame.contentWindow?.location.origin!==location.origin)return;
       const height=frame.contentDocument?.documentElement?.scrollHeight||0;
-      if(height>0)frame.style.height=Math.min(Math.max(height+24,700),4500)+'px';
+      if(height>0){const desired=Math.min(Math.max(height+24,700),4500)+'px';if(frame.style.height!==desired)frame.style.height=desired;}
      }catch{}
     };
     frame.addEventListener('load',()=>{
@@ -177,7 +177,7 @@
       const doc=frame.contentDocument;
       if(!doc)return;
       const observer=new MutationObserver(resize);
-      observer.observe(doc.body,{childList:true,subtree:true,attributes:true,characterData:true});
+      observer.observe(doc.body,{childList:true,subtree:true,characterData:true});
       setTimeout(resize,250);
      }catch{}
     });
