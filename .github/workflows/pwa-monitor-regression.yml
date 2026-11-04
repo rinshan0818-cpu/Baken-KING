@@ -3,6 +3,11 @@ on:
   push:
     paths:
       - 'app-next-monitor.js'
+      - 'admin-panel.js'
+      - 'admin-panel.css'
+      - 'api/auth/**'
+      - 'settings-surface.js'
+      - 'tests/test-admin-release-isolation.cjs'
       - 'app-next-cards.js'
       - 'api/auth/index.js'
       - 'race-card-auto-sync.js'
@@ -41,6 +46,7 @@ jobs:
           node --test tests/test-verified-results-fast-poll.cjs
           node --test tests/test-account-monitor-heartbeat.cjs
           node --test tests/test-account-race-cards-proxy.cjs
+          node --test tests/test-admin-release-isolation.cjs
           node --test tests/test-monitor-target-retirement.cjs
           node --test tests/test-scheduler-union-http.cjs
           node --test tests/test-scheduler-routing-fail-closed.cjs
