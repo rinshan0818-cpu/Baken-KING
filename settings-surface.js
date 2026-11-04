@@ -98,7 +98,7 @@
   groups.account.append(nicknameHint);
   // Keep one set of original backup controls and move the elements, never clone them.
   // The original handlers are retained, including backup verification and restore.
-  const season=root.querySelector('#newSeason')?.closest('section.card');
+  const season=root.querySelector('#backup')?.closest('section.card');
   const originalBackup=root.querySelector('#backup');
   const originalRestore=root.querySelector('#restore')?.closest('label');
   const verifyButton=root.querySelector('#bkVerifyBackup');
@@ -137,7 +137,7 @@
   }
   // Debug logs are administrator-only. Never show a diagnostic button to friends.
   if(diagnostics)groups.admin.append(diagnostics);
-  // A season is distinct from backups: leave original reset/new-season handlers untouched.
+  // A season is distinct from backups; only automatic rollover is available.
   if(season){
    const title=season.querySelector('h2');
    if(title)title.textContent='シーズン・記録管理';

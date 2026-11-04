@@ -55,6 +55,38 @@ const race={
   await page.reload({waitUntil:'domcontentloaded'});
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('bk-test-mode')),false);
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),LIVE),beforeReload,'Returning from test mode corrupted live bets');
+
+  // A season must not restart while it still has an unsettled wager.
+  await page.evaluate(()=>{
+   s.balance=0;
+   s.seasonOver=false;
+   save();
+  });
+  let ended=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),LIVE);
+  assert.equal(ended.season,1,'A pending ticket must prevent bankruptcy rollover');
+  assert.equal(ended.balance,0,'Pending race must preserve empty wallet until settlement');
+  assert.equal(ended.bets[0].status,'pending');
+
+  // Settling the last ticket at zero balance automatically begins season 2.
+  await page.evaluate(()=>{
+   s.bets[0].status='settled';
+   s.bets[0].paid=0;
+   save();
+  });
+  ended=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),LIVE);
+  assert.equal(ended.season,2,'Bankruptcy must start the next season automatically');
+  assert.equal(ended.balance,100000,'New season must receive 100,000 yen');
+  assert.equal(ended.grants,200000,'Second grant should be cumulative');
+  assert.equal(ended.bankrupt,1,'One completed bankruptcy should count once');
+  assert.equal(ended.seasons.length,1);
+  assert.equal(ended.seasons[0].reason,'ゲームオーバー');
+  assert.equal(ended.bets.length,1,'Old season betting history must remain intact');
+  assert.equal(ended.bets[0].season,1);
+  await page.reload({waitUntil:'domcontentloaded'});
+  const persisted=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),LIVE);
+  assert.equal(persisted.season,2,'Reload must not restart the season again');
+  assert.equal(persisted.grants,200000,'Reload must not award duplicate funds');
+  assert.equal(persisted.bets.length,1,'Reload must not delete previous records');
   assert.deepEqual(errors,[],'JavaScript exception during save/reload/mode switch');
   console.log('PASS: purchase balance, reload persistence, and live/test storage separation');
  }catch(error){

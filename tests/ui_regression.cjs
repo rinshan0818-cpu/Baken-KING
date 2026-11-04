@@ -58,7 +58,9 @@ const baseSelector='main.wrap > [data-tab]';
     storageControls:['backup','bkVerifyBackup','bkVerifyBackupFile','bkVerifyBackupResult','restore'].map(id=>root.querySelectorAll('#'+id).length),
     backupGroup:parent(item('backup')),restoreGroup:parent(labelForRestore),
     verifyGroup:parent(item('bkVerifyBackup')),
-    seasonGroup:parent(item('newSeason')),
+    seasonGroup:parent(item('seasons')),
+    resetCount:document.querySelectorAll('#resetDemo, #newSeason').length,
+    retiredRaceLabel:document.body.textContent.includes('従来のレース別収支を表示'),
     accountGroup:parent(item('bkAccountSettings')),
     updateGroup:parent(item('checkUpdate')),
     diagnosticHidden:!item('bkCopyNavLog')?.getClientRects().length
@@ -74,6 +76,8 @@ const baseSelector='main.wrap > [data-tab]';
   assert.equal(settingsLayout.accountGroup,'アカウント・友達');
   assert.equal(settingsLayout.updateGroup,'通知・アプリ');
   assert.equal(settingsLayout.diagnosticHidden,true,'Debug log must be hidden from friends');
+  assert.equal(settingsLayout.resetCount,0,'Manual record reset or arbitrary season restart remains in public app');
+  assert.equal(settingsLayout.retiredRaceLabel,false,'Retired race table label returned');
   // Regression: global input {width:100%} must never squash the shared chime label.
   const sharedLayout=await page.evaluate(()=>{
    const panel=document.querySelector('.bk-push-panel');

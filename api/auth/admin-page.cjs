@@ -21,6 +21,10 @@ const HTML=String.raw`<!doctype html>
 <div class="actions"><button id="switchMode" type="button">テストモードに切り替え</button>
 <button id="clearTest" type="button" class="secondary">テスト用データだけ初期化</button></div>
 <p class="muted">テスト馬券は本番と別のローカル保存領域に保存されます。切替後にアプリを開いてください。</p></section>
+<section><h2>全記録の削除（管理者専用）</h2>
+<p class="muted">通常の馬券・残高・精算履歴・シーズン記録をこの端末から削除し、初期状態へ戻します。自動的なリセットには使われません。削除前に通常アプリの「データ管理」からバックアップを保存してください。</p>
+<div class="actions"><button id="clearProduction" type="button" disabled>この端末の全記録を削除</button></div>
+<p id="clearProductionStatus" role="status" class="muted">本人認証の確認が必要です。</p></section>
 <section><h2>接続・運用</h2>
 <p class="muted">出馬表・結果・監視はアプリの共通APIを使用します。GitHubやVercelの秘密鍵はここに表示しません。</p>
 <div class="actions"><button id="recheck" type="button" class="secondary">状態を再確認</button>

@@ -73,3 +73,24 @@ test('public settings hide all legacy diagnostic sections and test-mode controls
  assert.ok(!admin.includes("localStorage.removeItem(LIVE)"));
  assert.ok(!admin.includes("localStorage.clear("));
 });
+
+test('record deletion belongs exclusively to owner HTML and requires new authorization',async()=>{
+ await withSession({id:ADMIN,emailVerified:true},async()=>{
+  const res=response();await handler(req('admin',{cookie:'session=fake-for-test'}),res);
+  assert.equal(res.result.status,200);
+  assert.match(res.result.body,/id="clearProduction"/);
+ });
+ await withSession({id:OTHER,emailVerified:true},async()=>{
+  const res=response();await handler(req('admin',{cookie:'session=fake-for-test'}),res);
+  assert.equal(res.result.status,403);
+  assert.doesNotMatch(res.result.body,/clearProduction/);
+ });
+ const main=fs.readFileSync('index.html','utf8');
+ assert.doesNotMatch(main,/id="resetDemo"/);
+ assert.doesNotMatch(main,/id="newSeason"/);
+ const admin=fs.readFileSync('admin-panel.js','utf8');
+ assert.ok(admin.includes("await verify(); // fresh server authorization"));
+ assert.ok(admin.includes("entered!==phrase"));
+ assert.ok(admin.includes("localStorage.setItem(LIVE,JSON.stringify(initialWallet()))"));
+ assert.ok(!admin.includes('localStorage.clear('));
+});
