@@ -4,6 +4,8 @@ on:
     paths:
       - 'app-next-monitor.js'
       - 'app-next-push.js'
+      - 'shared-settlement-chime.js'
+      - 'tests/test-shared-settlement-chime.cjs'
       - 'push-notifications.js'
       - 'app-next-cloud.js'
       - 'tests/test-account-push-client.cjs'
@@ -51,6 +53,7 @@ jobs:
           node --test tests/test-account-monitor-heartbeat.cjs
           node --test tests/test-account-race-cards-proxy.cjs
           node --test tests/test-account-push-client.cjs
+          node --test tests/test-shared-settlement-chime.cjs
           node --test tests/test-admin-release-isolation.cjs
           node --test tests/test-monitor-target-retirement.cjs
           node --test tests/test-scheduler-union-http.cjs
