@@ -10,6 +10,7 @@ on:
       - 'tests/account-backup.test.cjs'
       - 'tests/account-backup-ui.test.cjs'
       - 'tests/browser_smoke.cjs'
+      - 'tests/friends-post-login-return.test.cjs'
       - 'tests/friend-auth-data-tabs.test.cjs'
       - 'friends.html'
       - 'auth.html'
@@ -109,6 +110,8 @@ jobs:
         run: node tests/expired-cards.test.cjs
       - name: Test first-party friend login and mobile analytics tabs
         run: node --test tests/friend-auth-data-tabs.test.cjs
+      - name: Test login-to-friends transition
+        run: node tests/friends-post-login-return.test.cjs
       - name: Test race selection in Chromium
         run: node tests/browser_smoke.cjs
       - name: Test approved tab UI and state isolation
