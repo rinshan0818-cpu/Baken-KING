@@ -3542,23 +3542,12 @@ document.getElementById('raceImport').onchange=async e=>{
  catch{toast('旧形式専用です。出馬表JSONは予想タブの「出馬表データを読み込む」で選んでください')}finally{e.target.value=''}
 };renderImportedRace();
 
-// Historical fixture is displayed separately. No actual betting, no money changes.
-document.getElementById('loadHistoricalFixture').onclick=async()=>{
+// Historical fictional races are no longer fetched from public app assets.
+// Keep the retired hidden control inert for backward compatibility with old DOM.
+const legacyFixtureButton=document.getElementById('loadHistoricalFixture');
+if(legacyFixtureButton)legacyFixtureButton.onclick=()=>{
  const host=document.getElementById('historicalFixtureView');
- try{
-  const response=await fetch('./data/historical-fixture.json',{cache:'no-store'});
-  if(!response.ok)throw Error('ファイルを取得できません');
-  const race=BakenRaceData.parseRace(await response.json());
-  const state=BakenRaceData.purchaseState(race,'production');
-  host.replaceChildren();
-  const headline=document.createElement('b');
-  headline.textContent=race.date+' '+race.venue+race.raceNumber+'R / 発走 '+race.scheduledStartAt.slice(11,16);
-  host.append(headline);
-  const source=document.createElement('p');source.textContent='出典：'+race.source.label;host.append(source);
-  race.horses.forEach(h=>{const line=document.createElement('div');line.className='line';line.textContent=h.frame+'枠 '+h.number+'番 '+h.name;host.append(line)});
-  const result=document.createElement('p');result.textContent='テスト着順：'+(race.result?.finish.join(' → ')||'未登録');host.append(result);
-  const rule=document.createElement('p');rule.textContent='本番購入：不可（'+state.reason+'）';host.append(rule);
- }catch(e){host.textContent='データの検証に失敗しました：'+e.message}
+ if(host)host.textContent='旧開発用レースは配信を終了しました。';
 };
 
 /* Keep real-race tickets distinguishable from demo tickets in all views. */

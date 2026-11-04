@@ -30,7 +30,7 @@ const fixtureResult={results:[1,2,3,4].map((n,i)=>({rank:String(i+1),horse_no:St
 const converted=ctx.BakenJraAdapter.convertResult(fixtureResult,fullRace);
 assert.equal(converted.payouts.length,7);assert.equal(converted.payouts[6].yenPer100,45670);
 assert.equal(converted.status,"provisional");
-assert.equal(ctx.BakenRaceData.parseRace({...JSON.parse(fs.readFileSync(path.join(root,"data/historical-fixture.json"),"utf8")),result:JSON.parse(JSON.stringify(converted))}).result.finish[0],1);
+assert.equal(ctx.BakenRaceData.parseRace({...fullRace,result:JSON.parse(JSON.stringify(converted))}).result.finish[0],1);
 const tiedFinish=ctx.BakenJraAdapter.convertResult({...fixtureResult,results:[{rank:"1",horse_no:"1"},{rank:"1",horse_no:"2"}]},fullRace);
 assert.equal(tiedFinish.placements[0].rank,1);
 assert.equal(tiedFinish.placements[1].rank,1);
