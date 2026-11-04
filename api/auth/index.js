@@ -7,7 +7,7 @@ const ACCOUNT_PUSH='https://baken-king-monitor-bridge.vercel.app/api/account-pus
 const MONITOR_STATUS='https://baken-king-monitor-bridge.vercel.app/api/account-monitor-status';
 const HOST='baken-king-app-next.vercel.app';
 const ADMIN_PAGE=require('./admin-page.cjs').HTML;
-const authRoutes={GET:['get-session'],POST:['sign-in/email','sign-out']};
+const authRoutes={GET:['get-session'],POST:['sign-in/email','sign-up/email','sign-out','email-otp/send-verification-otp','email-otp/verify-email']};
 const uuid='[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
 function allowSharing(method,route){
  if(method==='GET')return route==='me'||route==='connections'||route==='monitor-targets'||new RegExp('^summary/'+uuid+'$','i').test(route);
