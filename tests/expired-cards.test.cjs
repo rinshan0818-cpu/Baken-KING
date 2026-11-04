@@ -21,10 +21,14 @@ const today=()=>{
    await window.BakenImportAuthorizedCards({races:[card(past)]});
    const stale={dates:[...document.querySelector('#weekDate').options].map(x=>x.value),
     selected:window.BakenSelectedImportedRace,
-    message:document.querySelector('#bkCardImportStatus')?.textContent||''};
+    message:document.querySelector('#bkCardImportStatus')?.textContent||'',
+    pickerHidden:document.querySelector('#weekendRaceSelector .bk-race-picker').hidden,
+    waitingHidden:document.querySelector('#bkRaceCardsWaiting').hidden};
    await window.BakenImportAuthorizedCards({races:[card(now)]});
    const current={dates:[...document.querySelector('#weekDate').options].map(x=>x.value),
     selected:window.BakenSelectedImportedRace?.date,
+    pickerHidden:document.querySelector('#weekendRaceSelector .bk-race-picker').hidden,
+    waitingHidden:document.querySelector('#bkRaceCardsWaiting').hidden,
     persisted:JSON.parse(localStorage.getItem('baken-king-personal-cards-v1')).races.map(x=>x.date)};
    await window.BakenImportAuthorizedCards({races:[card(past)]});
    const notOverwritten={dates:[...document.querySelector('#weekDate').options].map(x=>x.value),
@@ -34,9 +38,13 @@ const today=()=>{
   },{now,past});
   assert.deepEqual(result.stale.dates,[]);
   assert.equal(result.stale.selected,null);
+  assert.equal(result.stale.pickerHidden,true);
+  assert.equal(result.stale.waitingHidden,false);
   assert.match(result.stale.message,/次回開催の出馬表を準備中/);
   assert.deepEqual(result.current.dates,[now]);
   assert.equal(result.current.selected,now);
+  assert.equal(result.current.pickerHidden,false);
+  assert.equal(result.current.waitingHidden,true);
   assert.deepEqual(result.notOverwritten.dates,[now]);
   assert.deepEqual(result.notOverwritten.persisted,[now]);
   assert.equal(result.notOverwritten.wager,'retained');
