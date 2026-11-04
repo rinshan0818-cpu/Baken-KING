@@ -143,20 +143,28 @@
   adminNotice.textContent='管理機能は整理して表示しているだけです。複数アカウント導入時に、認証とサーバー側のアクセス制限を追加します。';
   groups.admin.prepend(adminNotice);
   main.append(root);
-  // Only an authenticated, server-authorized owner sees the admin link.
-  // Hiding client-side DOM is only presentation; authorization lives in the API.
+  // Only the signed-in, server-authorized owner can see the management link.
   if(location.hostname==='baken-king-app-next.vercel.app'){
-   fetch('/api/auth/admin/status',{credentials:'same-origin',cache:'no-store'})
-    .then(async r=>{
-     if(!r.ok)return;
+   const wrap=document.createElement('p');
+   wrap.id='bkAdminOwnerLink';wrap.hidden=true;
+   const link=document.createElement('a');
+   link.href='/api/auth/admin';link.className='official';
+   link.textContent='管理者ページを開く';
+   wrap.append(link);
+   groups.general.prepend(wrap);
+   let sequence=0;
+   const refreshAdmin=async()=>{
+    const current=++sequence;
+    wrap.hidden=true;
+    try{
+     const r=await fetch('/api/auth/admin/status',{credentials:'same-origin',cache:'no-store'});
+     if(!r.ok||current!==sequence)return;
      const data=await r.json();
-     if(data.ok!==true||data.admin!==true)return;
-     const link=document.createElement('a');
-     link.href='/api/auth/admin';link.className='official';
-     link.textContent='管理者ページを開く';
-     const wrap=document.createElement('p');wrap.append(link);
-     groups.general.prepend(wrap);
-    }).catch(()=>{});
+     if(current===sequence&&data.ok===true&&data.admin===true)wrap.hidden=false;
+    }catch{}
+   };
+   window.addEventListener('baken:account-changed',refreshAdmin);
+   refreshAdmin();
   }
   // If the legacy settings view was open when this script initialized,
   // preserve it rather than resetting the active tab.
