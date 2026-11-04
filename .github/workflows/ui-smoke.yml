@@ -10,6 +10,7 @@ on:
       - 'tests/account-backup.test.cjs'
       - 'tests/account-backup-ui.test.cjs'
       - 'tests/browser_smoke.cjs'
+      - 'tests/expired-cards.test.cjs'
       - 'tests/monitor-flow-contract.test.cjs'
       - 'app-next-monitor.js'
       - 'app-next-results.js'
@@ -101,6 +102,8 @@ jobs:
         run: node --test tests/monitor-flow-contract.test.cjs
       - name: Test settings simplification and on-off push controls
         run: node --test tests/settings-release-simplification.test.cjs
+      - name: Test expired race cards without losing stored wagers
+        run: node tests/expired-cards.test.cjs
       - name: Test race selection in Chromium
         run: node tests/browser_smoke.cjs
       - name: Test approved tab UI and state isolation
