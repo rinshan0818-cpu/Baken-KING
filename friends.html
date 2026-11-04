@@ -99,10 +99,14 @@
   $('myId').textContent='友達ID：'+user.id;$('nickname').value=localStorage.getItem('baken-king-nickname-v1')||user.name||'プレイヤー';
   // Verify registration before offering an ID that cannot receive requests.
   // Connecting never creates an account record without the user's action.
-  const me=await request('GET','/api/sharing/me');
+  $('connectionBadge').textContent='ログイン確認済み';
+  $('app').hidden=false;
+  status('友達情報を読み込んでいます…');
+  // These are independent reads: authenticate once, then load profile and list in parallel.
+  // Do not save credentials, friend state, or wallet data to a cache.
+  const [me]=await Promise.all([request('GET','/api/sharing/me'),refresh()]);
   profileReady=!!me?.user?.profile;
   if(me?.user?.profile?.displayName)$('nickname').value=me.user.profile.displayName;
-  await refresh();$('app').hidden=false;
   $('connectionBadge').textContent='接続済み';
   status(profileReady?(inviteId&&inviteId!==user.id?'ログイン確認済み。友達申請を送信できます。':'友達管理に接続しました。'):'まず「プロフィールを登録・更新」を押してください。登録後に友達IDを送れます。');
  });}
