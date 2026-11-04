@@ -91,6 +91,11 @@
   // Development tools remain mounted for compatibility but are not shown
   // in the public settings surface; the owner has a gated /api/auth/admin page.
   groups.admin.prepend(modePanel);
+  // Existing nickname remains controlled by the account profile, never by a second local field.
+  const nicknameHint=document.createElement('p');
+  nicknameHint.className='muted';
+  nicknameHint.textContent='表示名の変更は「アカウント・友達管理」に統一しました。ここでの入力は不要です。';
+  groups.account.append(nicknameHint);
   // Keep one set of original backup controls and move the elements, never clone them.
   // The original handlers are retained, including backup verification and restore.
   const season=root.querySelector('#newSeason')?.closest('section.card');
