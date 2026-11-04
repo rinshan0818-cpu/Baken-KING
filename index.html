@@ -3962,9 +3962,10 @@ saveDraft.addEventListener('click',()=>{
  try{localStorage.setItem(draftKey,JSON.stringify(drafts.slice(-100)));summary.textContent='買い目メモを保存しました（残高は変わりません）。';renderDrafts()}catch{summary.textContent='保存に失敗しました。'}
 });
 renderDrafts();
-function show(){selected.clear();updateSelection();host.replaceChildren();const c=cards.find(x=>x.date===date.value&&x.venue===venue.value&&x.raceNumber===Number(race.value));window.BakenSelectedImportedRace=c||null;if(c){const conditions=c.raceConditions||{};const start=c.scheduledStartAt?c.scheduledStartAt.slice(11,16):'';window.dispatchEvent(new CustomEvent('baken:race-selected',{detail:{race:{...c,numbersConfirmed:true,title:bkImportedRaceLabel(c),startTime:start,surface:conditions.surface||'',distance:conditions.distanceMeters||'',grade:conditions.grade||''}}}));}if(!c){status.textContent=cards.length?'該当レースなし':'未読込';return}status.textContent=c.date+' '+c.venue+c.raceNumber+'R：'+c.horses.length+'頭';for(const h of c.horses.slice().sort((a,b)=>a.number-b.number)){const row=document.createElement('button');row.type='button';row.className='horse';row.style.margin='3px';row.textContent=h.number+'番　'+h.name+(h.scratched?'【出走取消】':'');row.disabled=h.scratched===true;row.setAttribute('aria-pressed','false');row.disabled=true;row.style.opacity='1';row.style.cursor='default';host.append(row)}}
+function show(){selected.clear();updateSelection();host.replaceChildren();const c=cards.find(x=>x.date===date.value&&x.venue===venue.value&&x.raceNumber===Number(race.value));window.BakenSelectedImportedRace=c||null;if(c){const conditions=c.raceConditions||{};const start=c.scheduledStartAt?c.scheduledStartAt.slice(11,16):'';window.dispatchEvent(new CustomEvent('baken:race-selected',{detail:{race:{...c,numbersConfirmed:true,title:bkImportedRaceLabel(c),startTime:start,surface:conditions.surface||'',distance:conditions.distanceMeters||'',grade:conditions.grade||''}}}));}if(!c){status.textContent=cards.length?'該当レースなし':'次回開催の出馬表を準備中';return}status.textContent=c.date+' '+c.venue+c.raceNumber+'R：'+c.horses.length+'頭';for(const h of c.horses.slice().sort((a,b)=>a.number-b.number)){const row=document.createElement('button');row.type='button';row.className='horse';row.style.margin='3px';row.textContent=h.number+'番　'+h.name+(h.scratched?'【出走取消】':'');row.disabled=h.scratched===true;row.setAttribute('aria-pressed','false');row.disabled=true;row.style.opacity='1';row.style.cursor='default';host.append(row)}}
 let bkRaceManuallySelected=false;
 let bkAutoSelectionInitialized=false;
+let bkLastDisplayedDay='';
 function bkNowDay(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function bkNextScheduledRace(){
  const now=Date.now();
@@ -4019,18 +4020,44 @@ function syncImportedOptions(){
  race.value=String(races.includes(wantedRace)?wantedRace:races[0]);
 }
 for(const picker of [date,venue,race])picker.addEventListener('pointerdown',()=>{bkRaceManuallySelected=true});
-setInterval(()=>{if(cards.length)bkUpdateNextRaceShortcuts()},60000);
+function bkRenderAvailableCards(allRaces){
+ const today=bkNowDay();
+ cards=allRaces.filter(c=>c.date>=today);
+ const dates=[...new Set(cards.map(x=>x.date))].sort();
+ const previous={date:date.value,venue:venue.value,race:race.value};
+ date.replaceChildren(...dates.map(day=>{const o=document.createElement('option');o.value=day;o.textContent=day;return o}));
+ if(dates.length)date.value=dates.includes(previous.date)?previous.date:dates[0];
+ syncImportedOptions();
+ window.BakenImportedCards=cards;
+ bkLastDisplayedDay=today;
+ bkAutoSelectUpcoming();
+ show();
+}
+function bkRefreshRaceDay(){
+ const today=bkNowDay();
+ if(today===bkLastDisplayedDay)return;
+ let all=[];
+ try{const saved=JSON.parse(localStorage.getItem(cardStorageKey)||'null');all=Array.isArray(saved?.races)?saved.races:[]}catch{}
+ bkRenderAvailableCards(all);
+}
+setInterval(()=>{bkRefreshRaceDay();bkUpdateNextRaceShortcuts()},60000);
+window.addEventListener('focus',bkRefreshRaceDay);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')bkRefreshRaceDay()});
 function bkImportedRaceLabel(c){return bkOfficialRaceLabel(c)}
-async function importCardData(d){const races=Array.isArray(d)?d:d.races;if(!Array.isArray(races)||!races.length||races.length>108)throw Error('形式が不正です');const keys=new Set();for(const c of races){const key=c.date+'|'+c.venue+'|'+c.raceNumber;if(keys.has(key)||!/^\d{4}-\d{2}-\d{2}$/.test(c.date)||typeof c.venue!=='string'||!Number.isInteger(c.raceNumber)||c.raceNumber<1||c.raceNumber>12)throw Error('レース情報が不正です');keys.add(key);if(!Array.isArray(c.horses)||!c.horses.length||c.horses.length>18)throw Error('馬情報が不正です');const nums=c.horses.map(h=>h.number).sort((a,b)=>a-b);const missing=c.unavailableHorseNumbers||[];const all=[...nums,...missing].sort((a,b)=>a-b);if(all.some((n,i)=>n!==i+1)||new Set(all).size!==all.length||c.horses.some(h=>typeof h.name!=='string'||!h.name.trim())||new Set(c.horses.map(h=>h.name.trim())).size!==nums.length)throw Error('馬番・馬名が不正です')}cards=races;
-try{localStorage.setItem(cardStorageKey,JSON.stringify({races}))}catch(e){console.warn('出馬表の保存に失敗しました',e)}
-const dates=[...new Set(cards.map(x=>x.date))].sort();
-const previous={date:date.value,venue:venue.value,race:race.value};
-date.replaceChildren(...dates.map(day=>{const o=document.createElement('option');o.value=day;o.textContent=day;return o}));
-date.value=dates.includes(previous.date)?previous.date:dates[0];
-
-syncImportedOptions();
-window.BakenImportedCards=cards;
-bkAutoSelectUpcoming();window.dispatchEvent(new CustomEvent('baken:cards-imported',{detail:{count:cards.length}}));show();return races.length}
+async function importCardData(d){const races=Array.isArray(d)?d:d.races;if(!Array.isArray(races)||!races.length||races.length>108)throw Error('形式が不正です');const keys=new Set();for(const c of races){const key=c.date+'|'+c.venue+'|'+c.raceNumber;if(keys.has(key)||!/^\d{4}-\d{2}-\d{2}$/.test(c.date)||typeof c.venue!=='string'||!Number.isInteger(c.raceNumber)||c.raceNumber<1||c.raceNumber>12)throw Error('レース情報が不正です');keys.add(key);if(!Array.isArray(c.horses)||!c.horses.length||c.horses.length>18)throw Error('馬情報が不正です');const nums=c.horses.map(h=>h.number).sort((a,b)=>a-b);const missing=c.unavailableHorseNumbers||[];const all=[...nums,...missing].sort((a,b)=>a-b);if(all.some((n,i)=>n!==i+1)||new Set(all).size!==all.length||c.horses.some(h=>typeof h.name!=='string'||!h.name.trim())||new Set(c.horses.map(h=>h.name.trim())).size!==nums.length)throw Error('馬番・馬名が不正です')}
+const newestIncoming=races.reduce((latest,c)=>c.date>latest?c.date:latest,'');
+let existing=[];
+try{const stored=JSON.parse(localStorage.getItem(cardStorageKey)||'null');if(Array.isArray(stored?.races))existing=stored.races}catch{}
+const newestSaved=existing.reduce((latest,c)=>typeof c?.date==='string'&&c.date>latest?c.date:latest,'');
+const effective=newestSaved>newestIncoming?existing:races;
+// Do not let a bundled old JSON overwrite newer cards delivered by the account API.
+// Never remove purchased tickets or older private race-card data as a side effect.
+if(effective===races){
+ try{localStorage.setItem(cardStorageKey,JSON.stringify({races}))}catch(e){console.warn('出馬表の保存に失敗しました',e)}
+}
+bkRenderAvailableCards(effective);
+window.dispatchEvent(new CustomEvent('baken:cards-imported',{detail:{count:cards.length}}));
+return cards.length}
 window.BakenImportAuthorizedCards=importCardData;
 file.addEventListener('change',async()=>{try{const f=file.files[0];if(!f)return;if(f.size>2000000)throw Error('ファイルが大きすぎます');const count=await importCardData(JSON.parse(await f.text()));status.textContent=count+'レースを読み込みました。'}catch(e){status.textContent='読込エラー：'+e.message}});
 async function loadAuthorizedCards(){
