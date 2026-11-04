@@ -9,7 +9,7 @@
 <label for="email">メールアドレス</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254">
 <label for="password">パスワード</label><input id="password" name="password" type="password" autocomplete="current-password" required minlength="8">
 <button class="primary" id="login" type="submit">ログイン</button><button class="secondary" id="signup" type="button">新規登録</button>
-</form></div><div id="signedIn" hidden><strong>ログイン中</strong><p id="account"></p><button class="secondary" id="logout" type="button">ログアウト</button></div>
+</form></div><div id="signedIn" hidden><strong>ログイン中</strong><p id="account"></p><a id="continueFriends" href="./friends.html" style="display:block;text-align:center;padding:14px 12px;margin:14px 0 0;border-radius:11px;background:#0f6654;color:#fff;font-weight:700;text-decoration:none">友達管理へ進む</a><button class="secondary" id="logout" type="button">ログアウト</button></div>
 <div id="verification" hidden><label for="otp">メール確認コード（6桁）</label><input id="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="6桁のコード"><button class="secondary" id="sendOtp" type="button">確認コードをメールで送信</button><button class="primary" id="verifyOtp" type="button">コードを確認する</button><p class="muted">メール認証がNeon側で有効になっている場合に使用します。コードの有効期限は15分です。</p></div><div id="status" role="status" aria-live="polite" hidden></div></section>
 <p class="warn">SafariではブラウザのCookie保護により、ログインが成功してもセッションを維持できないことがあります。その場合、登録し直さずに別ブラウザでお試しください。馬券データは消去されません。</p>
 <p id="inviteReturn" hidden><a id="returnLink" href="./friends.html">友達申請に戻る</a></p><p><a href="./friends.html">友達管理へ戻る</a></p>
@@ -20,6 +20,9 @@ const authUrl=location.hostname==='baken-king-app-next.vercel.app'?'/api/auth':'
 const $=id=>document.getElementById(id),status=$('status'),login=$('login'),signup=$('signup'),logout=$('logout');
 let busy=false;
 const returnValue=new URL(location.href).searchParams.get('return');
+const safeReturn=returnValue==='friends.html'||/^friends\\.html\\?invite=[0-9a-f-]{36}$/i.test(returnValue||'')?returnValue:null;
+function continueToFriends(){if(safeReturn)location.replace('./'+safeReturn)}
+if(safeReturn)$('continueFriends').href='./'+safeReturn;
 if(returnValue&&/^friends\.html\?invite=[0-9a-f-]{36}$/i.test(returnValue)){
  const friendId=returnValue.split('=')[1];
  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(friendId)){
@@ -37,11 +40,11 @@ async function refresh(){const result=await call('/get-session');const user=resu
  const owner=localStorage.getItem('baken-king-friend-score-owner-v1');
  if(user?.id&&owner&&user.id!==owner)clearFriendCache();
  view(user);return !!user}
-$('authForm').addEventListener('submit',e=>{e.preventDefault();run(async()=>{await call('/sign-in/email',{email:$('email').value.trim(),password:$('password').value});$('password').value='';showStatus(await refresh()?'ログインしました。友達管理画面へ進めます。':'ログイン情報は受け付けられましたが、このブラウザでログイン状態を保持できません。SafariのCookie制限が考えられます。新規登録はせず、別ブラウザでログインしてください。');})});
+$('authForm').addEventListener('submit',e=>{e.preventDefault();run(async()=>{await call('/sign-in/email',{email:$('email').value.trim(),password:$('password').value});$('password').value='';const active=await refresh();showStatus(active?'ログインしました。友達管理へ移動します。':'ログイン状態を確認できません。既存アカウントで再度ログインしてください。');if(active)continueToFriends();})});
 signup.addEventListener('click',()=>run(async()=>{const email=$('email').value.trim(),password=$('password').value;if(!$('authForm').reportValidity())return;await call('/sign-up/email',{email,password,name:email.split('@')[0].slice(0,16)});$('password').value='';showStatus(await refresh()?'アカウントを作成しました。メール確認状況をご確認ください。':'登録を受け付けましたが、このブラウザではログイン状態を確認できません。既存アカウントの再登録は不要です。')}));
 $('sendOtp').addEventListener('click',()=>run(async()=>{const email=$('email').value.trim();if(!email||!$('email').checkValidity()){showStatus('メールアドレスを入力してください。');return}await call('/email-otp/send-verification-otp',{email,type:'email-verification'});showStatus('確認コードの送信を受け付けました。メールを確認してください。')}));
-$('verifyOtp').addEventListener('click',()=>run(async()=>{const email=$('email').value.trim(),otp=$('otp').value.trim();if(!/^[0-9]{6}$/.test(otp)){showStatus('6桁の確認コードを入力してください。');return}await call('/email-otp/verify-email',{email,otp});$('otp').value='';const active=await refresh();showStatus(active?'メール確認の結果を更新しました。':'メール確認を受け付けました。再ログインしてください。')}));
+$('verifyOtp').addEventListener('click',()=>run(async()=>{const email=$('email').value.trim(),otp=$('otp').value.trim();if(!/^[0-9]{6}$/.test(otp)){showStatus('6桁の確認コードを入力してください。');return}await call('/email-otp/verify-email',{email,otp});$('otp').value='';const active=await refresh();showStatus(active?'メール確認の結果を更新しました。':'メール確認を受け付けました。再ログインしてください。');if(active)continueToFriends()}));
 logout.addEventListener('click',()=>run(async()=>{await call('/sign-out',{});clearFriendCache();view(null);showStatus('ログアウトしました。')}));
-run(async()=>{showStatus('セッションを確認中…');const active=await refresh();showStatus(active?'ログイン状態を確認しました。':'未ログインです。')});
+run(async()=>{showStatus('セッションを確認中…');const active=await refresh();showStatus(active?'ログイン状態を確認しました。':'未ログインです。');if(active)continueToFriends()});
 })();
 </script></body></html>

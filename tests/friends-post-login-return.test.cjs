@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {Script}=require('node:vm');
+const auth=fs.readFileSync('auth.html','utf8');
+const friends=fs.readFileSync('friends.html','utf8');
+const js=auth.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert(js,'Auth script must exist');
+new Script(js);
+assert(auth.includes('id="continueFriends"'),'Signed-in users need a clear continue link');
+assert(auth.includes("returnValue==='friends.html'"),'Only allow a fixed first-party return route');
+assert(auth.includes('if(active)continueToFriends()'),'Completed logins must advance');
+assert(auth.includes("location.replace('./'+safeReturn)"),'Return using bounded same-origin path');
+assert(friends.includes('href="./auth.html?return=friends.html"'),'Friends login must set return target');
+assert(!js.includes('location.href=returnValue'),'Unbounded redirect forbidden');
+console.log('PASS: verified login advances to embedded friend management on same origin');
