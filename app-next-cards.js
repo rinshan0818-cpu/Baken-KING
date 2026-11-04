@@ -11,6 +11,8 @@
  status.className='muted';status.id='bkAccountCardsStatus';
  status.textContent='出馬表の自動取得：確認中';
  account.append(status);
+ const originalStatus=document.getElementById('bkPrivateCardMessage');
+ const originalCheck=document.getElementById('bkPrivateCardCheck');
  let busy=false,again=false,last='',lastChecked=0;
  async function refresh(){
   if(document.visibilityState==='hidden')return;
@@ -38,11 +40,13 @@
   }catch(error){
    status.textContent='出馬表の自動取得：'+(error?.message||'接続できません');
   }finally{
+   if(originalStatus)originalStatus.textContent=status.textContent;
    busy=false;
    if(again){again=false;queueMicrotask(refresh)}
   }
  }
  window.BakenRefreshAccountCards=refresh;
+ if(originalCheck)originalCheck.onclick=refresh;
  window.addEventListener('focus',refresh);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
  window.addEventListener('baken:account-changed',()=>{last='';refresh()});
