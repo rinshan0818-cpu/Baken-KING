@@ -4,6 +4,7 @@ const SHARING='https://baken-king-sharing-api.vercel.app';
 const VERIFIED='https://baken-king-monitor-bridge.vercel.app/api/account-verified-results';
 const CARDS='https://baken-king-monitor-bridge.vercel.app/api/account-race-cards';
 const ACCOUNT_PUSH='https://baken-king-monitor-bridge.vercel.app/api/account-push-subscriptions';
+const MONITOR_STATUS='https://baken-king-monitor-bridge.vercel.app/api/account-monitor-status';
 const HOST='baken-king-app-next.vercel.app';
 const ADMIN_PAGE=require('./admin-page.cjs').HTML;
 const authRoutes={GET:['get-session'],POST:['sign-in/email','sign-out']};
@@ -26,10 +27,11 @@ module.exports=async(req,res)=>{
  const isResult=req.method==='GET'&&friend==='verified-results';
  const adminPage=req.method==='GET'&&route==='admin';
  const adminStatus=req.method==='GET'&&route==='admin/status';
+ const adminMonitorStatus=req.method==='GET'&&route==='admin/monitor-status';
  const isCards=req.method==='GET'&&friend==='race-cards';
  const isPush=['GET','POST','DELETE'].includes(req.method)&&friend==='push-subscriptions';
  const isFriend=typeof friend==='string'&&allowSharing(req.method,friend);
- if(!isFriend&&!isResult&&!isCards&&!isPush&&!adminPage&&!adminStatus&&!authRoutes[req.method]?.includes(route))return respond(res,404,{error:'Not found'});
+ if(!isFriend&&!isResult&&!isCards&&!isPush&&!adminPage&&!adminStatus&&!adminMonitorStatus&&!authRoutes[req.method]?.includes(route))return respond(res,404,{error:'Not found'});
  if(req.headers.host!==HOST)return respond(res,403,{error:'Forbidden'});
  if(req.headers.origin&&req.headers.origin!=='https://'+HOST)return respond(res,403,{error:'Forbidden'});
  // POST and DELETE are never accepted as cross-origin requests.
@@ -42,7 +44,7 @@ module.exports=async(req,res)=>{
   body=Buffer.concat(parts);
  }
  try{
-  if(adminPage||adminStatus){
+  if(adminPage||adminStatus||adminMonitorStatus){
    if(!req.headers.cookie)return respond(res,401,{error:'Login required'});
    const session=await fetch(AUTH+'/get-session',{
     method:'GET',redirect:'error',signal:AbortSignal.timeout(8000),
@@ -56,6 +58,17 @@ module.exports=async(req,res)=>{
       !user||user.emailVerified!==true||user.id!==expected)
     return respond(res,403,{error:'Forbidden'});
    if(adminStatus)return respond(res,200,{ok:true,admin:true});
+   if(adminMonitorStatus){
+    const tokenResponse=await fetch(AUTH+'/token',{method:'GET',redirect:'error',signal:AbortSignal.timeout(8000),headers:{Cookie:req.headers.cookie,Accept:'application/json'}});
+    if(!tokenResponse.ok)return respond(res,401,{error:'Login required'});
+    const tokenData=await tokenResponse.json();
+    const jwt=tokenData?.token||tokenData?.data?.token||tokenResponse.headers.get('set-auth-jwt');
+    if(typeof jwt!=='string'||jwt.split('.').length!==3||jwt.length>12000)return respond(res,503,{error:'Status token unavailable'});
+    const upstream=await fetch(MONITOR_STATUS,{method:'GET',redirect:'error',signal:AbortSignal.timeout(12000),headers:{Authorization:'Bearer '+jwt,Accept:'application/json'}});
+    const payload=await upstream.text();
+    if(payload.length>12000)return respond(res,502,{error:'Status response too large'});
+    res.statusCode=upstream.status;return res.end(payload);
+   }
    res.setHeader('Content-Type','text/html; charset=utf-8');
    res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
    res.statusCode=200;

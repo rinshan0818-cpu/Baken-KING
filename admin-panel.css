@@ -11,3 +11,8 @@
 .operation-badge.error{background:#fae4e4;color:#9d2b33}
 .operation-badge.pending,.operation-badge.unknown{background:#edf1f6;color:#5d7085}
 #opsCheckedAt{font-variant-numeric:tabular-nums}
+
+.ops-history{display:grid;gap:9px;margin:12px 0}
+.ops-history>div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;padding:9px 10px;background:#f4f7fb;border-radius:8px;font-size:13px}
+.ops-history span{color:#586f87}
+.ops-history strong{font-weight:750;color:#173d70;overflow-wrap:anywhere}
