@@ -3,6 +3,8 @@
  */
 (()=>{
  'use strict';
+ // The Vercel app uses account-authenticated race-card delivery instead.
+ if(location.hostname==='baken-king-app-next.vercel.app')return;
  // Isolated Beta fixture mode must not read or alter live monitoring state.
  if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const SETTINGS='baken-monitor-sync-config-v1';
