@@ -107,3 +107,15 @@ test('administrator operations panel separates API checks from unverified schedu
  assert.ok(script.includes("method:'GET'")===false,'GET is the implicit read-only method');
  assert.ok(!script.includes("localStorage.removeItem(LIVE)"));
 });
+
+test('monitor execution history is read-only and describes actual workflow evidence',()=>{
+ const page=require('../api/auth/admin-page.cjs').HTML;
+ const admin=fs.readFileSync('admin-panel.js','utf8');
+ const api=fs.readFileSync('api/auth/index.js','utf8');
+ for(const id of ['opsRunBadge','opsLastRun','opsLastSuccess','opsLastError'])assert.ok(page.includes('id="'+id+'"'));
+ assert.match(page,/ワークフローの成功はJRA結果の取得成功とは限りません/);
+ assert.match(admin,/checkMonitorHistory/);
+ assert.match(admin,/履歴取得不可/);
+ assert.match(api,/adminMonitorStatus/);
+ assert.match(api,/if\(adminPage\|\|adminStatus\|\|adminMonitorStatus\)/);
+});
