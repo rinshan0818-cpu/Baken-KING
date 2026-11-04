@@ -10,6 +10,11 @@
  resultScript.src='./app-next-results.js?v=3';
  resultScript.async=true;
  document.head.append(resultScript);
+ // Race cards use the same verified account, never the old device token.
+ const cardsScript=document.createElement('script');
+ cardsScript.src='./app-next-cards.js?v=1';
+ cardsScript.async=true;
+ document.head.append(cardsScript);
  if(localStorage.getItem('baken-king-mode-v1')==='test')return;
  const CONFIG='keiba-demo-v1',CARDS='baken-king-personal-cards-v1';
  const account=document.getElementById('bkAccountSettings');
@@ -57,7 +62,7 @@
     throw Error('HTTP '+result.status);
    last=key;
    lastSyncedAt=Date.now();
-   panel.textContent='監視候補 '+targets.length+'レースをアカウントに登録済み（共通JRA監視への接続は準備中）';
+   panel.textContent='監視候補 '+targets.length+'レースをアカウントに登録済み（共通JRA監視に接続済み）';
   }catch(e){panel.textContent='レース監視登録を確認できません：'+e.message}
   finally{busy=false;if(resync){resync=false;queueMicrotask(sync)}}
  }
