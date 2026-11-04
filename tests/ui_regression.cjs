@@ -44,6 +44,36 @@ const baseSelector='main.wrap > [data-tab]';
   }));
   assert.equal(leakedTools.folds,0,'Old admin settings visible to public users');
   assert.equal(leakedTools.mode,false,'Test-mode switch visible to public users');
+  // Settings information architecture: one backup location and preserved handlers.
+  const settingsLayout=await page.evaluate(()=>{
+   const root=document.querySelector('#bkSettingsSurface');
+   const groups=[...root.querySelectorAll(':scope > details.bk-settings-fold')];
+   const item=id=>document.getElementById(id);
+   const labelForRestore=item('restore')?.closest('label');
+   const parent=element=>element?.closest('.bk-settings-fold')?.querySelector('summary .bk-settings-fold-label')?.textContent;
+   return {
+    headings:groups.filter(x=>!x.hidden).map(x=>x.querySelector('summary .bk-settings-fold-label')?.textContent),
+    backups:root.querySelectorAll('#bkSingleBackupPanel').length,
+    oldPanels:root.querySelectorAll('#bkAccountBackupPanel').length,
+    storageControls:['backup','bkVerifyBackup','bkVerifyBackupFile','bkVerifyBackupResult','restore'].map(id=>root.querySelectorAll('#'+id).length),
+    backupGroup:parent(item('backup')),restoreGroup:parent(labelForRestore),
+    verifyGroup:parent(item('bkVerifyBackup')),
+    seasonGroup:parent(item('newSeason')),
+    accountGroup:parent(item('bkAccountSettings')),
+    updateGroup:parent(item('checkUpdate')),
+    diagnosticHidden:!item('bkCopyNavLog')?.getClientRects().length
+   };
+  });
+  assert.deepEqual(settingsLayout.headings,['アカウント・友達','通知・アプリ','データ管理'],
+    'Settings group labels changed: '+JSON.stringify(settingsLayout));
+  assert.equal(settingsLayout.backups,1,'Backup must be shown in one dedicated panel');
+  assert.equal(settingsLayout.oldPanels,0,'Duplicate account-backup panel returned');
+  assert.deepEqual(settingsLayout.storageControls,[1,1,1,1,1],'Original storage controls must be moved, not cloned');
+  for(const type of ['backupGroup','restoreGroup','verifyGroup','seasonGroup'])
+   assert.equal(settingsLayout[type],'データ管理','Stored data action has wrong section: '+type);
+  assert.equal(settingsLayout.accountGroup,'アカウント・友達');
+  assert.equal(settingsLayout.updateGroup,'通知・アプリ');
+  assert.equal(settingsLayout.diagnosticHidden,true,'Debug log must be hidden from friends');
   // Regression: global input {width:100%} must never squash the shared chime label.
   const sharedLayout=await page.evaluate(()=>{
    const panel=document.querySelector('.bk-push-panel');
