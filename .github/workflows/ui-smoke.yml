@@ -34,6 +34,8 @@ on:
       - 'tests/friends-page.test.cjs'
       - 'friend-sync.js'
       - 'friend-cloud-sync.js'
+      - 'app-next-cloud.js'
+      - 'tests/zero-friend-sync.test.cjs'
       - 'tests/friend-cloud-sync-consent.test.cjs'
       - 'tests/friend-refresh.test.cjs'
       - 'friend-score-wire.js'
@@ -172,6 +174,8 @@ jobs:
         run: node tests/friend-refresh.test.cjs
       - name: Test opt-in nine-metric cloud sync and privacy boundaries
         run: node tests/friend-cloud-sync-consent.test.cjs
+      - name: Test consensual empty friend score publication
+        run: node --test tests/zero-friend-sync.test.cjs
       - name: Test manual and thirty-minute sync scheduling
         run: node tests/friend-sync.test.cjs
       - name: Test manual friend score exchange
