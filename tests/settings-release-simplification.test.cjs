@@ -23,3 +23,17 @@ test('notification actions are on/off without changing subscription APIs',()=>{
  assert.match(s,/await sub\.unsubscribe\(\)/);
  assert.doesNotMatch(s,/enable\.textContent=sub\?'通知を更新'/);
 });
+
+test('test-mode ticket creation is reachable outside hidden admin diagnostics',()=>{
+ const surface=fs.readFileSync('settings-surface.js','utf8');
+ const html=fs.readFileSync('index.html','utf8');
+ assert.match(surface,/groups\.general\.prepend\(modePanel\)/);
+ assert.doesNotMatch(surface,/groups\.admin\.prepend\(modePanel\)/);
+ assert.match(surface,/if\(testing\)\{/);
+ assert.match(surface,/create\.textContent='テスト馬券を4枚作成'/);
+ assert.match(surface,/window\.BakenCreateDemoTickets\(\)/);
+ assert.match(html,/window\.BakenCreateDemoTickets=\(\)=>\{/);
+ assert.match(html,/if\(!IS_TEST_MODE\)return false/);
+ assert.match(surface,/details\.open=section\.open/);
+ assert.match(surface,/id:'general'.*open:true/);
+});
