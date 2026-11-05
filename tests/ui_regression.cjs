@@ -56,7 +56,8 @@ const baseSelector='main.wrap > [data-tab]';
    mode:!!document.querySelector('.bk-mode-panel')?.getClientRects().length
   }));
   assert.equal(leakedTools.folds,0,'Old admin settings visible to public users');
-  assert.equal(leakedTools.mode,false,'Test-mode switch visible to public users');
+  assert.equal(leakedTools.mode,true,'Test-mode switch must be accessible from ordinary Settings');
+  assert.equal(await page.getByText('テスト馬券を4枚作成',{exact:true}).count(),0,'Test ticket creation must remain hidden in production mode');
   // Settings information architecture: one backup location and preserved handlers.
   const settingsLayout=await page.evaluate(()=>{
    const root=document.querySelector('#bkSettingsSurface');
