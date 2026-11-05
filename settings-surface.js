@@ -88,9 +88,9 @@
   const modeNote=document.createElement('p');modeNote.className='bk-mode-note';
   modeNote.textContent='本番とテストは別々に端末内保存します。テスト中は本番の結果監視・プッシュ通知処理を起動せず、テスト馬券もサーバーへ送信しません。モード切替後は自動で画面を再読み込みします。';
   modePanel.append(modeTitle,modeCurrent,actions,modeNote);
-  // Development tools remain mounted for compatibility but are not shown
-  // in the public settings surface; the owner has a gated /api/auth/admin page.
-  groups.admin.prepend(modePanel);
+  // Test mode is an ordinary user feature. Keep its ticket-creation controls
+  // in the visible settings section rather than the hidden admin diagnostics.
+  groups.general.prepend(modePanel);
   // Existing nickname remains controlled by the account profile, never by a second local field.
   const nicknameHint=document.createElement('p');
   nicknameHint.className='muted';
