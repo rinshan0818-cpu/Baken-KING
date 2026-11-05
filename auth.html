@@ -33,10 +33,14 @@ if(returnValue&&/^friends\.html\?invite=[0-9a-f-]{36}$/i.test(returnValue)){
 function showStatus(message){status.hidden=false;status.textContent=message}
 function view(user){$('formPanel').hidden=!!user;$('signedIn').hidden=!user;$('verification').hidden=!user||user.emailVerified===true;$('account').textContent=user?('メールアドレス: '+String(user.email||'登録済み')+'\nメール確認: '+(user.emailVerified===true?'確認済み':'未確認')):'';if(user?.email&&$('email').value==='')$('email').value=user.email}
 async function call(path,data){const opts={method:data===undefined?'GET':'POST',credentials:'include',headers:{'Accept':'application/json'},cache:'no-store'};if(data!==undefined){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(data)}
- const res=await fetch(authUrl+path,opts);let body={};try{body=await res.json()}catch{};if(!res.ok||body?.error)throw Error('認証リクエストに失敗しました（HTTP '+res.status+'）。');return body}
+ const res=await fetch(authUrl+path,opts);let body={};try{body=await res.json()}catch{};if(!res.ok||body?.error){const e=Error(res.status===401&&path==='/sign-in/email'?'ログインできませんでした。メールアドレスとパスワードを確認してください。':'認証リクエストに失敗しました（HTTP '+res.status+'）。');e.status=res.status;throw e}return body}
 async function run(fn){if(busy)return;busy=true;login.disabled=signup.disabled=logout.disabled=true;try{await fn()}catch(e){showStatus(e instanceof TypeError?'認証サービスに接続できません。ブラウザのCookie/CORS設定を確認してください。':e.message)}finally{busy=false;login.disabled=signup.disabled=logout.disabled=false}}
 function clearFriendCache(){for(const k of ['baken-king-friend-score-v1','baken-king-friend-score-owner-v1','baken-king-friend-score-friend-id-v1'])localStorage.removeItem(k)}
-async function refresh(){const result=await call('/get-session');const user=result?.user||result?.data?.user||null;
+async function refresh(){let result;try{result=await call('/get-session')}catch(e){
+ // A guest has no session; HTTP 401 is expected before the first login.
+ if(e.status!==401)throw e;
+ view(null);return false;
+}const user=result?.user||result?.data?.user||null;
  const owner=localStorage.getItem('baken-king-friend-score-owner-v1');
  if(user?.id&&owner&&user.id!==owner)clearFriendCache();
  view(user);return !!user}
