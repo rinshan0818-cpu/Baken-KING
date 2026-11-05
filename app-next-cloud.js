@@ -1,6 +1,6 @@
 /* Same-origin cloud account integration for baken-king-app-next preview only.
  * GitHub Pages version is unchanged. No local ticket migration is automatic.
- * Only explicit, consented 7 raw metrics are sent to friends API.
+ * Only the seven aggregate metrics are sent to friends API; no wagers leave the device.
  */
 (()=>{
  'use strict';
@@ -16,12 +16,12 @@
   if(link){link.href='#';link.hidden=true;link.setAttribute('aria-hidden','true')}
   const details=exchange.querySelector('details');
   const note=details?.querySelector('p.muted');
-  if(note)note.textContent='今すぐ同期で自分の9項目を共有します。初回の承認後はアプリを開いている間、30分間隔で自動同期します。馬券の買い目・残高・履歴は送信しません。';
+  if(note)note.textContent='ログイン中はアプリを開いたときと15分間隔で成績を自動同期します。手動更新もできます。馬券の買い目・残高・履歴は送信しません。';
  }
  
  if(!account||!sync||!status)return;
  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
- const interval=30*60*1000;
+ const interval=15*60*1000;
  const STATE='keiba-demo-v1';
  let user=null,friend=null,busy=false,lastSuccess=0;
  const message=t=>{status.textContent=t};
@@ -43,7 +43,6 @@
   if(data.ok!==true)throw Error('友達情報を取得できません');
   return data;
  }
- const consentKey=id=>'baken-next-score-consent:'+id;
  const lastKey=id=>'baken-next-score-last:'+id;
  function setUser(next){
   user=next&&UUID.test(next.id)&&next.emailVerified===true?next:null;
@@ -66,6 +65,9 @@
    window.dispatchEvent(new Event('baken:nickname-changed'));
   }
   await loadFriend();
+  // No separate popup: users have already agreed to share within their group.
+  // Publish once on the first signed-in session and whenever 15 minutes elapsed.
+  await publish(false);
  }
  async function loadFriend(){
   if(!user)return;
@@ -75,7 +77,7 @@
   friend=first;
   const score=await friends('GET','summary/'+first.id);
   const s=score.summary;
-  if(!s){message('友達「'+(first.displayName||'友達')+'」の成績は未共有です。相手の「データ → 友達比較 → 今すぐ同期」から共有してください。');return}
+  if(!s){message('友達「'+(first.displayName||'友達')+'」の成績はまだ未共有です。相手がアプリにログインすると自動同期されます。');return}
   const metrics={profit:s.profitYen,roi:s.roiPercent==null?null:Math.round(s.roiPercent*10)/10,
    stake:s.stakeYen,paid:s.returnedYen,races:s.purchasedRaceCount,hitRaces:s.hitRaceCount,
    raceRate:s.raceHitRatePercent,maxPayout:s.maxPayoutYen,settled:s.settledTicketCount};
@@ -88,21 +90,18 @@
  }
  async function publish(manual){
   if(busy||!user||localStorage.getItem('baken-king-mode-v1')==='test')return;
-  if(!manual&&!localStorage.getItem(consentKey(user.id)))return;
   if(!manual&&(Date.now()-Math.max(lastSuccess,Number(localStorage.getItem(lastKey(user.id)))||0)<interval))return;
   busy=true;sync.disabled=true;
   try{
    const state=JSON.parse(localStorage.getItem(STATE)||'null');
    if(!state||!Array.isArray(state.bets))throw Error('この配信元に馬券記録がありません。バックアップを復元した後に同期してください');
-   // A newly registered friend may have no wagers yet. A consensual zero-score
-   // snapshot is still valid and must not be mistaken for an unpublished account.
+   // A newly registered friend may have no wagers yet. A zero-score
+   // snapshot is valid and must not be mistaken for an unpublished account.
    if(typeof bkFriendCloudSnapshot!=='function')throw Error('集計処理を確認できません');
    const metrics=bkFriendCloudSnapshot();
    const allowed=['stakeYen','returnedYen','settledTicketCount','purchasedRaceCount','hitRaceCount','settledRaceCount','maxPayoutYen'];
    if(Object.keys(metrics).sort().join(',')!==allowed.slice().sort().join(','))throw Error('集計形式が異なります');
-   if(manual&&!localStorage.getItem(consentKey(user.id))&&!confirm('このアカウントの友達に9項目の成績を公開し、アプリを開いている間は30分ごとに同期しますか？買い目・残高・精算履歴は送信しません。'))return;
    await friends('POST','summary',{metrics});
-   localStorage.setItem(consentKey(user.id),'1');
    lastSuccess=Date.now();localStorage.setItem(lastKey(user.id),String(lastSuccess));
    message('自分の成績を同期しました（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）');
    await loadFriend();
@@ -127,6 +126,8 @@
  sync.onclick=()=>publish(true);
  sync.textContent='自分の9項目を今すぐ同期';
  sync.disabled=false;
- loadUser().then(()=>{if(user)publish(false)}).catch(e=>{accountStatus.textContent='ログイン状態を確認できません：'+e.message});
+ loadUser().catch(e=>{accountStatus.textContent='ログイン状態を確認できません：'+e.message});
  setInterval(()=>{if(document.visibilityState==='visible')publish(false)},60000);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadUser().catch(e=>message(e.message))});
+ window.addEventListener('focus',()=>{if(document.visibilityState==='visible')loadUser().catch(e=>message(e.message))});
 })();
