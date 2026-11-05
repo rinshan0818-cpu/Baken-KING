@@ -15,4 +15,6 @@ assert(html.includes("user.id!==owner"),'Account switch must clear stale friend 
 assert(!html.includes("localStorage.removeItem('keiba-demo-v1'"),'Auth must never modify local wager storage');
 assert(!html.includes("localStorage.setItem('keiba-demo-v1'"),'Auth must never replace local wallet');
 assert(!html.includes('sharing_snapshots'),'Auth must not write friend data directly');
-console.log('PASS: independent account page syntax and OTP verification controls');
+assert.match(script,/if\(e\.status!==401\)throw e;\s*view\(null\);return false;/,'Guest session 401 must show login form, not HTTP error');
+assert.match(script,/res\.status===401&&path==='\/sign-in\/email'/,'Actual sign-in 401 must be reported separately');
+console.log('PASS: guest 401, failed-login error, independent account page and OTP verification');
