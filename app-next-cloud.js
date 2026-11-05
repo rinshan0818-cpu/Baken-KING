@@ -77,7 +77,7 @@
   friend=first;
   const score=await friends('GET','summary/'+first.id);
   const s=score.summary;
-  if(!s){message('友達「'+(first.displayName||'友達')+'」の成績は未共有です。相手の「データ → 友達比較 → 今すぐ同期」から共有してください。');return}
+  if(!s){message('友達「'+(first.displayName||'友達')+'」の成績はまだ未共有です。相手がアプリにログインすると自動同期されます。');return}
   const metrics={profit:s.profitYen,roi:s.roiPercent==null?null:Math.round(s.roiPercent*10)/10,
    stake:s.stakeYen,paid:s.returnedYen,races:s.purchasedRaceCount,hitRaces:s.hitRaceCount,
    raceRate:s.raceHitRatePercent,maxPayout:s.maxPayoutYen,settled:s.settledTicketCount};
