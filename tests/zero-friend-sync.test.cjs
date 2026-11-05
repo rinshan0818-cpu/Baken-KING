@@ -18,7 +18,7 @@ test('signed-in accounts auto-publish even zero-bet scores without confirmation'
  assert.match(sync,/await friends\('POST','summary',\{metrics\}\)/);
  assert.match(sync,/if\(!state\|\|!Array\.isArray\(state\.bets\)\)throw/);
  assert.match(sync,/localStorage\.getItem\('baken-king-mode-v1'\)==='test'/);
- assert.match(sync,/友達.*成績はまだ未共有です/);
+ assert.match(sync,/友達.*成績は未登録です/);
 });
 test('an empty score is valid for local comparison and server persistence',()=>{
  const bkScoreValid=source.slice(source.indexOf('function bkScoreValid(m){'),source.indexOf('function bkRenderFriendCompare(){'));
