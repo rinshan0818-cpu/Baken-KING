@@ -36,6 +36,7 @@ on:
       - 'friend-cloud-sync.js'
       - 'app-next-cloud.js'
       - 'tests/zero-friend-sync.test.cjs'
+      - 'tests/friend-cache-status-v101.test.cjs'
       - 'tests/friend-cloud-sync-consent.test.cjs'
       - 'tests/friend-refresh.test.cjs'
       - 'friend-score-wire.js'
@@ -176,6 +177,8 @@ jobs:
         run: node tests/friend-cloud-sync-consent.test.cjs
       - name: Test consensual empty friend score publication
         run: node --test tests/zero-friend-sync.test.cjs
+      - name: Test cached friend score and session expiry behavior
+        run: node --test tests/friend-cache-status-v101.test.cjs
       - name: Test manual and thirty-minute sync scheduling
         run: node tests/friend-sync.test.cjs
       - name: Test manual friend score exchange
