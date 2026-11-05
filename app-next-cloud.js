@@ -75,7 +75,7 @@
   friend=first;
   const score=await friends('GET','summary/'+first.id);
   const s=score.summary;
-  if(!s){message('友達「'+(first.displayName||'友達')+'」の成績は未登録です');return}
+  if(!s){message('友達「'+(first.displayName||'友達')+'」の成績は未共有です。相手の「データ → 友達比較 → 今すぐ同期」から共有してください。');return}
   const metrics={profit:s.profitYen,roi:s.roiPercent==null?null:Math.round(s.roiPercent*10)/10,
    stake:s.stakeYen,paid:s.returnedYen,races:s.purchasedRaceCount,hitRaces:s.hitRaceCount,
    raceRate:s.raceHitRatePercent,maxPayout:s.maxPayoutYen,settled:s.settledTicketCount};
@@ -94,7 +94,8 @@
   try{
    const state=JSON.parse(localStorage.getItem(STATE)||'null');
    if(!state||!Array.isArray(state.bets))throw Error('この配信元に馬券記録がありません。バックアップを復元した後に同期してください');
-   if(!state.bets.length&&manual)throw Error('馬券が0件です。バックアップの復元後に同期してください');
+   // A newly registered friend may have no wagers yet. A consensual zero-score
+   // snapshot is still valid and must not be mistaken for an unpublished account.
    if(typeof bkFriendCloudSnapshot!=='function')throw Error('集計処理を確認できません');
    const metrics=bkFriendCloudSnapshot();
    const allowed=['stakeYen','returnedYen','settledTicketCount','purchasedRaceCount','hitRaceCount','settledRaceCount','maxPayoutYen'];
