@@ -6,13 +6,19 @@ const sync=fs.readFileSync('app-next-cloud.js','utf8');
 const source=fs.readFileSync('index.html','utf8');
 const store=fs.readFileSync('sharing-server/neon-store.cjs','utf8');
 
-test('zero-bet accounts may explicitly publish a valid empty score',()=>{
+test('signed-in accounts auto-publish even zero-bet scores without confirmation',()=>{
  assert.doesNotMatch(sync,/if\(!state\.bets\.length&&manual\)throw/);
- assert.match(sync,/if\(manual&&!localStorage\.getItem\(consentKey\(user\.id\)\)&&!confirm\(/);
+ assert.doesNotMatch(sync,/consentKey|confirm\(/);
+ assert.match(sync,/const interval=15\*60\*1000/);
+ assert.match(sync,/await publish\(false\);/);
+ assert.match(sync,/setInterval\(\(\)=>\{if\(document\.visibilityState==='visible'\)publish\(false\)\},60000\)/);
+ assert.match(sync,/visibilitychange/);
+ assert.match(sync,/window\.addEventListener\('focus'/);
+ assert.match(sync,/if\(!manual&&\(Date\.now\(\)-Math\.max\(lastSuccess,Number\(localStorage\.getItem\(lastKey\(user\.id\)\)\)\|\|0\)<interval\)\)return/);
  assert.match(sync,/await friends\('POST','summary',\{metrics\}\)/);
  assert.match(sync,/if\(!state\|\|!Array\.isArray\(state\.bets\)\)throw/);
  assert.match(sync,/localStorage\.getItem\('baken-king-mode-v1'\)==='test'/);
- assert.match(sync,/友達.*成績は未共有です/);
+ assert.match(sync,/友達.*成績はまだ未共有です/);
 });
 test('an empty score is valid for local comparison and server persistence',()=>{
  const bkScoreValid=source.slice(source.indexOf('function bkScoreValid(m){'),source.indexOf('function bkRenderFriendCompare(){'));
