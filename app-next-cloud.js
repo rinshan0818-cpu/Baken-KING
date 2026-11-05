@@ -24,7 +24,45 @@
  const interval=15*60*1000;
  const STATE='keiba-demo-v1';
  let user=null,friend=null,busy=false,lastSuccess=0;
+ const SCORE='baken-king-friend-score-v1',OWNER='baken-king-friend-score-owner-v1',FRIEND='baken-king-friend-score-friend-id-v1';
+ const fetchedKey=id=>'baken-next-friend-fetched:'+id;
+ const compare=document.querySelector('.bk-friend-compare');
+ const compareState=document.createElement('p');
+ compareState.id='bkFriendCompareSyncState';compareState.className='muted';
+ compareState.setAttribute('role','status');compareState.setAttribute('aria-live','polite');
+ compare?.querySelector('.bk-compare-table')?.after(compareState);
  const message=t=>{status.textContent=t};
+ const stamp=ms=>Number.isFinite(ms)&&ms>0?new Date(ms).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'不明';
+ function cached(){
+  try{
+   const id=localStorage.getItem(OWNER),fid=localStorage.getItem(FRIEND);
+   const score=JSON.parse(localStorage.getItem(SCORE)||'null');
+   if(!UUID.test(id||'')||!UUID.test(fid||'')||score?.version!==1||
+      typeof bkScoreValid!=='function'||!bkScoreValid(score.metrics))return null;
+   if(user&&user.id!==id)return null;
+   return {id,fid,saved:Number(localStorage.getItem(fetchedKey(id)))||0};
+  }catch{return null}
+ }
+ function clearFriendCache(){
+  const previous=localStorage.getItem(OWNER);
+  for(const k of [SCORE,OWNER,FRIEND])localStorage.removeItem(k);
+  if(previous)localStorage.removeItem(fetchedKey(previous));
+  if(typeof bkRenderFriendCompare==='function')bkRenderFriendCompare();
+ }
+ function explain(text,{stale=false}={}){
+  const last=cached();
+  const line=stale&&last?'前回取得した成績を表示中（最終同期 '+stamp(last.saved)+'）':'';
+  if(compareState)compareState.textContent=[text,line].filter(Boolean).join(' ／ ');
+  message([text,line].filter(Boolean).join(' ／ '));
+ }
+ function failure(e){
+  if(e?.status===401){
+   setUser(null);
+   accountStatus.textContent='ログインの有効期限が切れた可能性があります。再ログインしてください。';
+   explain('再ログインが必要です',{stale:true});return;
+  }
+  explain('通信エラー：友達の成績を更新できません',{stale:true});
+ }
  const accountPanel=document.createElement('div');
  account.querySelectorAll('a[href*="baken-king-account-bridge.vercel.app"]').forEach(a=>a.hidden=true);
  accountPanel.innerHTML='<div class="row"><label style="flex:1 1 100%">メールアドレス<input id="bkNextEmail" type="email" autocomplete="email" style="width:100%"></label><label style="flex:1 1 100%">パスワード<input id="bkNextPassword" type="password" autocomplete="current-password" style="width:100%"></label></div><div class="row"><button id="bkNextLogin" class="alt" type="button">ログイン</button><button id="bkNextLogout" class="outline" type="button">ログアウト</button></div><p id="bkNextAccountStatus" class="muted" aria-live="polite">ログイン状態を確認しています</p><label>アカウントのニックネーム<input id="bkNextNickname" type="text" maxlength="16" placeholder="ニックネーム" style="width:100%"></label><button id="bkNextSaveName" class="outline" type="button">表示名を更新</button><div class="row"><button id="bkNextRefresh" class="outline" type="button">友達の成績を更新</button></div>';
@@ -56,7 +94,7 @@
   setUser(auth?.user||auth?.data?.user||null);
   if(!user)return;
   const oldOwner=localStorage.getItem('baken-king-friend-score-owner-v1');
-  if(oldOwner&&oldOwner!==user.id){for(const key of ['baken-king-friend-score-v1','baken-king-friend-score-owner-v1','baken-king-friend-score-friend-id-v1'])localStorage.removeItem(key);if(typeof bkRenderFriendCompare==='function')bkRenderFriendCompare()}
+  if(oldOwner&&oldOwner!==user.id)clearFriendCache();
   const me=await friends('GET','me');
   const name=me.user?.profile?.displayName;
   nickInput.value=typeof name==='string'?name:'';
@@ -73,20 +111,22 @@
   if(!user)return;
   const listing=await friends('GET','connections');
   const first=(listing.friends||[]).find(f=>UUID.test(f.id));
-  if(!first){friend=null;message('友達登録はありません');return}
+  if(!first){friend=null;clearFriendCache();explain('友達登録はありません');return}
   friend=first;
+  if(localStorage.getItem(FRIEND)&&localStorage.getItem(FRIEND)!==first.id)clearFriendCache();
   const score=await friends('GET','summary/'+first.id);
   const s=score.summary;
-  if(!s){message('友達「'+(first.displayName||'友達')+'」の成績はまだ未共有です。相手がアプリにログインすると自動同期されます。');return}
+  if(!s){clearFriendCache();explain('友達「'+(first.displayName||'友達')+'」の成績は未登録です。相手がアプリを開くと自動同期されます。');return}
   const metrics={profit:s.profitYen,roi:s.roiPercent==null?null:Math.round(s.roiPercent*10)/10,
    stake:s.stakeYen,paid:s.returnedYen,races:s.purchasedRaceCount,hitRaces:s.hitRaceCount,
    raceRate:s.raceHitRatePercent,maxPayout:s.maxPayoutYen,settled:s.settledTicketCount};
   if(typeof bkScoreValid!=='function'||!bkScoreValid(metrics))throw Error('友達の集計形式を確認できません');
-  localStorage.setItem('baken-king-friend-score-v1',JSON.stringify({version:1,metrics,nickname:first.displayName||'友達'}));
-  localStorage.setItem('baken-king-friend-score-owner-v1',user.id);
-  localStorage.setItem('baken-king-friend-score-friend-id-v1',first.id);
+  localStorage.setItem(SCORE,JSON.stringify({version:1,metrics,nickname:first.displayName||'友達'}));
+  localStorage.setItem(OWNER,user.id);
+  localStorage.setItem(FRIEND,first.id);
+  const fetchedAt=Date.now();localStorage.setItem(fetchedKey(user.id),String(fetchedAt));
   if(typeof bkRenderFriendCompare==='function')bkRenderFriendCompare();
-  message('友達「'+(first.displayName||'友達')+'」の成績を更新しました');
+  explain('友達「'+(first.displayName||'友達')+'」の成績を更新しました（最終同期 '+stamp(fetchedAt)+'）');
  }
  async function publish(manual){
   if(busy||!user||localStorage.getItem('baken-king-mode-v1')==='test')return;
@@ -105,7 +145,7 @@
    lastSuccess=Date.now();localStorage.setItem(lastKey(user.id),String(lastSuccess));
    message('自分の成績を同期しました（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）');
    await loadFriend();
-  }catch(e){if(manual)message(e.message||'同期に失敗しました')}
+  }catch(e){if(manual)failure(e)}
   finally{busy=false;sync.disabled=false}
  }
  saveName.onclick=async()=>{try{if(!user)throw Error('ログインしてください');const name=nickInput.value.trim();if(!name||name.length>16)throw Error('表示名は1〜16文字で入力してください');await friends('POST','profile',{displayName:name});window.BakenCloudNickname=name;window.dispatchEvent(new Event('baken:nickname-changed'));accountStatus.textContent='表示名を更新しました：'+name}catch(e){accountStatus.textContent=e.message}};
@@ -121,13 +161,14 @@
    const stopped=await window.BakenReleaseAccountPush();
    if(!stopped)throw Error('通知の停止を確認できません。通知設定を確認してからログアウトしてください');
   }
-  await api('POST','sign-out',{});setUser(null);window.BakenCloudNickname=null;window.dispatchEvent(new Event('baken:nickname-changed'));friend=null;message('ログアウトしました')}catch(e){accountStatus.textContent=e.message}};
- refreshButton.onclick=()=>loadUser().catch(e=>message(e.message));
+  await api('POST','sign-out',{});setUser(null);clearFriendCache();window.BakenCloudNickname=null;window.dispatchEvent(new Event('baken:nickname-changed'));friend=null;explain('ログアウトしました')}catch(e){accountStatus.textContent=e.message}};
+ refreshButton.onclick=()=>loadUser().catch(failure);
  sync.onclick=()=>publish(true);
  sync.textContent='自分の9項目を今すぐ同期';
  sync.disabled=false;
- loadUser().catch(e=>{accountStatus.textContent='ログイン状態を確認できません：'+e.message});
+ if(cached())explain('保存済みの友達成績を表示しています',{stale:true});
+ loadUser().catch(failure);
  setInterval(()=>{if(document.visibilityState==='visible')publish(false)},60000);
- document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadUser().catch(e=>message(e.message))});
- window.addEventListener('focus',()=>{if(document.visibilityState==='visible')loadUser().catch(e=>message(e.message))});
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadUser().catch(failure)});
+ window.addEventListener('focus',()=>{if(document.visibilityState==='visible')loadUser().catch(failure)});
 })();
