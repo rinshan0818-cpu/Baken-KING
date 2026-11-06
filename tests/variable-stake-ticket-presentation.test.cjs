@@ -52,3 +52,31 @@ test('normal add-on renders each selection and its own unit price',()=>{
  assert.match(html,/function bkSettlementTicket\(b\)\{[\s\S]*?bkTicketReceipt\(b,false\)/);
  assert.doesNotMatch(snippet,/localStorage|save\(|s\.bets|fetch\(/);
 });
+
+test('v1.09: ordered and unordered add-on selections use visible correct separators',()=>{
+ assert.match(html,/ordered\.has\(b\.type\)\?'▶':'－'/);
+ assert.match(html,/bk-v26-normal-separator/);
+});
+test('v1.09: variable stake layouts for 馬連 ワイド 馬単 三連単 and BOX / formation',()=>{
+ const scenarios=[
+  {type:'馬連',mode:'wheel',wheelAxes:[8],wheelPartners:[4,6,7],picks:[[8,4],[8,6],[8,7]]},
+  {type:'ワイド',mode:'wheel',wheelAxes:[8],wheelPartners:[4,6,7],picks:[[8,4],[8,6],[8,7]]},
+  {type:'馬単',mode:'wheel',wheelAxes:[8],wheelPartners:[4,6,7],wheelPosition:1,picks:[[8,4],[8,6],[8,7]]},
+  {type:'三連単',mode:'wheel',wheelAxes:[8],wheelPartners:[4,6,7],wheelPosition:1,picks:[[8,4,6],[8,4,7],[8,6,4],[8,6,7],[8,7,4],[8,7,6]]},
+  {type:'馬連',mode:'box',picks:[[4,6],[4,7],[6,7]]},
+  {type:'三連複',mode:'formation',formationLegs:[[8],[4],[6,7]],picks:[[8,4,6],[8,4,7]]}
+ ];
+ for(const c of scenarios){
+  const make=(picks,unitStake)=>({...c,id:'id-'+unitStake,realRaceId:'2026-11-07-KYOTO-8',season:1,status:'pending',
+    officialReady:false,purchasedAt:'2026-11-07T07:50:00Z',picks,unitStake,stake:picks.length*unitStake});
+  const input=[make(c.picks.slice(0,1),300),make(c.picks.slice(1),200)];
+  const before=JSON.stringify(input),result=display(input);
+  assert.equal(result[0].mode,c.mode,c.type);
+  assert.equal(result[1].mode,'normal',c.type);
+  assert.equal(result[0].stake,c.picks.length*200,c.type);
+  assert.equal(result[1].stake,100,c.type);
+  assert.equal(JSON.stringify(input),before,c.type+' originals unchanged');
+  input[1].purchasedAt='2026-11-07T07:50:09Z';
+  assert.deepEqual(display(input),input,c.type+' unrelated records remain separate');
+ }
+});
