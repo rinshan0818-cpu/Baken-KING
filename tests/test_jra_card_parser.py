@@ -129,5 +129,30 @@ class CardParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"horse_number_duplicate_or_excess"):
             parse_card(fixture().replace("<td>3</td><td><a href=\"/horse/3\">架空馬3","<td>2</td><td><a href=\"/horse/3\">架空馬3"),"2026-10-31","東京",3)
 
+
+    def test_official_jump_grade_image_and_turf_inner_outer_course(self):
+        from jra_card_normalizer import normalize_cards
+        html = """<html><body>
+        <p>2026年11月7日 5回京都1日 発走時刻：14時00分 8レース</p>
+        <h2>京都ジャンプステークス <img alt="J･GⅢ" src="grade.png"></h2>
+        <p>障害3歳以上 オープン （混合） 別定 コース：3,170メートル（芝 内外）</p>
+        <table><tr><th>枠</th><th>馬番</th><th>馬名</th></tr>
+        <tr><td>1</td><td>1</td><td><a>架空馬A</a></td></tr>
+        <tr><td>1</td><td>2</td><td><a>架空馬B</a></td></tr></table></body></html>"""
+        parsed = parse_card(html, "2026-11-07", "京都", 8)
+        conditions = normalize_cards([parsed])["races"][0]["raceConditions"]
+        self.assertEqual(conditions["grade"], "J・GⅢ")
+        self.assertEqual(conditions["surface"], "障害")
+        self.assertEqual(conditions["obstacleCourse"], "芝")
+        self.assertEqual(conditions["distanceMeters"], 3170)
+
+    def test_grade_image_not_inferred_from_ordinary_open(self):
+        html = fixture("2026-11-07","東京",11)
+        original = parse_card(html,"2026-11-07","東京",11)
+        self.assertNotIn("grade",original["raceConditions"])
+        ranked = html.replace("<table>", '<img alt="GⅡ" src="grade.png"><table>')
+        card = parse_card(ranked,"2026-11-07","東京",11)
+        self.assertEqual(card["raceConditions"]["grade"], "GⅡ")
+
 if __name__=="__main__":
     unittest.main()

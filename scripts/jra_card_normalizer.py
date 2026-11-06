@@ -60,11 +60,15 @@ def normalize_cards(cards, expected_date=None, expected_venues=None):
         restrictions = conditions.get("restrictions", [])
         if not isinstance(restrictions, list) or any(not isinstance(x, str) for x in restrictions):
             raise ValueError("invalid_restrictions")
-        optional = {field:conditions[field] for field in ("ageCondition","classCondition","grade","surface","distanceMeters") if field in conditions}
+        optional = {field:conditions[field] for field in ("ageCondition","classCondition","grade","surface","distanceMeters","obstacleCourse") if field in conditions}
         if "surface" in optional and optional["surface"] not in ("芝","ダート","障害"):
             raise ValueError("invalid_surface")
         if "distanceMeters" in optional and (type(optional["distanceMeters"]) is not int or not 100<=optional["distanceMeters"]<=5000):
             raise ValueError("invalid_distance")
+        if "obstacleCourse" in optional and (
+            optional.get("surface") != "障害" or optional["obstacleCourse"] not in ("芝", "ダート")
+        ):
+            raise ValueError("invalid_obstacle_course")
         for horse in horses:
             if "frame" in horse and (type(horse["frame"]) is not int or not 1 <= horse["frame"] <= 8):
                 raise ValueError("invalid_frame")
