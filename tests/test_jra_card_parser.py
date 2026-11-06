@@ -137,8 +137,8 @@ class CardParserTests(unittest.TestCase):
         <h2>京都ジャンプステークス <img alt="J･GⅢ" src="grade.png"></h2>
         <p>障害3歳以上 オープン （混合） 別定 コース：3,170メートル（芝 内外）</p>
         <table><tr><th>枠</th><th>馬番</th><th>馬名</th></tr>
-        <tr><td>1</td><td>1</td><a>架空馬A</a></td></tr>
-        <tr><td>1</td><td>2</td><a>架空馬B</a></td></tr></table></body></html>"""
+        <tr><td>1</td><td>1</td><td><a>架空馬A</a></td></tr>
+        <tr><td>1</td><td>2</td><td><a>架空馬B</a></td></tr></table></body></html>"""
         parsed = parse_card(html, "2026-11-07", "京都", 8)
         conditions = normalize_cards([parsed])["races"][0]["raceConditions"]
         self.assertEqual(conditions["grade"], "J・GⅢ")
