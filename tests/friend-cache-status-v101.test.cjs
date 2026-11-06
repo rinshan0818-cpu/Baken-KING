@@ -81,9 +81,9 @@ test('a verified missing summary is explicitly unregistered, not a connection er
  assert.match(t.state,/未登録/);
  assert.doesNotMatch(t.state,/通信エラー/);
 });
-test('v1.02 markers and no private wager transfer',()=>{
+test('v1.03 markers and no private wager transfer',()=>{
  const index=fs.readFileSync('index.html','utf8');
- for(const marker of ['<title>Baken-KING | v1.02</title>','現在 v1.02',"const APP_VERSION='v1.02';"])assert(index.includes(marker));
+ for(const marker of ['<title>Baken-KING | v1.03</title>','現在 v1.03',"const APP_VERSION='v1.03';"])assert(index.includes(marker));
  assert.match(source,/const interval=15\*60\*1000/);
  assert.match(source,/if\(busy\|\|!user\|\|localStorage.getItem\('baken-king-mode-v1'\)==='test'\)return/);
  assert.match(source,/await friends\('POST','summary',\{metrics\}\)/);
