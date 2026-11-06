@@ -2359,6 +2359,29 @@ function bkDemoRaceNumber(b){return Number.isInteger(b.demoRaceIndex)&&b.demoRac
 function bkCurrentRaceBets(){return s.bets.filter(b=>b.season===s.season&&bkDemoRaceNumber(b)===(s.demoRaceIndex||1))}
 function bkDemoRaceName(b){return '東京11R'+(bkDemoRaceNumber(b)>1?' · 第'+bkDemoRaceNumber(b)+'回':'')}
 function bkTicketRaceTitle(b){const raw=b.raceDate||b.purchasedAt||'';const d=raw?new Date(String(raw).slice(0,10)+'T12:00:00'):null;const date=d&&!Number.isNaN(d.getTime())?(d.getMonth()+1)+'/'+d.getDate()+' ':'';const venue=b.raceVenue||b.venue||'';const number=b.raceNumber||b.raceNo||'';return date+venue+(number?number+'R':'')+(bkResolvedRaceName(b)&&bkResolvedRaceName(b)!=='レース名未取得'?' '+bkResolvedRaceName(b):'')}
+// Ticket-tab heading only: keep prediction titles and the paper-ticket artwork unchanged.
+function bkTicketTabRaceName(b){
+ const base=bkResolvedRaceName(b);
+ const date=String(b.raceDate||b.realRaceId||b.raceId||'').slice(0,10);
+ const venue=b.raceVenue||b.venue||({TOKYO:'東京',KYOTO:'京都'})[String(b.realRaceId||'').match(/-(TOKYO|KYOTO)-/)?.[1]]||'';
+ const number=Number(b.raceNumber||b.raceNo||String(b.realRaceId||'').match(/-(\d{1,2})$/)?.[1]);
+ const verified={
+  '2026-11-01|東京|11':'G1',
+  '2026-11-07|東京|11':'G2',
+  '2026-11-07|京都|8':'J・G3'
+ };
+ const card=bkRaceCardForBet(b);
+ const raw=verified[[date,venue,number].join('|')]||
+  card?.raceConditions?.grade||card?.grade||
+  b.raceMeta?.grade||b.raceMeta?.raceGrade||b.grade||b.raceGrade||'';
+ const normalized=String(raw).trim().toUpperCase().replace(/[･·]/g,'・').replace(/[ⅠⅡⅢ]/g,x=>({'Ⅰ':'1','Ⅱ':'2','Ⅲ':'3'})[x]||x);
+ const grade=/^J[・-]?G(?:3|III)$/.test(normalized)?'J・G3':
+  /^(?:G1|GI)$/.test(normalized)?'G1':
+  /^(?:G2|GII)$/.test(normalized)?'G2':
+  /^(?:G3|GIII)$/.test(normalized)?'G3':'';
+ if(!grade||/[（(](?:J[・-]?)?G[ⅠⅡⅢ123]|GI{1,3}[）)]/i.test(base))return base;
+ return base+'（'+grade+'）';
+}
 function bkTicketHitPicks(b){
  if(b.status==='pending')return [];
  if(b.testSettlement)return Array.isArray(b.testWinningPicks)?b.testWinningPicks:[];
@@ -3171,7 +3194,7 @@ function machineRender(){
   const expanded=bkExpandedTicketRaces.has(key);section.classList.toggle('is-expanded',expanded);
   const toggle=bkNode('button',expanded?'▲':'▼','bk-race-ticket-toggle');toggle.type='button';toggle.setAttribute('aria-label',expanded?'馬券一覧を閉じる':'馬券一覧を開く');toggle.setAttribute('aria-expanded',String(expanded));
   toggle.onclick=()=>{if(bkExpandedTicketRaces.has(key))bkExpandedTicketRaces.delete(key);else bkExpandedTicketRaces.add(key);machineRender()};
-  const title=bkNode('strong',bkTicketRaceTitle(rows[0])+'　'+bkResolvedRaceName(rows[0]));header.append(title);
+  const title=bkNode('strong',bkTicketRaceTitle(rows[0]).replace(/ .*/,'')+'　'+bkTicketTabRaceName(rows[0]));header.append(title);
   title.style.cursor='pointer';title.onclick=()=>toggle.click();
   const pendingRows=rows.filter(b=>b.status==='pending'),readyRows=rows.filter(b=>b.status!=='pending');
   if(readyRows.length&&!rows[0].realRaceId){
