@@ -40,7 +40,7 @@ test('missing stored race name is recovered from verified race identity',()=>{
  assert.equal(getLabel(fromCard,{raceName:'未来ステークス',raceConditions:{grade:'GⅡ'}}),'未来ステークス（G2）');
 });
 test('full ticket title includes race name, and waiting status is below title',()=>{
- const codeToRun=code+'\\n'+
+ const codeToRun=code+'\n'+
  "bkTicketTabHeading({raceDate:'2026-11-07',raceVenue:'東京',raceNumber:11,raceName:''})";
  const label=vm.runInNewContext(codeToRun,{bkResolvedRaceName:t=>t.raceName,bkRaceCardForBet:()=>null});
  assert.equal(label,'11/7 東京11R 京王杯2歳ステークス（G2）');
