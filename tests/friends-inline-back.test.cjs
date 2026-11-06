@@ -15,5 +15,5 @@ assert(settings.includes("event.data?.type!=='BAKEN_CLOSE_INLINE_FRIENDS'"),'Onl
 assert(settings.includes("setFriendsVisible(false)"),'Close should hide iframe without reloading app');
 assert(settings.includes("open.scrollIntoView({block:'nearest'})"),'Return to settings close control');
 assert(friends.includes("credentials:'same-origin'"),'Friend auth route remains unchanged');
-assert(fs.readFileSync('index.html','utf8').includes("const APP_VERSION='v1.02';"),'Do not change v1.02');
-console.log('PASS: embedded friend return closes frame; standalone page and v1.02 unchanged');
+assert(fs.readFileSync('index.html','utf8').includes("const APP_VERSION='v1.03';"),'Do not change v1.03');
+console.log('PASS: embedded friend return closes frame; standalone page and v1.03 unchanged');
