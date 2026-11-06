@@ -26,8 +26,25 @@ test('published source grades work on future races, only when explicitly present
 });
 test('never add a duplicate grade and do not change prediction display or ticket artwork',()=>{
  assert.equal(getLabel({raceDate:'2026-11-07',raceVenue:'東京',raceNumber:11,raceName:'京王杯2歳ステークス（G2）'}),'京王杯2歳ステークス（G2）');
- assert.match(html,/const title=bkNode\('strong',bkTicketRaceTitle\(rows\[0\]\)\+bkTicketTabRaceName\(rows\[0\]\)/);
+ assert.match(html,/const title=bkNode\('strong',bkTicketTabHeading\(rows\[0\]\)\)/);
  assert.match(html,/const eventText=bkResolvedRaceName\(b\);/);
  assert.match(html,/function bkImportedRaceLabel\(c\)\{return bkOfficialRaceLabel\(c\)\}/);
  assert.doesNotMatch(code,/localStorage\.setItem|fetch\(|save\(/);
+});
+
+test('missing stored race name is recovered from verified race identity',()=>{
+ const missing={raceDate:'2026-11-07',raceVenue:'東京',raceNumber:11,raceName:''};
+ assert.equal(getLabel(missing),'京王杯2歳ステークス（G2）');
+ assert.equal(getLabel({...missing,raceVenue:'京都',raceNumber:8}),'京都ジャンプステークス（J・G3）');
+ const fromCard={...missing,raceDate:'2026-11-14',raceNumber:11};
+ assert.equal(getLabel(fromCard,{raceName:'未来ステークス',raceConditions:{grade:'GⅡ'}}),'未来ステークス（G2）');
+});
+test('full ticket title includes race name, and waiting status is below title',()=>{
+ const codeToRun=code+'\\n'+
+ "bkTicketTabHeading({raceDate:'2026-11-07',raceVenue:'東京',raceNumber:11,raceName:''})";
+ const label=vm.runInNewContext(codeToRun,{bkResolvedRaceName:t=>t.raceName,bkRaceCardForBet:()=>null});
+ assert.equal(label,'11/7 東京11R 京王杯2歳ステークス（G2）');
+ assert.match(html,/headingText.append\(status\)/);
+ assert.doesNotMatch(html,/header.append\(labels\)/);
+ assert.match(html,/\.bk-race-ticket-heading-text\{flex:1 1 auto/);
 });
