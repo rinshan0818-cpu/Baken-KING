@@ -37,15 +37,25 @@ def parse_race_conditions(text: str) -> dict:
     age_condition = age_match.group(0) if age_match else None
     class_match = re.search(r"(?:未勝利|新馬|[123]勝クラス|オープン)", compact)
     class_condition = class_match.group(0) if class_match else None
-    grade_match = re.search(r"(?:G[ⅠⅡⅢ]|G[123]|リステッド|\(L\))", compact)
-    grade = grade_match.group(0) if grade_match else None
+    grade_match = re.search(r"(?:J[･・]?G[ⅠⅡⅢ123]|G[ⅠⅡⅢ123]|リステッド|\(L\))", compact)
+    grade = grade_match.group(0).replace("･", "・") if grade_match else None
     surface_match = re.search(r"(芝|ダート|障害)\s*(\d{3,4})\s*(?:m|ｍ|メートル)", compact)
-    official_course = re.search(r"コース[:：]([\d,，]{3,6})(?:メートル|m|ｍ)\((芝|ダート|障害)(?:・[^)]*)?\)", compact)
+    # Official jump race descriptions show "障害3歳以上" but the course
+    # itself is labelled e.g. コース:3,170メートル(芝 内外).
+    official_course = re.search(
+        r"コース[:：]?([\d,，]{3,6})(?:メートル|m|ｍ)\((芝|ダート|障害)[^)]*\)", compact
+    ) or re.search(
+        r"コース[:：]?([\d,，]{3,6})(?:メートル|m|ｍ)(芝|ダート|障害)(?:内外|内|外|左|右)?", compact
+    )
     if official_course:
-        surface = official_course.group(2)
-        distance = int(official_course.group(1).replace(",","").replace("，",""))
+        course_track = official_course.group(2)
+        jump_race = bool(re.search(r"障害[234]歳", compact[:official_course.start()]))
+        surface = "障害" if jump_race else course_track
+        obstacle_course = course_track if jump_race else None
+        distance = int(official_course.group(1).replace(",", "").replace("，", ""))
     else:
         surface = surface_match.group(1) if surface_match else None
+        obstacle_course = None
         distance = int(surface_match.group(2)) if surface_match else None
     return {"restrictions": restrictions, "weightRule": weights[0] if weights else None,
             "isMixed": "混合" in restrictions,
@@ -54,7 +64,8 @@ def parse_race_conditions(text: str) -> dict:
             **({"ageCondition":age_condition} if age_condition else {}),
             **({"classCondition":class_condition} if class_condition else {}),
             **({"grade":grade} if grade else {}),
-            **({"surface":surface,"distanceMeters":distance} if surface else {})}
+            **({"surface":surface,"distanceMeters":distance} if surface else {}),
+            **({"obstacleCourse":obstacle_course} if obstacle_course else {})}
 
 def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     dt = datetime.strptime(day, "%Y-%m-%d")
@@ -82,6 +93,16 @@ def parse_card(html: str, day: str, venue: str, race_number: int) -> dict:
     # JRA puts 発走時刻 before the race-number heading; keep both in scope.
     header = current[:race_match.end() + 450].split("本賞金", 1)[0].split("詳細出馬表", 1)[0][:700]
     conditions = parse_race_conditions(header)
+    # Grade badges can be images. An exact alt label is official metadata;
+    # do not derive grade solely from the word "オープン".
+    if "grade" not in conditions:
+        badges = []
+        for img in soup.find_all("img"):
+            alt = re.sub(r"\s+", "", img.get("alt", "")).replace("･", "・")
+            if re.fullmatch(r"(?:J[・]?G[ⅠⅡⅢ123]|G[ⅠⅡⅢ123]|リステッド|L)", alt, re.I):
+                badges.append(alt)
+        if len(set(badges)) == 1:
+            conditions["grade"] = badges[0]
     start_match = re.search(r"発走時刻[:：]\s*(\d{1,2})時(\d{2})分", header)
     scheduled_start = None
     if start_match:

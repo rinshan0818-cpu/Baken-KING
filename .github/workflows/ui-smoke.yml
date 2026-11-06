@@ -17,6 +17,7 @@ on:
       - 'friends.html'
       - 'auth.html'
       - 'tests/expired-cards.test.cjs'
+      - 'tests/nov7-grade-course.test.cjs'
       - 'tests/monitor-flow-contract.test.cjs'
       - 'app-next-monitor.js'
       - 'app-next-results.js'
@@ -113,6 +114,8 @@ jobs:
         run: node --test tests/settings-release-simplification.test.cjs
       - name: Test expired race cards without losing stored wagers
         run: node tests/expired-cards.test.cjs
+      - name: Verify Nov 7 graded and obstacle course metadata is display-only
+        run: node --test tests/nov7-grade-course.test.cjs
       - name: Test first-party friend login and mobile analytics tabs
         run: node --test tests/friend-auth-data-tabs.test.cjs
       - name: Test login-to-friends transition
