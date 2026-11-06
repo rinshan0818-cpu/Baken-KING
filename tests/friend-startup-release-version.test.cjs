@@ -11,6 +11,6 @@ assert(html.includes("$('app').hidden=false;"),'Authenticated friend panel shoul
 assert(html.includes("status('友達情報を読み込んでいます…')"),'Show truthful loading state during requests');
 assert(html.includes("credentials:'same-origin'"),'Do not regress first-party session cookie handling');
 const index=fs.readFileSync('index.html','utf8');
-for(const line of ['<title>Baken-KING | v1.03</title>','現在 v1.03',"const APP_VERSION='v1.03';"])assert(index.includes(line),'Version marker is not aligned: '+line);
+for(const line of ['<title>Baken-KING | v1.04</title>','現在 v1.04',"const APP_VERSION='v1.04';"])assert(index.includes(line),'Version marker is not aligned: '+line);
 assert(!index.includes('v5.90'),'Previous public version must not remain');
-console.log('PASS: friend load sequence and three v1.03 release markers');
+console.log('PASS: friend load sequence and three v1.04 release markers');
