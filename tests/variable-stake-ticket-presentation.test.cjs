@@ -80,3 +80,14 @@ test('v1.09: variable stake layouts for 馬連 ワイド 馬単 三連単 and BO
   assert.deepEqual(display(input),input,c.type+' unrelated records remain separate');
  }
 });
+
+test('v1.10: ordinary one-selection ticket includes separators in shared addNums',()=>{
+ const start=html.indexOf('const addNums=(nums)=>');
+ const end=html.indexOf(';\n const ticketLayout=',start);
+ assert.ok(start>0&&end>start);
+ const snippet=html.slice(start,end);
+ assert.match(snippet,/nums\.forEach\(\(num,i\)=>/);
+ assert.match(snippet,/if\(i\)group\.append/);
+ assert.match(snippet,/ordered\.has\(b\.type\)\?'▶':'－'/);
+ assert.match(html,/\}else\{addNums\(picks\[0\]\|\|b\.nums\|\|\[\]\);\}/);
+});
