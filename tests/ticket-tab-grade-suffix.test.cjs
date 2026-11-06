@@ -27,7 +27,7 @@ test('published source grades work on future races, only when explicitly present
 test('never add a duplicate grade and do not change prediction display or ticket artwork',()=>{
  assert.equal(getLabel({raceDate:'2026-11-07',raceVenue:'東京',raceNumber:11,raceName:'京王杯2歳ステークス（G2）'}),'京王杯2歳ステークス（G2）');
  assert.match(html,/const title=bkNode\('strong',bkTicketTabHeading\(rows\[0\]\)\)/);
- assert.match(html,/const eventText=bkTicketTabRaceName\(b\);/);
+ assert.match(html,/const eventText=bkResolvedRaceName\(b\);/);
  assert.match(html,/function bkImportedRaceLabel\(c\)\{return bkOfficialRaceLabel\(c\)\}/);
  assert.doesNotMatch(code,/localStorage\.setItem|fetch\(|save\(/);
 });
@@ -49,16 +49,10 @@ test('full ticket title includes race name, and waiting status is below title',(
  assert.match(html,/\.bk-race-ticket-heading-text\{flex:1 1 auto/);
 });
 
-test('paper tickets include grade after race name without a duplicate floating grade mark',()=>{
- assert.match(html,/const eventText=bkTicketTabRaceName\(b\);/);
- assert.match(html,/if\(gradeInline\)card\.classList\.add\('bk-v26-grade-inline'\)/);
- assert.match(html,/if\(gradeText&&!gradeInline\)/);
- assert.match(html,/\.bk-ticket-v23\.bk-v26-grade-inline \.bk-v26-grade-mark\{display:none!important\}/);
- for(const [raceDate,raceVenue,raceNumber,raceName,expected] of [
-  ['2026-11-07','東京',11,'京王杯2歳ステークス','京王杯2歳ステークス（G2）'],
-  ['2026-11-07','京都',8,'京都ジャンプステークス','京都ジャンプステークス（J・G3）'],
-  ['2026-11-07','京都',11,'室町ステークス','室町ステークス']
- ]){
-  assert.equal(getLabel({raceDate,raceVenue,raceNumber,raceName}),expected);
- }
+test('printed ticket keeps the original full-size race name and does not append a grade',()=>{
+ const receipt=html.slice(html.indexOf('function bkTicketReceipt(b,compact=false){'),html.indexOf('function bkTicketReceipt(b,compact=false){')+12000);
+ assert.match(receipt,/const eventText=bkResolvedRaceName\(b\);/);
+ assert.doesNotMatch(receipt,/const eventText=bkTicketTabRaceName\(b\);/);
+ assert.doesNotMatch(receipt,/bk-v26-grade-mark|bk-v26-graded-event|bk-v26-grade-inline/);
+ assert.match(html,/const title=bkNode\('strong',bkTicketTabHeading\(rows\[0\]\)\)/);
 });
