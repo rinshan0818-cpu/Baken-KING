@@ -42,6 +42,21 @@ function raceCount(data){
  if(Array.isArray(data?.monitorTargets))return data.monitorTargets.length;
  return null;
 }
+// Date classification is presentation-only. A successful API response does not
+// prove that today's races have finished or that the five-minute monitor ran.
+function classifyVerifiedResults(data,now=new Date()){
+ if(!Array.isArray(data?.races))return null;
+ const today=new Date(now.getTime()+9*60*60*1000).toISOString().slice(0,10);
+ const counts={today:0,past:0,future:0,unknown:0};
+ for(const race of data.races){
+  const day=typeof race?.date==='string'?race.date:'';
+  if(!/^20\d{2}-\d{2}-\d{2}$/.test(day)||Number.isNaN(Date.parse(day+'T00:00:00Z'))){counts.unknown++;continue;}
+  if(day===today)counts.today++;
+  else if(day<today)counts.past++;
+  else counts.future++;
+ }
+ return counts;
+}
 async function checkOperation(spec){
  operationStatus(spec.key,'pending','接続検査中','配信APIから現在の状態を取得しています…');
  try{
@@ -60,6 +75,24 @@ async function checkOperation(spec){
   }
   const data=await response.json();
   const count=raceCount(data);
+  if(spec.key==='Results'){
+   const buckets=classifyVerifiedResults(data);
+   if(!buckets){
+    operationStatus(spec.key,'unknown','取得形式不明','確定結果APIは応答しましたが、開催日を含むレース一覧を取得できません。');
+    return 'unknown';
+   }
+   const detail='本日の確定結果：'+buckets.today+'レース／保存済みの過去結果：'+buckets.past+'レース。';
+   if(buckets.future||buckets.unknown){
+    operationStatus(spec.key,'error','結果の日付に要確認',detail+'未来日付：'+buckets.future+'レース／日付不明・不正：'+buckets.unknown+'レース。結果APIのデータを確認してください。');
+    return 'error';
+   }
+   if(buckets.today===0&&buckets.past===0){
+    operationStatus(spec.key,'waiting','配信データなし',detail+'確定結果APIは接続可能です。');
+    return 'waiting';
+   }
+   operationStatus(spec.key,'ok',buckets.today?'本日の結果あり':'過去結果あり',detail+'確定結果APIへの接続を確認しました（自動監視の実行は別項目で判定）。');
+   return 'ok';
+  }
   if(count===null){
    operationStatus(spec.key,'unknown','取得形式不明','APIは応答しましたが、対象レース数を読み取れませんでした。');
    return 'unknown';
