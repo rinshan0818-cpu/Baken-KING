@@ -13,6 +13,8 @@
  const audio=new Audio('./settlement-chime.mp3');
  audio.preload='auto';
  const PREFERENCE='baken-king-settlement-chime-v1';
+ const FORCE_MUTE='baken-king-sound-force-off-v1';
+ const forcedOff=()=>localStorage.getItem(FORCE_MUTE)==='on';
  const box=document.createElement('div');
  box.className='bk-shared-sound-box';
  const title=document.createElement('h4');title.textContent='精算準備の共通チャイム';
@@ -27,13 +29,18 @@
  const status=document.createElement('p');status.className='muted';status.setAttribute('aria-live','polite');
  enabled.onchange=()=>localStorage.setItem(PREFERENCE,enabled.checked?'on':'off');
  async function play(){
+  if(forcedOff()){audio.pause();audio.currentTime=0;return}
   audio.pause();audio.currentTime=0;
-  try{await audio.play();status.textContent='チャイムを再生しました'}
+  try{await audio.play();if(forcedOff()){audio.pause();audio.currentTime=0;return}status.textContent='チャイムを再生しました'}
   catch{status.textContent='音声を再生できません。アプリ内の試聴ボタンを押し、端末の音量を確認してください'}
  }
  trySound.onclick=play;
  window.addEventListener('baken:new-settlement-ready',event=>{
-  if(enabled.checked&&document.visibilityState==='visible'&&Number(event.detail?.count)>0)play();
+  if(!forcedOff()&&enabled.checked&&document.visibilityState==='visible'&&Number(event.detail?.count)>0)play();
+ });
+ window.addEventListener('baken:force-mute-changed',event=>{
+  if(event.detail?.muted){audio.pause();audio.currentTime=0;status.textContent='チャイムを強制オフにしました'}
+  else status.textContent='強制オフを解除しました';
  });
  audio.addEventListener('error',()=>{status.textContent='共通チャイムの音源を取得できません（配信準備中）'});
  box.append(title,label,desc,trySound,status);
