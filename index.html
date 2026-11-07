@@ -1293,20 +1293,22 @@ body.bk-payout-locked #realAutoSettle[disabled]{display:none!important}
 /* v1.15: four horses in the first formation leg require two full, readable
    columns. Earlier packed-leg weighting squeezed the first column so 11/14
    collapsed vertically. Allocate explicit space; leave small formations alone. */
-.bk-ticket-v23 .bk-v26-picks-formation .bk-v26-formation:has(.bk-v26-leg-packed) .bk-v26-leg-big:not(.bk-v26-leg-packed){
+.bk-ticket-v23 .bk-v26-picks-formation .bk-v26-formation:has(.bk-v26-leg-four) .bk-v26-leg-four{
  flex:1.35 1 0;
  grid-template-columns:repeat(2,minmax(0,1fr));
  min-width:0;
  gap:clamp(1px,.25cqw,2px);
  overflow:hidden;
 }
-.bk-ticket-v23 .bk-v26-picks-formation .bk-v26-formation:has(.bk-v26-leg-packed) .bk-v26-leg-big:not(.bk-v26-leg-packed) .bk-v26-num{
+.bk-ticket-v23 .bk-v26-picks-formation .bk-v26-formation:has(.bk-v26-leg-four) .bk-v26-leg-four .bk-v26-num{
  box-sizing:border-box;
  width:100%;min-width:0;max-width:100%;
  height:clamp(13px,3.3cqw,20px);
  font-size:clamp(8px,2.35cqw,13px);
  line-height:1;
 }
+/* Keep columns with 5-6 selected horses proportional to the corrected first leg. */
+.bk-ticket-v23 .bk-v26-picks-formation .bk-v26-formation:has(.bk-v26-leg-four) .bk-v26-leg:not(.bk-v26-leg-four):not(.bk-v26-leg-packed){flex:1.1 1 0;min-width:0;overflow:hidden}
 /* v4.14: detailed purchase confirmation */
 .bk-purchase-overlay{position:fixed;inset:0;z-index:99999;background:rgba(8,24,45,.65);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
 .bk-purchase-dialog{width:min(100%,480px);max-height:min(88dvh,780px);overflow:auto;overscroll-behavior:contain;background:#fff;color:#142d4b;border-radius:20px;padding:22px;box-shadow:0 20px 65px #06162966;box-sizing:border-box}
@@ -2843,7 +2845,7 @@ function bkTicketReceipt(b,compact=false){
  if(mode==='formation'&&picks.length>1){
    const k=specs[b.type]||picks[0]?.length||2;
    const legs=Array.isArray(b.formationLegs)&&b.formationLegs.slice(0,k).every(x=>x?.length)?b.formationLegs.slice(0,k):Array.from({length:k},(_,i)=>[...new Set(picks.map(p=>p[i]))]);
-   const cols=bkNode('div','','bk-v26-formation');cols.classList.add('bk-v26-layout-'+Math.min(legs.length,3));const maxLegSize=Math.max(...legs.map(x=>new Set(x).size));if(maxLegSize>=5)cols.classList.add('bk-v26-formation-dense');if(maxLegSize>=8)cols.classList.add('bk-v26-formation-ultra');for(let i=0;i<legs.length;i++){const col=bkNode('div','','bk-v26-leg');const numbers=[...new Set(legs[i].map(Number))].sort((a,z)=>a-z);col.classList.add(numbers.length===1?'bk-v26-leg-one':numbers.length<=10?'bk-v26-leg-two':'bk-v26-leg-three');if(numbers.length>=7)col.classList.add('bk-v26-leg-packed');if(numbers.length>=13)col.classList.add('bk-v26-leg-ultrapacked');if(numbers.length<=4)col.classList.add('bk-v26-leg-big');const fullField=Number(b.fieldSize)||(b.realRaceId==='2026-11-01-TOKYO-11'?17:0);if(fullField>=8&&numbers.length===fullField&&numbers.every((n,j)=>n===j+1)){col.append(bkNode('span','全','bk-v26-all'))}else{for(const num of numbers){col.append(bkNode('span',String(num),'bk-v26-num'))}}cols.append(col);if(i<legs.length-1){const sep=bkNode('span',ordered.has(b.type)?'▶':'－','bk-v26-separator');cols.append(sep)}}picksRoot.append(cols);
+   const cols=bkNode('div','','bk-v26-formation');cols.classList.add('bk-v26-layout-'+Math.min(legs.length,3));const maxLegSize=Math.max(...legs.map(x=>new Set(x).size));if(maxLegSize>=5)cols.classList.add('bk-v26-formation-dense');if(maxLegSize>=8)cols.classList.add('bk-v26-formation-ultra');for(let i=0;i<legs.length;i++){const col=bkNode('div','','bk-v26-leg');const numbers=[...new Set(legs[i].map(Number))].sort((a,z)=>a-z);col.classList.add(numbers.length===1?'bk-v26-leg-one':numbers.length<=10?'bk-v26-leg-two':'bk-v26-leg-three');if(numbers.length>=7)col.classList.add('bk-v26-leg-packed');if(numbers.length>=13)col.classList.add('bk-v26-leg-ultrapacked');if(numbers.length<=4)col.classList.add('bk-v26-leg-big');if(numbers.length===4)col.classList.add('bk-v26-leg-four');const fullField=Number(b.fieldSize)||(b.realRaceId==='2026-11-01-TOKYO-11'?17:0);if(fullField>=8&&numbers.length===fullField&&numbers.every((n,j)=>n===j+1)){col.append(bkNode('span','全','bk-v26-all'))}else{for(const num of numbers){col.append(bkNode('span',String(num),'bk-v26-num'))}}cols.append(col);if(i<legs.length-1){const sep=bkNode('span',ordered.has(b.type)?'▶':'－','bk-v26-separator');cols.append(sep)}}picksRoot.append(cols);
  }else if(mode==='wheel'&&picks.length>1){
    const axes=Array.isArray(b.wheelAxes)&&b.wheelAxes.length?b.wheelAxes.map(Number):[Number(b.axis)||picks[0]?.[0]];
    const others=Array.isArray(b.wheelPartners)&&b.wheelPartners.length?b.wheelPartners.map(Number):[...new Set(picks.flat().filter(x=>!axes.includes(x)))].sort((a,z)=>a-z);
