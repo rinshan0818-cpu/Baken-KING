@@ -25,7 +25,7 @@ function render(venue,raceNumber,overrides={}){
  const sandbox={
   document:{querySelector:q=>q==='#autumnFixtureCard .bk-race-hero'?hero:null,
    createElement:elem,addEventListener(){} },
-  individualStakes:{clear(){}},draw(){},bkDraftStore(){},window:{addEventListener(){}},
+  individualStakes:{clear(){}},individualToggle:{checked:false},bkDraftRestore(){},draw(){},bkDraftStore(){},window:{addEventListener(){}},
   input:{date:'2026-11-07',venue,raceNumber,numbersConfirmed:true,
    title:'公式のレース名',startTime:'14:00',
    horses:[{number:1,name:'架空馬A'},{number:2,name:'架空馬B'}],
