@@ -19,12 +19,12 @@ self.addEventListener('push',event=>{
    icon:'./baken_king_icon_512.png',
    badge:'./icon.svg',
    tag,renotify:false,
-   data:{url:new URL('./?open=tickets',self.registration.scope).href},
+   data:{url:new URL('./?open=settlement',self.registration.scope).href},
  }));
 });
 self.addEventListener('notificationclick',event=>{
  event.notification.close();
- const url=event.notification.data?.url||new URL('./?open=tickets',self.registration.scope).href;
+ const url=event.notification.data?.url||new URL('./?open=settlement',self.registration.scope).href;
  event.waitUntil((async()=>{
   const clientsList=await clients.matchAll({type:'window',includeUncontrolled:true});
   const scope=new URL(self.registration.scope);
@@ -32,7 +32,7 @@ self.addEventListener('notificationclick',event=>{
    const current=new URL(client.url);
    if(current.origin===scope.origin&&current.pathname.startsWith(scope.pathname)){
     await client.focus();
-    client.postMessage({type:'BAKEN_OPEN_TICKETS_FROM_NOTIFICATION'});
+    client.postMessage({type:'BAKEN_OPEN_SETTLEMENT_FROM_NOTIFICATION'});
     return;
    }
   }
