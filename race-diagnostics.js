@@ -76,12 +76,12 @@
   button.addEventListener('click',diagnose);
   panel.append(heading,note,select,button,out);target.prepend(panel);
   async function authorize(){
-   panel.hidden=true;
+   panel.hidden=true;fold.hidden=true;
    try{
     const r=await fetch('/api/auth/admin/status',{credentials:'same-origin',cache:'no-store'});
     if(!r.ok)return;
     const d=await r.json();
-    if(d.ok===true&&d.admin===true){panel.hidden=false;refresh()}
+    if(d.ok===true&&d.admin===true){fold.hidden=false;panel.hidden=false;refresh()}
    }catch{}
   }
   window.addEventListener('baken:account-changed',authorize);
