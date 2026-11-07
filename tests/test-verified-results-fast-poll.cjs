@@ -6,11 +6,11 @@ const INITIAL=Date.parse('2026-11-07T15:45:00+09:00');
 function fixture(bets=[]){
  let now=INITIAL,visible=true,loaded=bets,requests=0,imports=0,interval;
  const handlers={};
- const state={textContent:''};
+ const state={textContent:'',setAttribute(){}};
  const sandbox={
   location:{hostname:'baken-king-app-next.vercel.app'},
   localStorage:{getItem(k){return k==='keiba-demo-v1'?JSON.stringify({bets:loaded}):null}},
-  document:{get visibilityState(){return visible?'visible':'hidden'},createElement(){return state},getElementById(){return {append(){}}},addEventListener(k,fn){handlers[k]=fn}},
+  document:{get visibilityState(){return visible?'visible':'hidden'},createElement(){return state},querySelector(){return null},getElementById(){return {append(){}}},addEventListener(k,fn){handlers[k]=fn}},
   window:{BakenImportVerifiedResults:async()=>{imports++;return 0},addEventListener(k,fn){handlers[k]=fn},dispatchEvent(){}},
   fetch:async()=>{requests++;return {status:200,ok:true,json:async()=>({schemaVersion:1,races:[]})}},
   Date:class extends Date{static now(){return now}},
