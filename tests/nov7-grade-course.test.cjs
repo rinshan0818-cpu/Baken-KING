@@ -24,7 +24,7 @@ function render(venue,raceNumber,overrides={}){
  };
  const sandbox={
   document:{querySelector:q=>q==='#autumnFixtureCard .bk-race-hero'?hero:null,
-   createElement:elem},
+   createElement:elem,addEventListener(){} },
   individualStakes:{clear(){}},draw(){},window:{},
   input:{date:'2026-11-07',venue,raceNumber,numbersConfirmed:true,
    title:'公式のレース名',startTime:'14:00',
