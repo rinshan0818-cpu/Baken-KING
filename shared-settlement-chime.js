@@ -14,6 +14,9 @@
  audio.preload='auto';
  const PREFERENCE='baken-king-settlement-chime-v1';
  const FORCE_MUTE='baken-king-sound-force-off-v1';
+ // One source of truth for the header indicator and the settings preference.
+ function effectiveOn(){return localStorage.getItem(FORCE_MUTE)!=='on'&&localStorage.getItem(PREFERENCE)!=='off'}
+ window.BakenSharedChimeEnabled=effectiveOn;
  const forcedOff=()=>localStorage.getItem(FORCE_MUTE)==='on';
  const box=document.createElement('div');
  box.className='bk-shared-sound-box';
@@ -27,22 +30,31 @@
  desc.textContent='音源は全ユーザー共通です。個別のMP3登録・変更はできません。アプリを閉じている間の通知音はiPhone側の設定が使われます。';
  const trySound=document.createElement('button');trySound.className='outline';trySound.type='button';trySound.textContent='チャイムを試聴';
  const status=document.createElement('p');status.className='muted';status.setAttribute('aria-live','polite');
- enabled.onchange=()=>localStorage.setItem(PREFERENCE,enabled.checked?'on':'off');
- async function play(){
-  if(forcedOff()){audio.pause();audio.currentTime=0;return}
+ enabled.onchange=()=>{localStorage.setItem(PREFERENCE,enabled.checked?'on':'off');window.dispatchEvent(new Event('baken:chime-preference-changed'))};
+ async function play(preview=false){
+  if(forcedOff()){
+   audio.pause();audio.currentTime=0;
+   status.textContent='上部のチャイムがOFFです。ONにしてから試してください。';return;
+  }
+  if(!preview&&!enabled.checked){status.textContent='設定内のチャイムがOFFです';return;}
   audio.pause();audio.currentTime=0;
-  try{await audio.play();if(forcedOff()){audio.pause();audio.currentTime=0;return}status.textContent='チャイムを再生しました'}
-  catch{status.textContent='音声を再生できません。アプリ内の試聴ボタンを押し、端末の音量を確認してください'}
+  try{
+   await audio.play();
+   if(forcedOff()){audio.pause();audio.currentTime=0;return;}
+   status.textContent=preview?'試聴中です':'精算準備チャイムを再生しました';
+  }catch(error){
+   status.textContent='音声再生に失敗（'+String(error?.name||'不明')+'）。試聴ボタンを押し、端末の音量とマナーモードを確認してください。';
+  }
  }
- trySound.onclick=play;
+ trySound.onclick=()=>play(true);
  window.addEventListener('baken:new-settlement-ready',event=>{
-  if(!forcedOff()&&enabled.checked&&document.visibilityState==='visible'&&Number(event.detail?.count)>0)play();
+  if(!forcedOff()&&enabled.checked&&document.visibilityState==='visible'&&Number(event.detail?.count)>0)play(false);
  });
  window.addEventListener('baken:force-mute-changed',event=>{
   if(event.detail?.muted){audio.pause();audio.currentTime=0;status.textContent='チャイムを強制オフにしました'}
   else status.textContent='強制オフを解除しました';
  });
- audio.addEventListener('error',()=>{status.textContent='共通チャイムの音源を取得できません（配信準備中）'});
+ audio.addEventListener('error',()=>{status.textContent='共通チャイムの音源を取得できません。配信ファイルを確認してください。'});
  box.append(title,label,desc,trySound,status);
  panel.append(box);
 })();
