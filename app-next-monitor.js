@@ -19,7 +19,7 @@
  pushScript.src='./app-next-push.js?v=1';pushScript.async=true;
  document.head.append(pushScript);
  const sharedSoundScript=document.createElement('script');
- sharedSoundScript.src='./shared-settlement-chime.js?v=1';
+ sharedSoundScript.src='./shared-settlement-chime.js?v=2';
  sharedSoundScript.async=true;
  document.head.append(sharedSoundScript);
  if(localStorage.getItem('baken-king-mode-v1')==='test')return;
