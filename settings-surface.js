@@ -1,4 +1,4 @@
-/* Settings surface v5.35: presentation only, no auth or data changes. */
+/* Settings surface v1.35: presentation only, no auth or data changes. */
 (()=>{
  'use strict';
  function init(){
@@ -12,7 +12,7 @@
   root.innerHTML='<div class="bk-settings-heading"><div><h2>設定</h2><p class="muted">アプリの設定とデータ管理</p></div></div>';
   const sections=[
    {id:'account',name:'アカウント・友達',hint:'ログイン・表示名・友達登録・成績共有',open:false},
-   {id:'general',name:'通知・アプリ',hint:'プッシュ通知・共通チャイム・更新',open:true},
+   {id:'general',name:'通知・アプリ',hint:'プッシュ通知・共通チャイム・更新',open:false},
    {id:'data',name:'データ管理',hint:'バックアップ・復元・購入履歴',open:false},
    {id:'admin',name:'管理・接続設定',hint:'出馬表・結果取得・診断（管理者向け）',open:false}
   ];
@@ -204,6 +204,12 @@
   adminNotice.textContent='管理用の診断項目です。通常ユーザーには表示されません。';
   groups.admin.prepend(adminNotice);
   main.append(root);
+  // Every entry through the settings gear starts with all categories collapsed.
+  // Keep normal user-triggered <details> toggling unchanged while inside Settings.
+  document.addEventListener('click',event=>{
+   if(!event.target.closest?.('[data-nav="settings"]'))return;
+   root.querySelectorAll('.bk-settings-fold').forEach(fold=>{fold.open=false});
+  },true);
   // Only the signed-in, server-authorized owner can see the management link.
   if(location.hostname==='baken-king-app-next.vercel.app'){
    const wrap=document.createElement('p');
