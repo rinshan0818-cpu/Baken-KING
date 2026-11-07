@@ -24,7 +24,7 @@
   function available(){
    const entries=new Map();
    for(const b of bets()){
-    if(b?.status!=='pending'||!/^20\\d{2}-\\d{2}-\\d{2}$/.test(b.raceDate||'')||!b.raceVenue||!Number.isInteger(Number(b.raceNumber)))continue;
+    if(b?.status!=='pending'||!/^20\d{2}-\d{2}-\d{2}$/.test(b.raceDate||'')||!b.raceVenue||!Number.isInteger(Number(b.raceNumber)))continue;
     const id=key(b);if(!entries.has(id))entries.set(id,b);
    }
    return [...entries.entries()].sort((a,b)=>b[0].localeCompare(a[0]));
@@ -69,7 +69,7 @@
       server,
       matched&&needs.length?'判定：配信済みなのに結果待ち。レース識別子または取込エラーを調査してください。':!res.ok?'判定：確定結果APIとの接続・ログインを確認してください。':!matched?'判定：サーバー側で対象レースの確定結果が未配信です。監視対象登録・JRA取得・承認処理を調査してください。':'判定：配信済み。精算待ちへの反映を確認してください。',
       '※この診断による記録の変更・自動精算はありません。'
-    ];out.textContent=msg.join('\\n');
+    ];out.textContent=msg.join('\n');
    }catch(e){out.textContent='診断失敗：'+String(e?.message||e)+'。記録は変更していません。'}
    finally{button.disabled=false}
   }
