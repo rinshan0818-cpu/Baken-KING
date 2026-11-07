@@ -86,8 +86,9 @@
  }
  // A notification can be received while the result-feed script is loading.
  // Replay the request after setup without relying on event-listener order.
- if(window.BakenNotificationSettlementReady){
-  queueMicrotask(()=>{if(window.BakenNotificationSettlementReady()===true){notificationRequested=false;notificationStatus.hidden=true}});
+ if(window.BakenNotificationSettlementPending?.()===true){
+  notificationRequested=true;
+  notificationMessage('通知されたレースの確定結果を確認しています…');
  }
  window.BakenRefreshVerifiedResults=fetchResults;
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')fetchResults()});
