@@ -3016,7 +3016,8 @@ function bkMeta(b,key){
   const condition=card?.raceConditions||{};
   const verifiedClass={
    '2026-11-07|福島|9':'1勝クラス',
-   '2026-11-07|東京|9':'2勝クラス'
+   '2026-11-07|東京|9':'2勝クラス',
+   '2026-11-07|東京|10':'3勝クラス'
   };
   const raceKey=[b.raceDate||String(b.realRaceId||'').slice(0,10),b.raceVenue||b.venue,Number(b.raceNumber)].join('|');
   if(verifiedClass[raceKey])return verifiedClass[raceKey];
