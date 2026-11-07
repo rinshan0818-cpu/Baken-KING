@@ -3784,6 +3784,7 @@ function bkRequestNotificationSettlement(){
  bkWithTrustedNavigation(bkHasLocalSettlementReady()?'payout':'tickets');
  window.dispatchEvent(new Event('baken:notification-settlement-requested'));
 }
+window.BakenNotificationSettlementPending=()=>bkNotificationSettlementRequested;
 window.BakenNotificationSettlementReady=function(){
  if(!bkNotificationSettlementRequested||!bkHasLocalSettlementReady())return false;
  bkNotificationSettlementRequested=false;
