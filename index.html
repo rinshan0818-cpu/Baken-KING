@@ -2929,7 +2929,7 @@ $('count').textContent=s.bets.length+'件';renderDashboards();$('seasons').textC
 
 const bkVenues=['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'];
 let bkDetail='venue';
-const bkDetailFields={venue:{label:'競馬場',values:bkVenues},surface:{label:'コース',values:['芝','ダート','障害']},distance:{label:'距離',values:['〜1400m','1401〜1800m','1801〜2400m','2401m〜']},class:{label:'クラス',values:['新馬','未勝利','1勝クラス','2勝クラス','3勝クラス','オープン','リステッド','GⅢ','GⅡ','GⅠ']},weightRule:{label:'負担重量区分',values:['ハンデ','別定','定量','馬齢']},restriction:{label:'出走条件',values:['混合','牝馬限定','牡・せん限定','指定','特別指定','国際','若手騎手']},raceKind:{label:'平地・障害',values:['平地','障害']},going:{label:'馬場状態',values:['良','稍重','重','不良']},style:{label:'買い方',values:['通常','BOX','流し','フォーメーション']},fieldSize:{label:'頭数',values:['〜9頭','10〜13頭','14〜16頭','17頭以上']}};
+const bkDetailFields={venue:{label:'競馬場',values:bkVenues},surface:{label:'コース',values:['芝','ダート','障害']},distance:{label:'距離',values:['〜1400m','1401〜1800m','1801〜2400m','2401m〜']},class:{label:'クラス',values:['新馬','未勝利','1勝クラス','2勝クラス','3勝クラス','オープン','リステッド','J・GⅢ','GⅢ','GⅡ','GⅠ']},weightRule:{label:'負担重量区分',values:['ハンデ','別定','定量','馬齢']},restriction:{label:'出走条件',values:['混合','牝馬限定','牡・せん限定','指定','特別指定','国際','若手騎手']},raceKind:{label:'平地・障害',values:['平地','障害']},going:{label:'馬場状態',values:['良','稍重','重','不良']},style:{label:'買い方',values:['通常','BOX','流し','フォーメーション']},fieldSize:{label:'頭数',values:['〜9頭','10〜13頭','14〜16頭','17頭以上']}};
 function bkRaceCardForBet(b){
  if(!b?.raceDate||!b.raceVenue||!Number.isInteger(Number(b.raceNumber)))return null;
  try{
@@ -2938,7 +2938,12 @@ function bkRaceCardForBet(b){
  }catch{return null}
 }
 function bkNormalizeGrade(value){
- const t=String(value||'').trim().toUpperCase().replace(/[\u2160-\u2163]/g,c=>({'Ⅰ':'I','Ⅱ':'II','Ⅲ':'III','Ⅳ':'IV'})[c]||c).replace(/[１-３]/g,c=>String(c.charCodeAt(0)-65296)).replace(/Ｇ/g,'G').replace(/[\s\-_]/g,'');
+ const t=String(value||'').trim().toUpperCase()
+  .replace(/[ⅠⅡⅢⅣ]/g,c=>({'Ⅰ':'I','Ⅱ':'II','Ⅲ':'III','Ⅳ':'IV'})[c])
+  .replace(/[１-３]/g,c=>String(c.charCodeAt(0)-65296))
+  .replace(/Ｇ/g,'G').replace(/[･·]/g,'・').replace(/[\s_－-]/g,'')
+  .replace(/[（）()]/g,'');
+ if(/^(J・?G3|J・?GIII)$/.test(t))return 'J・GⅢ';
  if(/^(G1|GI)$/.test(t))return 'GⅠ';
  if(/^(G2|GII)$/.test(t))return 'GⅡ';
  if(/^(G3|GIII)$/.test(t))return 'GⅢ';
@@ -2947,19 +2952,45 @@ function bkNormalizeGrade(value){
 }
 function bkKnownRaceGrade(b){
  const date=b.raceDate||String(b.realRaceId||b.raceId||'').match(/^\d{4}-\d{2}-\d{2}/)?.[0];
- const venue=b.raceVenue||b.venue||(String(b.realRaceId||'').includes('-TOKYO-')?'東京':null);
- const number=Number(b.raceNumber||b.raceNo||String(b.realRaceId||b.raceId||'').match(/-(\d{1,2})$/)?.[1]);
- // Officially identified 2026 Tenno Sho (Autumn). Never guess grade from an ordinary open class.
- return date==='2026-11-01'&&venue==='東京'&&number===11?'GⅠ':null;
+ const id=String(b.realRaceId||b.raceId||'');
+ const venue=b.raceVenue||b.venue||({
+  TOKYO:'東京',KYOTO:'京都',FUKUSHIMA:'福島',NAKAYAMA:'中山',
+  HANSHIN:'阪神',CHUKYO:'中京',NIIGATA:'新潟',KOKURA:'小倉',
+  SAPPORO:'札幌',HAKODATE:'函館'
+ })[id.match(/-([A-Z]+)-\d{1,2}$/i)?.[1]?.toUpperCase()];
+ const number=Number(b.raceNumber||b.raceNo||id.match(/-(\d{1,2})$/)?.[1]);
+ const known={
+  '2026-11-01|東京|11':'GⅠ',
+  '2026-11-07|東京|11':'GⅡ',
+  '2026-11-07|京都|8':'J・GⅢ'
+ };
+ return known[[date,venue,number].join('|')]||null;
 }
 function bkMeta(b,key){
  const existing=b&&b.raceMeta&&typeof b.raceMeta==='object'?b.raceMeta[key]:null;
  if(key==='class'){
+  // A verified grade overrides stale "オープン" stored when the ticket was bought.
   const known=bkKnownRaceGrade(b);if(known)return known;
-  const savedGrade=bkNormalizeGrade(b.raceMeta?.grade||b.raceMeta?.raceGrade||existing);if(savedGrade)return savedGrade;
+  const savedGrade=bkNormalizeGrade(b.raceMeta?.grade||b.raceMeta?.raceGrade||b.grade||b.raceGrade||existing);
+  if(savedGrade)return savedGrade;
+  const card=bkRaceCardForBet(b);
+  const condition=card?.raceConditions||{};
+  const cardGrade=bkNormalizeGrade(condition.grade||condition.raceGrade||card?.grade);
+  if(cardGrade)return cardGrade;
+  const name=String(card?.raceName||b.raceName||b.raceTitle||'');
+  const match=name.match(/(?:J[・･\-]?G(?:[ⅠⅡⅢ123]|I{1,3})|G(?:[ⅠⅡⅢ123]|I{1,3})|リステッド)(?=[）)\s]|$)/i);
+  const namedGrade=bkNormalizeGrade(match?.[0]);if(namedGrade)return namedGrade;
+  if(existing!=null&&existing!=='')return existing;
+  return ['新馬','未勝利','1勝クラス','2勝クラス','3勝クラス','オープン']
+   .includes(condition.classCondition)?condition.classCondition:null;
  }
  if(existing!=null&&existing!=='')return existing;
- if(key==='venue'){if(b.raceVenue)return b.raceVenue;if(b.venue)return b.venue;const id=String(b.realRaceId||b.raceId||'');const m=id.match(/-(TOKYO|KYOTO|NAKAYAMA|HANSHIN|CHUKYO|NIIGATA|FUKUSHIMA|KOKURA|SAPPORO|HAKODATE)-\d{1,2}$/i);return m?({TOKYO:'東京',KYOTO:'京都',NAKAYAMA:'中山',HANSHIN:'阪神',CHUKYO:'中京',NIIGATA:'新潟',FUKUSHIMA:'福島',KOKURA:'小倉',SAPPORO:'札幌',HAKODATE:'函館'})[m[1].toUpperCase()]:null;}
+ if(key==='venue'){
+  if(b.raceVenue)return b.raceVenue;if(b.venue)return b.venue;
+  const id=String(b.realRaceId||b.raceId||'');
+  const m=id.match(/-(TOKYO|KYOTO|NAKAYAMA|HANSHIN|CHUKYO|NIIGATA|FUKUSHIMA|KOKURA|SAPPORO|HAKODATE)-\d{1,2}$/i);
+  return m?({TOKYO:'東京',KYOTO:'京都',NAKAYAMA:'中山',HANSHIN:'阪神',CHUKYO:'中京',NIIGATA:'新潟',FUKUSHIMA:'福島',KOKURA:'小倉',SAPPORO:'札幌',HAKODATE:'函館'})[m[1].toUpperCase()]:null;
+ }
  const card=bkRaceCardForBet(b);if(!card)return null;
  const condition=card.raceConditions||{};
  if(key==='surface')return condition.surface||null;
@@ -2968,16 +2999,6 @@ function bkMeta(b,key){
  if(key==='fieldSize')return card.horses?.filter(h=>!h.scratched).length||null;
  if(key==='raceKind')return condition.surface==='障害'?'障害':condition.surface==='芝'||condition.surface==='ダート'?'平地':null;
  if(key==='weightRule')return condition.weightRule||null;
- if(key==='class'){
-  const g=bkNormalizeGrade(condition.grade||condition.raceGrade||card.grade);
-  if(g)return g;
-  const raceLabel=String(card.raceName||'');
-  const marker=raceLabel.match(/(?:G[ⅠⅡⅢ123]|GI{1,3}|リステッド)(?=[）)\s]|$)/i);
-  const namedGrade=bkNormalizeGrade(marker?.[0]);
-  if(namedGrade)return namedGrade;
-  const c=condition.classCondition;
-  return ['新馬','未勝利','1勝クラス','2勝クラス','3勝クラス','オープン'].includes(c)?c:null;
- }
  if(key==='restriction')return Array.isArray(condition.restrictions)&&condition.restrictions.length?condition.restrictions:null;
  return null;
 }
