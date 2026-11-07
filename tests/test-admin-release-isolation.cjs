@@ -63,8 +63,8 @@ test('server admin access is unavailable when owner identity is unconfigured',as
 test('public settings hide all legacy diagnostic sections and test-mode controls',()=>{
  const script=fs.readFileSync('settings-surface.js','utf8');
  assert.match(script,/details\.hidden=true/);
- assert.match(script,/groups\.admin\.prepend\(modePanel\)/);
- assert.ok(!script.includes('groups.general.prepend(modePanel)'));
+ assert.match(script,/groups\.general\.prepend\(modePanel\)/);
+ assert.ok(!script.includes('groups.admin.prepend(modePanel)'));
  const main=fs.readFileSync('index.html','utf8');
  assert.ok(main.includes("const KEY=IS_TEST_MODE?'baken-king-test-state-v1':'keiba-demo-v1'"));
  assert.ok(main.includes('data-bk-legacy-hidden="true"'));
@@ -100,8 +100,8 @@ test('administrator operations panel separates API checks from unverified schedu
  const script=fs.readFileSync('admin-panel.js','utf8');
  for(const id of ['operationOverview','opsAuthBadge','opsCardsBadge','opsResultsBadge','opsMonitorBadge','opsCheckedAt'])
   assert.ok(page.includes('id="'+id+'"'),'Missing operations indicator: '+id);
- assert.match(page,/5分監視の実行状況/);
- assert.match(page,/定期監視ジョブが実際に動いたか/);
+ assert.match(page,/5分監視の実行履歴/);
+ assert.match(page,/GitHub Actionsの実行履歴を読み込みます/);
  for(const path of ['/api/auth/friends/race-cards','/api/auth/friends/verified-results','/api/auth/friends/monitor-targets'])
   assert.ok(script.includes(path),'Missing read-only check: '+path);
  assert.ok(script.includes("method:'GET'")===false,'GET is the implicit read-only method');
