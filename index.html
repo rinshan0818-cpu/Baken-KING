@@ -3441,7 +3441,7 @@ function bkTicketRaceSort(a,b){
  const getDate=row=>String(row.raceDate||row.purchasedAt||'').slice(0,10);
  const dateCompare=getDate(a[1][0]).localeCompare(getDate(b[1][0]),'ja');
  if(dateCompare)return dateCompare;
- const getNumber=row=>Number(row.raceNumber||row.raceNo||String(row.realRaceId||'').match(/-(\\d{1,2})$/)?.[1])||99;
+ const getNumber=row=>Number(row.raceNumber||row.raceNo||String(row.realRaceId||'').match(/-(\d{1,2})$/)?.[1])||99;
  const numberCompare=getNumber(a[1][0])-getNumber(b[1][0]);
  if(numberCompare)return numberCompare;
  return String(a[1][0].raceVenue||'').localeCompare(String(b[1][0].raceVenue||''),'ja');
