@@ -93,9 +93,13 @@
   }catch(e){return Promise.reject(e)}
  }
  function playSound(){
+  if(localStorage.getItem('baken-king-sound-force-off-v1')==='on')return Promise.resolve();
   if(customAudio){customAudio.pause();customAudio.currentTime=0;return customAudio.play()}
   return originalChime();
  }
+ window.addEventListener('baken:force-mute-changed',event=>{
+  if(event.detail?.muted&&customAudio){customAudio.pause();customAudio.currentTime=0}
+ });
  chime.addEventListener('change',()=>{
   localStorage.setItem(CHIME_KEY,chime.checked?'on':'off');
   if(chime.checked)playSound().catch(()=>{audioStatus.textContent='音声を再生できませんでした。音量・マナーモードをご確認ください。'})
