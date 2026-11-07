@@ -86,7 +86,11 @@ module.exports=async(req,res)=>{
     headers:{Authorization:'Bearer '+jwt,Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},body
    });
    const text=await upstream.text();
-   if(text.length>(isCards?2000000:20000))return respond(res,502,{error:'Oversized upstream response'});
+   // Verified result artifacts are cumulative across race days. 20KB becomes
+   // insufficient after a few cards; reject only implausibly large replies.
+   // Auth and permitted same-origin GET checks remain unchanged.
+   const limit=isCards?2000000:isResult?1000000:20000;
+   if(text.length>limit)return respond(res,502,{error:'Oversized upstream response'});
    res.statusCode=upstream.status;
    return res.end(text);
   }
