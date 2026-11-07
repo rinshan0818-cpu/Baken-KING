@@ -31,6 +31,7 @@
  const trySound=document.createElement('button');trySound.className='outline';trySound.type='button';trySound.textContent='チャイムを試聴';
  const status=document.createElement('p');status.className='muted';status.setAttribute('aria-live','polite');
  enabled.onchange=()=>{localStorage.setItem(PREFERENCE,enabled.checked?'on':'off');window.dispatchEvent(new Event('baken:chime-preference-changed'))};
+ window.addEventListener('baken:chime-preference-changed',()=>{enabled.checked=localStorage.getItem(PREFERENCE)!=='off'});
  async function play(preview=false){
   if(forcedOff()){
    audio.pause();audio.currentTime=0;
