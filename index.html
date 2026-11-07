@@ -2993,7 +2993,7 @@ function bkMeta(b,key){
   // Explicit ordinary class outranks stale grade metadata, even in analytics.
   const card=bkRaceCardForBet(b);
   const condition=card?.raceConditions||{};
-  const ordinaryLabel=String(condition.classCondition||b.raceName||b.raceTitle||card?.raceName||'');
+  const ordinaryLabel=[condition.classCondition,b.raceName,b.raceTitle,card?.raceName].filter(Boolean).join(' ');
   const ordinary=ordinaryLabel.match(/新馬|未勝利|[123１-３]勝クラス/);
   if(ordinary)return ordinary[0];
   const known=bkKnownRaceGrade(b);if(known)return known;
