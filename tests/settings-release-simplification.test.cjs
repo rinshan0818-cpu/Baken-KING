@@ -35,5 +35,6 @@ test('test-mode ticket creation is reachable outside hidden admin diagnostics',(
  assert.match(html,/window\.BakenCreateDemoTickets=\(\)=>\{/);
  assert.match(html,/if\(!IS_TEST_MODE\)return false/);
  assert.match(surface,/details\.open=section\.open/);
- assert.match(surface,/id:'general'.*open:true/);
+ // Settings categories intentionally open collapsed; test-mode controls stay in general.
+ assert.match(surface,/id:'general'.*open:false/);
 });
