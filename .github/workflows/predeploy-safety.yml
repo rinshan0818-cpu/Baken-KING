@@ -1,0 +1,43 @@
+name: Baken-KING predeploy safety checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'app-next-results.js'
+      - 'app-next-monitor.js'
+      - 'shared-settlement-chime.js'
+      - 'race-diagnostics.js'
+      - 'tests/test-kyoto11-pending-result.cjs'
+      - '.github/workflows/predeploy-safety.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate app JavaScript syntax
+        run: |
+          node --check app-next-results.js
+          node --check app-next-monitor.js
+          node --check shared-settlement-chime.js
+          node --check race-diagnostics.js
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const html=fs.readFileSync('index.html','utf8');
+          const blocks=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)];
+          for(const [i,match] of blocks.entries()){
+            try {new Function(match[1]);}
+            catch(e){throw Error('index.html inline script '+i+': '+e.message);}
+          }
+          if(!blocks.length)throw Error('Missing inline scripts');
+          console.log('Checked '+blocks.length+' inline scripts');
+          NODE
+      - name: Test losing Kyoto 11R and race-identity isolation
+        run: node --test tests/test-kyoto11-pending-result.cjs
