@@ -3444,19 +3444,23 @@ function machineDrawTicket(){
   status.textContent='● 受付中';status.dataset.status='ready';return;
  }
  const isSettled=ticket.status!=='pending';
- const label=isSettled?(ticket.paid>0?'的中':'不的中'):'結果待ち';
+ const hasOfficialRefund=Array.isArray(ticket.officialRefundPicks)&&ticket.officialRefundPicks.length>0;
+ const hasOfficialWin=Array.isArray(ticket.testWinningPicks)&&ticket.testWinningPicks.length>0;
+ const label=isSettled?(ticket.officialSettlement&&hasOfficialRefund&&!hasOfficialWin?'返還':ticket.paid>0?'的中':'不的中'):'結果待ち';
  host.append(bkSettlementTicket(ticket));
  instruction.textContent=isSettled?'精算結果・'+label:'読取完了・結果確定待ち';
  amount.textContent=isSettled?fmt(ticket.paid):'— 円';
- status.textContent=isSettled?'● '+label:'● 結果待ち';status.dataset.status=isSettled?(ticket.paid>0?'won':'lost'):'pending';
+ status.textContent=isSettled?'● '+label:'● 結果待ち';status.dataset.status=isSettled?(label==='返還'?'ready':ticket.paid>0?'won':'lost'):'pending';
  if(!isSettled){
   detail.append(bkNode('div',ticket.officialReady?'確定結果を受信済みです。精算機で読み取ると結果を確認できます。':'結果確定待ちです。','bk-machine-result-note'));
   return;
  }
  const picks=bkTicketPicksFromSaved(ticket),unit=ticket.unitStake||ticket.stake/Math.max(picks.length,1);
  const wins=ticket.officialSettlement?(ticket.testWinningPicks||[]).map(p=>({nums:p,per100:(ticket.officialPayouts||{})[keyFor(ticket.type,p)]||0})):ticket.testSettlement?(ticket.testWinningPicks||[]).map(p=>({nums:p,per100:500})):picks.map(p=>({nums:p,per100:payouts[ticket.type]?.[keyFor(ticket.type,p)]||0})).filter(p=>p.per100>0);
+ const refunded=ticket.officialSettlement?(ticket.officialRefundPicks||[]):[];
+ const verdictLabel=wins.length?'的中':refunded.length?'返還':ticket.paid>0?'的中':'不的中';
  const summary=bkNode('div','','bk-machine-result-summary');
- if(ticket.paid>0){
+ if(wins.length){
   const hero=bkNode('div','','bk-win-hero');
   const combo=wins.slice(0,3).map(w=>w.nums.join(ordered.has(ticket.type)?' → ':' － ')).join(' / ');
   hero.append(bkNode('div','🎯 的中！','bk-win-hero-title'),bkNode('small','的中した組み合わせ'),bkNode('strong',combo||'的中'));
@@ -3466,14 +3470,14 @@ function machineDrawTicket(){
  if(ticket.testSettlement){
   detail.append(bkNode('div','過去の練習記録による判定（公式払戻ではありません）','bk-machine-result-note'));
  }
- const verdict=bkNode('strong',ticket.paid>0?'的中':'不的中','bk-machine-verdict'+(ticket.paid>0?' won':''));
+ const verdict=bkNode('strong',verdictLabel,'bk-machine-verdict'+(wins.length?' won':''));
  const net=ticket.paid-ticket.stake;
  const stats=bkNode('div','','bk-machine-result-figures');
  stats.append(bkNode('span','購入 '+fmt(ticket.stake)),
-              bkNode('span','的中 '+wins.length+' / '+picks.length+'点'),
+              bkNode('span','的中 '+wins.length+' / '+picks.length+'点'+(refunded.length?'・返還 '+refunded.length+'点':'')),
               bkNode('b','収支 '+(net>0?'+':'')+fmt(net)));
  summary.append(verdict,stats);detail.append(summary);
- if(ticket.paid>0)detail.append(bkNode('div','的中買い目・払戻内訳','bk-win-breakdown-heading'));
+ if(wins.length||refunded.length)detail.append(bkNode('div','的中・返還の内訳','bk-win-breakdown-heading'));
  if(wins.length){
   const list=bkNode('div','','bk-machine-win-list');
   for(const w of wins.slice(0,12)){
@@ -3485,7 +3489,17 @@ function machineDrawTicket(){
   if(wins.length>12)list.append(bkNode('small','ほか '+(wins.length-12)+'点的中'));
   detail.append(list);
  }
- detail.append(bkNode('p','※ 払戻金はレース結果確定時に残高へ反映済みです。ここで再加算されません。','bk-machine-result-note'));
+ if(refunded.length){
+  const refundList=bkNode('div','','bk-machine-win-list');
+  for(const pick of refunded.slice(0,12)){
+   const line=bkNode('div','','bk-machine-win-row');
+   line.append(bkNode('span','返還 '+pick.join(ordered.has(ticket.type)?' → ':' - ')),bkNode('strong',fmt(unit)));
+   refundList.append(line);
+  }
+  if(refunded.length>12)refundList.append(bkNode('small','ほか '+(refunded.length-12)+'点返還'));
+  detail.append(refundList);
+ }
+ detail.append(bkNode('p','※ 精算済みの払戻・返還金は残高に加算済みです。ここで再加算されません。','bk-machine-result-note'));
 }
 function bkUpdatePayoutReadyBadge(){
  const nav=document.querySelector('.bottom-nav [data-nav="payout"]');
