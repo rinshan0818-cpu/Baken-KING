@@ -3604,8 +3604,8 @@ $('machineRead').onclick=()=>{
    if(latest.status==='pending'&&latest.officialReady){
     const paid=latest.officialPendingPaid;
     if(!Number.isSafeInteger(paid)||paid<0){toast('払戻金データが不正です');machineVisibleId=null;machineRender();return;}
-    latest.paid=paid;latest.status='settled';latest.officialSettlement=true;latest.testSettlement=false;latest.testWinningPicks=latest.officialPendingWins||[];latest.officialPayouts=latest.officialPendingPayouts||{};
-    delete latest.officialPendingPaid;delete latest.officialPendingWins;delete latest.officialPendingPayouts;delete latest.officialReady;
+    latest.paid=paid;latest.status='settled';latest.officialSettlement=true;latest.testSettlement=false;latest.testWinningPicks=latest.officialPendingWins||[];latest.officialRefundPicks=latest.officialPendingRefunds||[];latest.officialPayouts=latest.officialPendingPayouts||{};
+    delete latest.officialPendingPaid;delete latest.officialPendingWins;delete latest.officialPendingRefunds;delete latest.officialPendingPayouts;delete latest.officialReady;
     s.balance+=paid;s.totalPaid+=paid;save();
    }
    if(latest.status!=='pending'&&!latest.machineProcessed){
@@ -4443,17 +4443,36 @@ bkTicketRaceTitle=function(b){
      const key=p.type+':'+(orderedTypes.has(p.type)?nums:nums.sort((a,b)=>a-b)).join('-');
      if(payoutMap.has(key))throw Error('払戻金の重複');payoutMap.set(key,p.yenPer100);
     }
-    if(race.refunds?.length)throw Error('返還があるレースは安全確認のため自動精算を保留します');
+    // Only independently validated official refund horse numbers are usable.
+    // Older feeds with opaque "refunds" must remain pending.
+    if(race.refunds?.length)throw Error('返還情報の形式が未確認のため精算を保留します');
+    const refundNumbers=race.refundHorseNumbers===undefined?[]:race.refundHorseNumbers;
+    if(!Array.isArray(refundNumbers)||refundNumbers.length>18||
+       refundNumbers.some(n=>!Number.isInteger(n)||n<1||n>18)||
+       new Set(refundNumbers).size!==refundNumbers.length||
+       (refundNumbers.length>0&&race.refundHorseNumbersVerified!==true))
+      throw Error('公式返還馬番の確認情報が不足しています');
+    const refundSet=new Set(refundNumbers);
+    if(race.payouts.some(p=>p.numbers.some(n=>refundSet.has(Number(n)))))
+      throw Error('返還馬番が的中払戻情報に含まれています');
     for(const b of rows){
      if(!validTypes.includes(b.type)||!Array.isArray(b.picks)||!Number.isSafeInteger(b.unitStake)||b.unitStake<100||b.unitStake%100)throw Error('購入データが不正');
-     let paid=0;const winning=[];
+     let paid=0;const winning=[],refunded=[];
      for(const pick of b.picks){
-      const nums=pick.map(Number);const key=b.type+':'+(orderedTypes.has(b.type)?nums:nums.sort((a,c)=>a-c)).join('-');
+      if(!Array.isArray(pick)||pick.length!==({'単勝':1,'複勝':1,'馬連':2,'馬単':2,'ワイド':2,'三連複':3,'三連単':3})[b.type])
+       throw Error('買い目の形式が不正');
+      const nums=pick.map(Number);
+      if(nums.some(n=>!Number.isInteger(n)||n<1||n>18)||new Set(nums).size!==nums.length)
+       throw Error('買い目の馬番が不正');
+      if(nums.some(n=>refundSet.has(n))){
+       paid+=b.unitStake;refunded.push(pick);continue;
+      }
+      const key=b.type+':'+(orderedTypes.has(b.type)?nums:nums.sort((a,c)=>a-c)).join('-');
       const amount=payoutMap.get(key)||0;
       paid+=amount*(b.unitStake/100);if(amount)winning.push(pick);
      }
      if(!Number.isSafeInteger(paid))throw Error('払戻金の計算結果が不正');
-     candidates.push({bet:b,paid,winning,payouts:Object.fromEntries([...payoutMap].filter(([k])=>k.startsWith(b.type+':')).map(([k,v])=>[k.slice(b.type.length+1),v]))});
+     candidates.push({bet:b,paid,winning,refunded,payouts:Object.fromEntries([...payoutMap].filter(([k])=>k.startsWith(b.type+':')).map(([k,v])=>[k.slice(b.type.length+1),v]))});
     }
    }
    if(!candidates.length){if(automatic)return 0;throw Error('一致する未精算馬券がありません');}
@@ -4461,7 +4480,7 @@ bkTicketRaceTitle=function(b){
    if(!Number.isSafeInteger(total))throw Error('払戻金合計が不正');
    if(!automatic&&!confirm('確定結果を'+candidates.length+'枚の馬券に登録します。的中・払戻金は精算機で確認できます。続けますか？'))return 0;
    if(candidates.some(x=>x.bet.status!=='pending'))throw Error('精算状態が変更されました');
-   for(const x of candidates){x.bet.officialReady=true;x.bet.officialPendingPaid=x.paid;x.bet.officialPendingWins=x.winning;x.bet.officialPendingPayouts=x.payouts;x.bet.machineProcessed=false;}
+   for(const x of candidates){x.bet.officialReady=true;x.bet.officialPendingPaid=x.paid;x.bet.officialPendingWins=x.winning;x.bet.officialPendingRefunds=x.refunded;x.bet.officialPendingPayouts=x.payouts;x.bet.machineProcessed=false;}
    save();draw();machineRender();
    officialMessage.textContent=candidates.length+'枚の確定結果を登録しました。精算は手動です。';
    return candidates.length;
