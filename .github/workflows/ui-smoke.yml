@@ -33,6 +33,7 @@ on:
       - 'tests/race-settlement.test.cjs'
       - 'tests/small-field-sales.test.cjs'
       - 'tests/refund-combinations.test.cjs'
+      - 'tests/void-race-refund.test.cjs'
       - 'race-settlement.js'
       - 'friends-share.js'
       - 'friends.html'
@@ -140,6 +141,8 @@ jobs:
         run: node tests/storage_regression.cjs
       - name: Test mixed official refunds and payouts
         run: node tests/refund-combinations.test.cjs
+      - name: Test whole-race void and cancellation refund
+        run: node tests/void-race-refund.test.cjs
       - name: Verify JRA small-field bet availability
         run: node tests/small-field-sales.test.cjs
       - name: Test official settlement math, refunds and pending outcomes
