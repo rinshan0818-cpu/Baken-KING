@@ -4452,8 +4452,8 @@ bkTicketRaceTitle=function(b){
     // official void/cancellation decision. Never infer it from missing payouts.
     if(race.status==='void'){
      if(race.voidVerified!==true||!['競走不成立','競走取止'].includes(race.voidReason)||
-        typeof race.confirmedAt!=='string'||!/^20\\d{2}-\\d{2}-\\d{2}T/.test(race.confirmedAt)||
-        !Number.isFinite(Date.parse(race.confirmedAt))||!/[zZ]|[+-]\\d{2}:\\d{2}$/.test(race.confirmedAt)||
+        typeof race.confirmedAt!=='string'||!/^20\d{2}-\d{2}-\d{2}T/.test(race.confirmedAt)||
+        !Number.isFinite(Date.parse(race.confirmedAt))||!/[zZ]|[+-]\d{2}:\d{2}$/.test(race.confirmedAt)||
         !Array.isArray(race.payouts)||race.payouts.length!==0||
         !Array.isArray(race.completeTypes)||race.completeTypes.length!==0||
         race.refunds?.length||race.refundHorseNumbers?.length)
