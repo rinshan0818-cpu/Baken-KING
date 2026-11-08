@@ -31,6 +31,7 @@ on:
       - 'tests/storage_regression.cjs'
       - 'tests/settlement_backup_regression.cjs'
       - 'tests/race-settlement.test.cjs'
+      - 'tests/small-field-sales.test.cjs'
       - 'race-settlement.js'
       - 'friends-share.js'
       - 'friends.html'
@@ -136,6 +137,8 @@ jobs:
         run: node tests/ui_regression.cjs
       - name: Test purchase storage, reload and test-mode isolation
         run: node tests/storage_regression.cjs
+      - name: Verify JRA small-field bet availability
+        run: node tests/small-field-sales.test.cjs
       - name: Test official settlement math, refunds and pending outcomes
         run: node tests/race-settlement.test.cjs
       - name: Test email verification OTP screen
