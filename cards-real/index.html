@@ -1,0 +1,34 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Baken-KING 実写名馬カード試作</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#273750,#09111d 68%);color:#ffecd1;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}.wrap{max-width:960px;margin:auto;padding:20px 14px 55px}h1{font-size:clamp(23px,5vw,34px);text-align:center;color:#ffe1a1;margin:8px 0}.lead{text-align:center;font-size:13px;color:#b6c1d4;line-height:1.7;margin:8px 0 30px}h2{font-size:20px;border-bottom:1px solid #65563e;padding-bottom:9px}.group{margin-bottom:38px}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,3vw,22px)}.tag{text-align:center;letter-spacing:.15em;font-size:12px;font-weight:800;margin-bottom:9px;color:#ecca88}.card{aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:17px;border:3px solid #d2a14a;box-shadow:0 11px 35px #0009,inset 0 0 0 3px #fae2a4;background:#151618;isolation:isolate}.card:after{content:"";position:absolute;inset:8px;border:1px solid #ffdc88;border-radius:10px;z-index:3;pointer-events:none}.photo{width:100%;height:100%;object-fit:cover;object-position:var(--pos,center);position:absolute;inset:0;filter:contrast(1.07) saturate(.92) brightness(.9)}.shade{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,#0b0c16b3 0%,transparent 18%,transparent 62%,#090b0e69 76%,#05060a 100%)}.stars{z-index:4;position:absolute;top:14px;left:0;right:0;text-align:center;white-space:nowrap;font-family:serif;letter-spacing:0;font-size:clamp(15px,3vw,27px);color:#ffde86;text-shadow:0 1px 6px #000,0 0 7px #eab954}.name{z-index:4;position:absolute;bottom:5%;left:0;right:0;text-align:center;white-space:nowrap;font-size:clamp(12px,3vw,30px);font-family:serif;font-weight:bold;color:#ffdb96;text-shadow:0 2px 5px #000,0 1px 2px #000;padding:0 5px}.holo{border-color:#ead2bb;box-shadow:0 12px 42px #000b,0 0 16px #6d86ef75}.holo:before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(125deg,transparent 7%,#75bdff27 18%,transparent 35%,#bd8dfc31 48%,transparent 64%,#f3b6a53a 80%,transparent 97%)}.holo .photo{filter:contrast(1.1) saturate(1.1) brightness(.9)}.warning{display:none;position:absolute;inset:0;z-index:5;align-items:center;justify-content:center;text-align:center;background:#1d1922d9;padding:15px;font-size:13px}.card.failed .warning{display:flex}.note{font-size:12px;color:#b6c2d3;line-height:1.7}.source{background:#172334;border-radius:12px;padding:18px;margin-top:24px;font-size:12px;line-height:2;color:#b6c5d7}.source h3{color:#ffe1a1;margin:0 0 4px}.source a{color:#bdd8ff}.btn{color:#eec681;border:1px solid #b59559;padding:10px 15px;border-radius:9px;text-decoration:none;display:inline-block;margin:0 auto 25px;font-size:13px}@media(max-width:460px){.wrap{padding:15px 9px 30px}.card{border-radius:12px;border-width:2px}.card:after{inset:5px}.stars{top:8px}.tag{font-size:10px}.name{font-size:clamp(11px,3.6vw,19px)}h2{font-size:18px}}
+</style></head><body><main class="wrap"><h1>Baken-KING 名馬カード</h1><p class="lead">21世紀名馬シリーズ Vol.1｜実在する競走馬の写真による試作<br>左：通常版／右：ホログラム版<br>アプリ本体の購入・精算には未接続</p>
+<div id="root"></div><aside class="source"><h3>写真クレジット・利用条件</h3>
+<div>イクイノックス・通常／ホロ：<a href="https://commons.wikimedia.org/wiki/File:Equinox_2023_Japan_Cup_01.jpg">nakashi / CC BY-SA 2.0</a>・<a href="https://commons.wikimedia.org/wiki/File:Equinox_2023_Tenno_Sho_(Autumn).jpg">nakashi / CC BY-SA 2.0</a></div>
+<div>オルフェーヴル・通常／ホロ：<a href="https://commons.wikimedia.org/wiki/File:Orfevre_20121125a.jpg">urasimaru / CC BY-SA 2.0</a>・<a href="https://commons.wikimedia.org/wiki/File:Orfevre_2012.JPG">Hide4307 / CC BY-SA 3.0</a></div>
+<div>ドゥラエレーデ・通常／ホロ：<a href="https://commons.wikimedia.org/wiki/File:Dura_Erede_Tokyo_Yushun_2023(IMG1).jpg">Nadaraikon / CC BY-SA 3.0</a></div>
+<p>元画像はWikimedia Commons収録の実写写真。表示のため縮小・トリミング・暗部調整し、ホログラム版には虹色の光沢を重ねています。加工画像の使用条件は元写真と同じCC BY-SAです。<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>／<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>。</p></aside></main>
+<script>
+const horses=[
+{name:"イクイノックス",stars:6,normal:"equinox-standard.jpg",holo:"equinox-holo.jpg",normalPosition:"57% 50%",holoPosition:"55% 50%"},
+{name:"オルフェーヴル",stars:6,normal:"orfevre-standard.jpg",holo:"orfevre-holo.jpg",normalPosition:"52% 50%",holoPosition:"50% 50%"},
+{name:"ドゥラエレーデ",stars:1,normal:"dura-standard.jpg",holo:"dura-standard.jpg",normalPosition:"60% 50%",holoPosition:"70% 50%",samePhoto:true}
+];const root=document.getElementById("root");
+for(const h of horses){
+ const section=document.createElement("section");section.className="group";
+ section.innerHTML='<h2></h2><div class="twocol"></div>';section.querySelector("h2").textContent=h.name;
+ for(const holographic of [false,true]){
+  const el=document.createElement("div");
+  el.innerHTML='<div class="tag"></div><article class="card"><img class="photo" alt=""><div class="shade"></div><div class="stars"></div><div class="name"></div><div class="warning">写真の表示に失敗しました</div></article>';
+  el.querySelector(".tag").textContent=holographic?"HOLOGRAPHIC":"STANDARD";
+  const card=el.querySelector(".card");if(holographic)card.classList.add("holo");
+  const img=el.querySelector("img");img.src="./assets/"+(holographic?h.holo:h.normal);img.alt=h.name+"（実写）";img.style.setProperty("--pos",holographic?h.holoPosition:h.normalPosition);
+  if(holographic&&h.samePhoto)img.style.transform="scale(1.13)";
+  img.onerror=()=>card.classList.add("failed");
+  el.querySelector(".stars").textContent="★".repeat(h.stars);
+  el.querySelector(".name").textContent=h.name;
+  section.querySelector(".twocol").append(el);
+ }
+ if(h.samePhoto){const p=document.createElement("p");p.className="note";p.textContent="※ホロ版は、写真の別構図が未確保のため同じ原写真を別トリミングで使用（暫定）。";section.append(p);}
+ root.append(section);
+}
+</script></body></html>
