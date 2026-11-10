@@ -22,11 +22,15 @@ jobs:
         run: python -m pip install pillow
       - name: Download and resize Wikimedia Commons photos
         run: python scripts/build-real-card-preview.py
+      - name: Install Japanese font
+        run: sudo apt-get update -qq && sudo apt-get install -y fonts-noto-cjk
+      - name: Render face-focused portrait cards
+        run: python scripts/render-real-card-preview.py
       - name: Commit locally stored preview photos
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add cards-real/assets
+          git add cards-real/assets cards-real/rendered
           if ! git diff --cached --quiet; then
             git commit -m "Store CC-licensed real horse photos for preview"
             git push
