@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'scripts/build-real-card-preview.py'
+      - 'scripts/render-real-card-preview.py'
       - '.github/workflows/build-real-card-preview.yml'
 permissions:
   contents: write
