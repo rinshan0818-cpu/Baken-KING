@@ -14,8 +14,8 @@ DST.mkdir(parents=True,exist_ok=True)
 W,H=900,1200
 # Position of the horse / horse face in the underlying landscape photograph.
 CARDS=[
-    ("equinox","イクイノックス",6,"equinox-standard.jpg","equinox-holo.jpg",.46,.43),
-    ("orfevre","オルフェーヴル",6,"orfevre-standard.jpg","orfevre-holo.jpg",.44,.40),
+    ("equinox","イクイノックス",6,"equinox-standard.jpg","equinox-holo.jpg",.22,.22),
+    ("orfevre","オルフェーヴル",6,"orfevre-standard.jpg","orfevre-holo.jpg",.28,.39),
     ("dura","ドゥラエレーデ",1,"dura-standard.jpg","dura-standard.jpg",.66,.69),
 ]
 FONTS=[
