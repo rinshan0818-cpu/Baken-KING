@@ -13,6 +13,7 @@
   const sections=[
    {id:'account',name:'アカウント・友達',hint:'ログイン・表示名・友達登録・成績共有',open:false},
    {id:'general',name:'通知・アプリ',hint:'プッシュ通知・共通チャイム・更新',open:false},
+   {id:'collection',name:'G1ピンバッジ',hint:'ガチャ・バッジ図鑑・所持状況',open:false},
    {id:'data',name:'データ管理',hint:'バックアップ・復元・購入履歴',open:false},
    {id:'admin',name:'管理・接続設定',hint:'出馬表・結果取得・診断（管理者向け）',open:false}
   ];
@@ -53,6 +54,21 @@
    if(node.matches('section.card'))node.classList.add('bk-settings-item');
    groups[group].append(node);
   }
+  // Isolated souvenir pin collection; never touch the ordinary betting wallet.
+  const pinPanel=document.createElement('section');
+  pinPanel.className='card bk-settings-item';
+  pinPanel.id='bkPinCollectionEntry';
+  const pinTitle=document.createElement('h3');
+  pinTitle.textContent='G1記念ピンバッジ';
+  const pinText=document.createElement('p');
+  pinText.className='muted';
+  pinText.textContent='5レース・通常／ホロの計10種類。WIN5準備財布でガチャを回して、図鑑に集められます。';
+  const pinLink=document.createElement('a');
+  pinLink.className='official';
+  pinLink.href='./pin-collection.html';
+  pinLink.textContent='ピンバッジ図鑑・ガチャを開く';
+  pinPanel.append(pinTitle,pinText,pinLink);
+  groups.collection.append(pinPanel);
   // Beta mode selector: never copy or overwrite production wallet data.
   const modeKey='baken-king-mode-v1';
   const testStateKey='baken-king-test-state-v1';
