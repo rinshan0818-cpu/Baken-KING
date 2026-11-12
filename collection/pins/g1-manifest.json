@@ -1,0 +1,350 @@
+{
+  "version": "2026-11-12",
+  "status": "approved-artwork-archive",
+  "count": 48,
+  "raceCount": 24,
+  "archivedInChatGPTLibrary": "/Baken-KING/G1 Pins/BakenKING_G1_Pin_48_Approved_Archive.zip",
+  "githubImagesUploaded": false,
+  "rarities": {
+    "4": "G1通常版",
+    "5": "G1ホログラム版"
+  },
+  "images": [
+    {
+      "race_id": "derby",
+      "race": "日本ダービー",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "derby-normal.webp"
+    },
+    {
+      "race_id": "derby",
+      "race": "日本ダービー",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "derby-holo.webp"
+    },
+    {
+      "race_id": "arima",
+      "race": "有馬記念",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "arima-normal.webp"
+    },
+    {
+      "race_id": "arima",
+      "race": "有馬記念",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "arima-holo.webp"
+    },
+    {
+      "race_id": "tenno-autumn",
+      "race": "天皇賞（秋）",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "tenno-autumn-normal.webp"
+    },
+    {
+      "race_id": "tenno-autumn",
+      "race": "天皇賞（秋）",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "tenno-autumn-holo.webp"
+    },
+    {
+      "race_id": "oka",
+      "race": "桜花賞",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "oka-normal.webp"
+    },
+    {
+      "race_id": "oka",
+      "race": "桜花賞",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "oka-holo.webp"
+    },
+    {
+      "race_id": "japan-cup",
+      "race": "ジャパンカップ",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "japan-cup-normal.webp"
+    },
+    {
+      "race_id": "japan-cup",
+      "race": "ジャパンカップ",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "japan-cup-holo.webp"
+    },
+    {
+      "race_id": "february",
+      "race": "フェブラリーS",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "february-normal.webp"
+    },
+    {
+      "race_id": "february",
+      "race": "フェブラリーS",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "february-holo.webp"
+    },
+    {
+      "race_id": "takamatsunomiya",
+      "race": "高松宮記念",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "takamatsunomiya-normal.webp"
+    },
+    {
+      "race_id": "takamatsunomiya",
+      "race": "高松宮記念",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "takamatsunomiya-holo.webp"
+    },
+    {
+      "race_id": "osaka",
+      "race": "大阪杯",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "osaka-normal.webp"
+    },
+    {
+      "race_id": "osaka",
+      "race": "大阪杯",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "osaka-holo.webp"
+    },
+    {
+      "race_id": "satsuki",
+      "race": "皐月賞",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "satsuki-normal.webp"
+    },
+    {
+      "race_id": "satsuki",
+      "race": "皐月賞",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "satsuki-holo.webp"
+    },
+    {
+      "race_id": "tenno-spring",
+      "race": "天皇賞（春）",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "tenno-spring-normal.webp"
+    },
+    {
+      "race_id": "tenno-spring",
+      "race": "天皇賞（春）",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "tenno-spring-holo.webp"
+    },
+    {
+      "race_id": "nhk-mile",
+      "race": "NHKマイルC",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "nhk-mile-normal.webp"
+    },
+    {
+      "race_id": "nhk-mile",
+      "race": "NHKマイルC",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "nhk-mile-holo.webp"
+    },
+    {
+      "race_id": "victoria-mile",
+      "race": "ヴィクトリアマイル",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "victoria-mile-normal.webp"
+    },
+    {
+      "race_id": "victoria-mile",
+      "race": "ヴィクトリアマイル",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "victoria-mile-holo.webp"
+    },
+    {
+      "race_id": "oaks",
+      "race": "オークス",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "oaks-normal.webp"
+    },
+    {
+      "race_id": "oaks",
+      "race": "オークス",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "oaks-holo.webp"
+    },
+    {
+      "race_id": "yasuda",
+      "race": "安田記念",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "yasuda-normal.webp"
+    },
+    {
+      "race_id": "yasuda",
+      "race": "安田記念",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "yasuda-holo.webp"
+    },
+    {
+      "race_id": "takarazuka",
+      "race": "宝塚記念",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "takarazuka-normal.webp"
+    },
+    {
+      "race_id": "takarazuka",
+      "race": "宝塚記念",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "takarazuka-holo.webp"
+    },
+    {
+      "race_id": "sprinters",
+      "race": "スプリンターズS",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "sprinters-normal.webp"
+    },
+    {
+      "race_id": "sprinters",
+      "race": "スプリンターズS",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "sprinters-holo.webp"
+    },
+    {
+      "race_id": "shuka",
+      "race": "秋華賞",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "shuka-normal.webp"
+    },
+    {
+      "race_id": "shuka",
+      "race": "秋華賞",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "shuka-holo.webp"
+    },
+    {
+      "race_id": "kikka",
+      "race": "菊花賞",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "kikka-normal.webp"
+    },
+    {
+      "race_id": "kikka",
+      "race": "菊花賞",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "kikka-holo.webp"
+    },
+    {
+      "race_id": "elizabeth",
+      "race": "エリザベス女王杯",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "elizabeth-normal.webp"
+    },
+    {
+      "race_id": "elizabeth",
+      "race": "エリザベス女王杯",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "elizabeth-holo.webp"
+    },
+    {
+      "race_id": "mile-cs",
+      "race": "マイルCS",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "mile-cs-normal.webp"
+    },
+    {
+      "race_id": "mile-cs",
+      "race": "マイルCS",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "mile-cs-holo.webp"
+    },
+    {
+      "race_id": "champions",
+      "race": "チャンピオンズC",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "champions-normal.webp"
+    },
+    {
+      "race_id": "champions",
+      "race": "チャンピオンズC",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "champions-holo.webp"
+    },
+    {
+      "race_id": "hanshin-jf",
+      "race": "阪神JF",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "hanshin-jf-normal.webp"
+    },
+    {
+      "race_id": "hanshin-jf",
+      "race": "阪神JF",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "hanshin-jf-holo.webp"
+    },
+    {
+      "race_id": "asahi",
+      "race": "朝日杯FS",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "asahi-normal.webp"
+    },
+    {
+      "race_id": "asahi",
+      "race": "朝日杯FS",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "asahi-holo.webp"
+    },
+    {
+      "race_id": "hopeful",
+      "race": "ホープフルS",
+      "variant": "normal",
+      "rarity": 4,
+      "filename": "hopeful-normal.webp"
+    },
+    {
+      "race_id": "hopeful",
+      "race": "ホープフルS",
+      "variant": "holo",
+      "rarity": 5,
+      "filename": "hopeful-holo.webp"
+    }
+  ]
+}
