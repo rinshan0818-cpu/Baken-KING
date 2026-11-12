@@ -4,9 +4,9 @@ This file tracks the **50 individually approved badge designs** for Baken-KING. 
 
 - Approved design: circular gold rim; gold laurels and white flowers; cream center; racehorse silhouette; grade plaque; large Japanese race name; ROAD TO ribbon.
 - Grade color: G2 red / G3 green / L bronze.
-- Source images recovered and checksummed locally: **40** (numbers 01–20 and 31–50).
-- Approved originals not yet recovered: **10** (numbers 21–30).
-- The complete 50-image upload remains **pending**. The application must not reference missing assets.
+- Source images recovered and checksummed locally: **50** (all numbers 01–50); originals preserved without modification.
+- Approved originals not yet recovered: **0**. Numbers 21–30 were recovered from the original in-conversation generated-image attachments (previously all named `imagegen.png`).
+- A verified ZIP with 50 individual original PNGs and SHA-256 manifest has been created locally. The GitHub PNG upload remains **pending**. The application must not reference missing assets.
 
 | No. | Race | Grade | Original file |
 |---:|---|---|---|
@@ -30,16 +30,16 @@ This file tracks the **50 individually approved badge designs** for Baken-KING. 
 | 18 | 根岸S | G3 | Recovered locally; not uploaded |
 | 19 | 阪急杯 | G3 | Recovered locally; not uploaded |
 | 20 | オーシャンS | G3 | Recovered locally; not uploaded |
-| 21 | 中山記念 | G2 | Approved; original not recovered |
-| 22 | 金鯱賞 | G2 | Approved; original not recovered |
-| 23 | 阪神大賞典 | G2 | Approved; original not recovered |
-| 24 | 日経賞 | G2 | Approved; original not recovered |
-| 25 | 阪神牝馬S | G2 | Approved; original not recovered |
-| 26 | 福島牝馬S | G3 | Approved; original not recovered |
-| 27 | マイラーズC | G2 | Approved; original not recovered |
-| 28 | 京王杯SC | G2 | Approved; original not recovered |
-| 29 | キーンランドC | G3 | Approved; original not recovered |
-| 30 | セントウルS | G2 | Approved; original not recovered |
+| 21 | 中山記念 | G2 | Recovered locally; not uploaded |
+| 22 | 金鯱賞 | G2 | Recovered locally; not uploaded |
+| 23 | 阪神大賞典 | G2 | Recovered locally; not uploaded |
+| 24 | 日経賞 | G2 | Recovered locally; not uploaded |
+| 25 | 阪神牝馬S | G2 | Recovered locally; not uploaded |
+| 26 | 福島牝馬S | G3 | Recovered locally; not uploaded |
+| 27 | マイラーズC | G2 | Recovered locally; not uploaded |
+| 28 | 京王杯SC | G2 | Recovered locally; not uploaded |
+| 29 | キーンランドC | G3 | Recovered locally; not uploaded |
+| 30 | セントウルS | G2 | Recovered locally; not uploaded |
 | 31 | オールカマー | G2 | Recovered locally; not uploaded |
 | 32 | 毎日王冠 | G2 | Recovered locally; not uploaded |
 | 33 | 京都大賞典 | G2 | Recovered locally; not uploaded |
