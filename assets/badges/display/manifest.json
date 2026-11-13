@@ -1,7 +1,8 @@
 {
-  "version": 1,
+  "version": 2,
   "count": 98,
   "source": "approved-originals",
+  "g1Background": "border-connected dark background removed",
   "files": [
     {
       "key": "step-01",
@@ -256,242 +257,242 @@
     {
       "key": "derby_normal",
       "file": "derby-normal.webp",
-      "bytes": 37162
+      "bytes": 41686
     },
     {
       "key": "derby_holo",
       "file": "derby-holo.webp",
-      "bytes": 42448
+      "bytes": 46420
     },
     {
       "key": "arima_normal",
       "file": "arima-normal.webp",
-      "bytes": 40852
+      "bytes": 48430
     },
     {
       "key": "arima_holo",
       "file": "arima-holo.webp",
-      "bytes": 44328
+      "bytes": 51288
     },
     {
       "key": "tenno-autumn_normal",
       "file": "tenno-autumn-normal.webp",
-      "bytes": 54816
+      "bytes": 61620
     },
     {
       "key": "tenno-autumn_holo",
       "file": "tenno-autumn-holo.webp",
-      "bytes": 59926
+      "bytes": 66014
     },
     {
       "key": "oka_normal",
       "file": "oka-normal.webp",
-      "bytes": 34366
+      "bytes": 41090
     },
     {
       "key": "oka_holo",
       "file": "oka-holo.webp",
-      "bytes": 40182
+      "bytes": 44248
     },
     {
       "key": "japan-cup_normal",
       "file": "japan-cup-normal.webp",
-      "bytes": 41660
+      "bytes": 47250
     },
     {
       "key": "japan-cup_holo",
       "file": "japan-cup-holo.webp",
-      "bytes": 46890
+      "bytes": 52616
     },
     {
       "key": "february_normal",
       "file": "february-normal.webp",
-      "bytes": 57272
+      "bytes": 63426
     },
     {
       "key": "february_holo",
       "file": "february-holo.webp",
-      "bytes": 60360
+      "bytes": 65098
     },
     {
       "key": "takamatsunomiya_normal",
       "file": "takamatsunomiya-normal.webp",
-      "bytes": 58712
+      "bytes": 65004
     },
     {
       "key": "takamatsunomiya_holo",
       "file": "takamatsunomiya-holo.webp",
-      "bytes": 61276
+      "bytes": 68106
     },
     {
       "key": "osaka_normal",
       "file": "osaka-normal.webp",
-      "bytes": 58214
+      "bytes": 61692
     },
     {
       "key": "osaka_holo",
       "file": "osaka-holo.webp",
-      "bytes": 55260
+      "bytes": 60354
     },
     {
       "key": "satsuki_normal",
       "file": "satsuki-normal.webp",
-      "bytes": 56818
+      "bytes": 63326
     },
     {
       "key": "satsuki_holo",
       "file": "satsuki-holo.webp",
-      "bytes": 59144
+      "bytes": 65174
     },
     {
       "key": "tenno-spring_normal",
       "file": "tenno-spring-normal.webp",
-      "bytes": 57110
+      "bytes": 62904
     },
     {
       "key": "tenno-spring_holo",
       "file": "tenno-spring-holo.webp",
-      "bytes": 62554
+      "bytes": 67628
     },
     {
       "key": "nhk-mile_normal",
       "file": "nhk-mile-normal.webp",
-      "bytes": 56156
+      "bytes": 62098
     },
     {
       "key": "nhk-mile_holo",
       "file": "nhk-mile-holo.webp",
-      "bytes": 66138
+      "bytes": 72044
     },
     {
       "key": "victoria-mile_normal",
       "file": "victoria-mile-normal.webp",
-      "bytes": 50828
+      "bytes": 55550
     },
     {
       "key": "victoria-mile_holo",
       "file": "victoria-mile-holo.webp",
-      "bytes": 63874
+      "bytes": 69146
     },
     {
       "key": "oaks_normal",
       "file": "oaks-normal.webp",
-      "bytes": 49764
+      "bytes": 55488
     },
     {
       "key": "oaks_holo",
       "file": "oaks-holo.webp",
-      "bytes": 61514
+      "bytes": 67178
     },
     {
       "key": "yasuda_normal",
       "file": "yasuda-normal.webp",
-      "bytes": 55678
+      "bytes": 63734
     },
     {
       "key": "yasuda_holo",
       "file": "yasuda-holo.webp",
-      "bytes": 65788
+      "bytes": 72396
     },
     {
       "key": "takarazuka_normal",
       "file": "takarazuka-normal.webp",
-      "bytes": 60898
+      "bytes": 65882
     },
     {
       "key": "takarazuka_holo",
       "file": "takarazuka-holo.webp",
-      "bytes": 72422
+      "bytes": 78998
     },
     {
       "key": "sprinters_normal",
       "file": "sprinters-normal.webp",
-      "bytes": 53790
+      "bytes": 71912
     },
     {
       "key": "sprinters_holo",
       "file": "sprinters-holo.webp",
-      "bytes": 63988
+      "bytes": 79594
     },
     {
       "key": "shuka_normal",
       "file": "shuka-normal.webp",
-      "bytes": 58760
+      "bytes": 66580
     },
     {
       "key": "shuka_holo",
       "file": "shuka-holo.webp",
-      "bytes": 71822
+      "bytes": 77862
     },
     {
       "key": "kikka_normal",
       "file": "kikka-normal.webp",
-      "bytes": 58816
+      "bytes": 80982
     },
     {
       "key": "kikka_holo",
       "file": "kikka-holo.webp",
-      "bytes": 73426
+      "bytes": 79606
     },
     {
       "key": "elizabeth_normal",
       "file": "elizabeth-normal.webp",
-      "bytes": 54712
+      "bytes": 59844
     },
     {
       "key": "elizabeth_holo",
       "file": "elizabeth-holo.webp",
-      "bytes": 66322
+      "bytes": 71068
     },
     {
       "key": "mile-cs_normal",
       "file": "mile-cs-normal.webp",
-      "bytes": 50488
+      "bytes": 55164
     },
     {
       "key": "mile-cs_holo",
       "file": "mile-cs-holo.webp",
-      "bytes": 63310
+      "bytes": 69138
     },
     {
       "key": "champions_normal",
       "file": "champions-normal.webp",
-      "bytes": 61472
+      "bytes": 66604
     },
     {
       "key": "champions_holo",
       "file": "champions-holo.webp",
-      "bytes": 72098
+      "bytes": 77344
     },
     {
       "key": "hanshin-jf_normal",
       "file": "hanshin-jf-normal.webp",
-      "bytes": 59054
+      "bytes": 63762
     },
     {
       "key": "hanshin-jf_holo",
       "file": "hanshin-jf-holo.webp",
-      "bytes": 72530
+      "bytes": 77678
     },
     {
       "key": "asahi_normal",
       "file": "asahi-normal.webp",
-      "bytes": 57748
+      "bytes": 63854
     },
     {
       "key": "asahi_holo",
       "file": "asahi-holo.webp",
-      "bytes": 66962
+      "bytes": 72318
     },
     {
       "key": "hopeful_normal",
       "file": "hopeful-normal.webp",
-      "bytes": 55004
+      "bytes": 59648
     },
     {
       "key": "hopeful_holo",
       "file": "hopeful-holo.webp",
-      "bytes": 67690
+      "bytes": 72402
     }
   ]
 }
