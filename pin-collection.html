@@ -180,6 +180,22 @@ html.bk-embedded .reveal-dialog .bk-reveal-grid{grid-template-columns:repeat(5,m
 html.bk-embedded .reveal-dialog:has(.bk-reveal-summary) .reveal-actions{margin-top:6px}
 html.bk-embedded .reveal-dialog:has(.bk-reveal-summary) .reveal-actions button{min-height:41px}
 @media(max-height:490px){html.bk-embedded .reveal-dialog .bk-reveal-item{height:57px}}
+/* Unified badge filter and completion at the top of the catalog. */
+html.bk-embedded .bk-unified-toolbar{background:#fff;padding:7px 8px 8px;border:1px solid #dce5ef;border-radius:12px;margin:4px 0 7px}
+html.bk-embedded .bk-unified-toolbar[hidden]{display:none!important}
+html.bk-embedded .bk-unified-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 7px;color:#0b2d5b}
+html.bk-embedded .bk-unified-heading strong{font-size:15px}
+html.bk-embedded .bk-unified-heading span{font-size:11px;color:#587494;font-weight:750;white-space:nowrap}
+html.bk-embedded .bk-unified-toolbar>label{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:#60738c;font-weight:700}
+html.bk-embedded #bkUnifiedFilter{height:38px;min-width:55%;background:#edf2fb;color:#123e74;border:1px solid #cfdbec;border-radius:9px;padding:4px 9px;font-size:13px;font-weight:700}
+html.bk-embedded .bk-collection-select,html.bk-embedded .bk-step-dropdowns,html.bk-embedded [data-collection-panel]>.bk-collection-heading,html.bk-embedded #stepStatus{display:none!important}
+html.bk-embedded .bk-collection-scroll>[data-collection-panel]:not([hidden]){margin-top:6px!important}
+html.bk-embedded .reveal-dialog .bk-reveal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+html.bk-embedded .reveal-dialog .bk-reveal-item{height:clamp(67px,11dvh,112px);aspect-ratio:auto;padding:5px;flex-direction:row;justify-content:flex-start;gap:7px}
+html.bk-embedded .reveal-dialog .bk-reveal-item img{height:100%;width:42%;object-fit:contain}
+html.bk-embedded .reveal-dialog .bk-reveal-item .bk-reveal-label{width:56%;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:clamp(9px,2.8vw,12px);text-align:left;line-height:1.25}
+html.bk-embedded .reveal-dialog:has(.bk-reveal-summary){width:min(100%,470px)}
+@media(max-height:660px){html.bk-embedded .reveal-dialog .bk-reveal-item{height:clamp(48px,9dvh,85px)}}
 </style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
@@ -188,6 +204,17 @@ html.bk-embedded .reveal-dialog:has(.bk-reveal-summary) .reveal-actions button{m
  <button type="button" data-collection-view="collection" aria-pressed="false">コレクション</button>
 </div>
 <div class="bk-collection-scroll">
+<div id="bkUnifiedCollectionToolbar" class="bk-unified-toolbar" hidden>
+ <div class="bk-unified-heading"><strong>コレクション</strong><span id="bkUnifiedOwned">0 / 98種類収集</span></div>
+ <label for="bkUnifiedFilter">表示するバッジ <select id="bkUnifiedFilter">
+  <option value="all">すべて</option>
+  <option value="holo">ホロ</option>
+  <option value="normal">G1</option>
+  <option value="G2">G2</option>
+  <option value="G3">G3</option>
+  <option value="L">L</option>
+ </select></label>
+</div>
 <section class="panel" data-gacha-panel><h2>ガチャ</h2>
 <div class="bk-gacha-hero" aria-label="バッジガチャのサンプル">
  <img src="./assets/badges/display/step-01.webp?v=2" alt="ステップレースのバッジ" loading="eager">
@@ -259,6 +286,7 @@ function pinArtwork(r,variant){
 function render(){
  const owned=Object.entries(state.owned).filter(([k,v])=>v>0).length;
  const collectionOwned=$('bkCollectionOwned');if(collectionOwned)collectionOwned.textContent=owned+' / 98種類収集';
+ const unifiedOwned=$('bkUnifiedOwned');if(unifiedOwned)unifiedOwned.textContent=owned+' / 98種類収集';
  const catalogReady=stepEntries.length===50&&g1Items.length===48&&g1AssetsReady;
  const total=(g1Items.length||10)+stepEntries.length;
  $('wallet').textContent=fmt(state.wallet);$('points').textContent=state.points.toLocaleString('ja-JP')+' pt';$('drawPoints').disabled=!catalogReady||state.points<POINT_COST;$('owned').textContent=owned+' / '+total;$('progressFill').style.width=(owned/total*100)+'%';$('progressLabel').textContent='未収集：'+(total-owned)+'種類';
@@ -610,7 +638,7 @@ loadStepCatalog();
 if(document.documentElement.classList.contains('bk-embedded')){
  const nav=document.querySelector('.bk-collection-menu');
  nav.hidden=false;
- document.querySelector('.bk-collection-select').hidden=false;
+ document.querySelector('.bk-collection-select').hidden=true;
  document.querySelector('.bk-legacy-collection-backup').hidden=true;
  document.querySelector('.bk-step-dropdowns').hidden=false;
  function showCollectionView(view){
@@ -618,12 +646,30 @@ if(document.documentElement.classList.contains('bk-embedded')){
   document.querySelectorAll('[data-collection-view]').forEach(btn=>btn.setAttribute('aria-pressed',String((btn.dataset.collectionView==='gacha')===isGacha)));
   document.querySelectorAll('[data-gacha-panel]').forEach(el=>el.hidden=!isGacha);
   document.querySelectorAll('[data-collection-panel]').forEach(el=>el.hidden=isGacha);
+  $('bkUnifiedCollectionToolbar').hidden=isGacha;
+  if(!isGacha)updateUnifiedCollectionFilter();
   document.documentElement.classList.toggle('bk-draw-fixed',isGacha);
   try{window.parent.postMessage({type:'baken:win5-gacha-view',fixed:isGacha},location.origin);}catch(e){}
   document.querySelector('.bk-collection-scroll').scrollTop=0;
   window.scrollTo(0,0);
  }
- $('bkG1Filter').addEventListener('change',e=>{filter=e.target.value;$('detail').classList.add('hidden');render();});
+ function updateUnifiedCollectionFilter(){
+  const choice=$('bkUnifiedFilter').value;
+  const g1Visible=['all','holo','normal'].includes(choice);
+  const stepVisible=choice==='all'||['G2','G3','L'].includes(choice);
+  const g1Panel=$('pins').closest('[data-collection-panel]');
+  const stepPanel=$('stepBadgePanel');
+  if(!g1Panel.hidden||document.querySelector('[data-collection-view="collection"][aria-pressed="true"]')){
+   g1Panel.hidden=!g1Visible;stepPanel.hidden=!stepVisible;
+  }
+  filter=choice==='normal'?'normal':choice==='holo'?'holo':'all';
+  stepGradeSelect=['G2','G3','L'].includes(choice)?choice:'all';
+  stepOwnership='all';stepIndex=0;
+  $('detail').classList.add('hidden');$('stepPreview').hidden=true;
+  render();displayStepBadges();
+ }
+ $('bkUnifiedFilter').addEventListener('change',updateUnifiedCollectionFilter);
+
  nav.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>showCollectionView(btn.dataset.collectionView)));
  showCollectionView('gacha');
 }
