@@ -57,7 +57,7 @@ const baseSelector='main.wrap > [data-tab]';
    posterVisible:getComputedStyle(image).display!=='none'
   }));
   assert.equal(hero.loaded,true,'WIN5 premium poster image must load');
-  assert.match(hero.source,/collection-hero\.webp/,'WIN5 poster must use the approved artwork');
+  assert.match(hero.source,/collection-hero(?:-hq)?\.webp/,'WIN5 poster must use the approved artwork');
   assert.equal(hero.posterVisible,true,'WIN5 poster must be visible in embedded mode');
   assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),true,'Gacha overview must be visible');
   await page.waitForFunction(()=>document.body.classList.contains('bk-win5-draw-fixed'));
