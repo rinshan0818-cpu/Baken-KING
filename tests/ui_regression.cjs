@@ -38,6 +38,21 @@ const baseSelector='main.wrap > [data-tab]';
   const collectionFrame=page.frameLocator('#bkWin5Frame');
   await collectionFrame.locator('#wallet').waitFor({state:'visible'});
   assert.match(await collectionFrame.locator('#wallet').textContent(),/300,000/,'WIN5 wallet starts independently at 300,000');
+  // Compact embedded view keeps drawing controls first and the large collection separately.
+  assert.equal(await collectionFrame.locator('.bk-gacha-hero img').count(),3,'Gacha overview must show three badge previews');
+  assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),true,'Gacha overview must be visible');
+  assert.equal(await collectionFrame.locator('[data-collection-panel]').first().isVisible(),false,'Collection should not crowd the initial draw screen');
+  await collectionFrame.locator('[data-collection-view="collection"]').click();
+  assert.equal(await collectionFrame.locator('[data-collection-panel]').first().isVisible(),true,'Collection view must be reachable');
+  assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),false,'Draw controls must be hidden in collection view');
+  await collectionFrame.locator('[data-collection-view="gacha"]').click();
+  assert.equal(await collectionFrame.locator('#drawOne').isVisible(),true,'Drawing must work again after returning from collection');
+  const win5MenuLayout=await page.locator('.bk-win5-subnav').evaluate(nav=>{
+   const buttons=[...nav.querySelectorAll('button')].map(x=>x.getBoundingClientRect());
+   return buttons.length===2&&Math.abs(buttons[0].top-buttons[1].top)<3&&buttons[1].left>buttons[0].right;
+  });
+  assert.equal(win5MenuLayout,true,'WIN5 purchase/gacha buttons must stay side by side');
+
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')||'null')?.balance??100000),100000,'WIN5 must not alter the main wallet');
   assert.equal(await page.locator('[data-tab="home"]').first().isVisible(),false,'WIN5 must hide the home panel');
   await page.locator('[data-win5-section="purchase"]').click();
