@@ -144,6 +144,29 @@ html.bk-embedded .bk-collection-heading h2{margin:0}
 html.bk-embedded #stepBadgePanel{padding-top:10px}
 html.bk-embedded #stepStatus{margin:3px 0 7px}
 @media(max-height:560px){html.bk-embedded.bk-draw-fixed .bk-gacha-hero{height:66px}html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.summary .metric{min-height:45px}html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{min-height:36px}}
+/* WIN5: fixed menus and independently scrolling collection content. */
+html.bk-embedded,html.bk-embedded body{height:100dvh;max-height:100dvh;overflow:hidden}
+html.bk-embedded main{height:100dvh;max-height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+html.bk-embedded .bk-collection-menu{flex:0 0 auto;position:relative;z-index:5;background:#fff;padding:2px 0 7px;margin:0!important}
+html.bk-embedded .bk-collection-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:16px;scrollbar-width:thin}
+html.bk-embedded.bk-draw-fixed .bk-collection-scroll{overflow:hidden;padding-bottom:0}
+html.bk-embedded #g1Status,html.bk-embedded .tabs,html.bk-embedded .bk-legacy-collection-backup{display:none!important}
+html.bk-embedded .bk-collection-select{display:block;margin:4px 0 10px}
+html.bk-embedded .bk-collection-select[hidden]{display:none!important}
+html.bk-embedded .bk-collection-select label{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#526c91;font-size:12px;font-weight:700}
+html.bk-embedded .bk-collection-select select{width:min(66%,245px);height:38px;padding:5px 9px;border:1px solid #cfdbec;border-radius:9px;background:#edf2fb;color:#173e70;font:inherit;font-size:12px}
+html.bk-embedded .bk-unowned-art{filter:brightness(0)!important;opacity:.74!important}
+html.bk-embedded .pin.locked,html.bk-embedded .step-tile.locked{background:#e9eef6}
+html.bk-embedded .bk-collection-scroll>.panel:first-child{margin-top:3px!important}
+html.bk-embedded .reveal-stage.bk-reveal-summary{min-height:0;height:auto;max-height:none;display:block;margin:7px 0;padding:10px;background:linear-gradient(150deg,#1b3964,#08172d)}
+html.bk-embedded .bk-reveal-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+html.bk-embedded .bk-reveal-item{min-width:0;aspect-ratio:1/1.35;padding:3px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d5b77755;border-radius:7px;background:#ffffff0c;position:relative}
+html.bk-embedded .bk-reveal-item img{width:100%;height:70%;object-fit:contain;filter:drop-shadow(0 1px 2px #0008)}
+html.bk-embedded .bk-reveal-item .bk-reveal-label{color:#e9d9b8;font-size:9px;line-height:1.15;text-align:center;overflow:hidden;width:100%;white-space:nowrap;text-overflow:ellipsis}
+html.bk-embedded .bk-reveal-item.is-holo{border-color:#d6bbff;background:#7a65b42c}
+html.bk-embedded .bk-reveal-item.is-new:after{content:'NEW';position:absolute;right:1px;top:1px;font-size:7px;color:#ffe2a2;font-weight:900}
+html.bk-embedded .reveal-dialog:has(.bk-reveal-summary){padding:12px;max-height:calc(100dvh - 25px)}
+html.bk-embedded .reveal-dialog:has(.bk-reveal-summary) .reveal-actions button{min-height:43px}
 </style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
@@ -151,19 +174,21 @@ html.bk-embedded #stepStatus{margin:3px 0 7px}
  <button type="button" data-collection-view="gacha" aria-pressed="true">ガチャを引く</button>
  <button type="button" data-collection-view="collection" aria-pressed="false">コレクション</button>
 </div>
+<div class="bk-collection-scroll">
 <section class="panel" data-gacha-panel><h2>ガチャ</h2>
 <div class="bk-gacha-hero" aria-label="バッジガチャのサンプル">
  <img src="./assets/badges/display/step-01.webp?v=2" alt="ステップレースのバッジ" loading="eager">
  <img src="./assets/badges/display/derby-normal.webp?v=2" alt="GⅠ通常バッジ" loading="eager">
  <img src="./assets/badges/display/arima-holo.webp?v=2" alt="GⅠホロバッジ" loading="eager">
 </div><div class="summary"><div class="metric"><small>所持バリエーション</small><strong id="owned">0 / 98</strong></div><div class="metric"><small>WIN5準備財布</small><strong id="wallet">¥300,000</strong></div><div class="metric"><small>交換ポイント</small><strong id="points">0 pt</strong></div></div><div class="progress"><div id="progressFill" style="width:0%"></div></div><p class="sub" id="progressLabel">未収集：98種類</p><p class="note">これはWIN5機能ができるまでの独立した準備財布です。初回30万円から開始し、通常馬券の残高・精算・購入履歴には一切影響しません。現在、WIN5の的中金はまだ自動入金されません。</p><div class="actions"><button id="drawOne">1回ガチャ ¥5,000</button><button id="drawTen">10連ガチャ ¥45,000</button></div><div class="actions" style="grid-template-columns:1fr"><button type="button" class="secondary" id="drawPoints">1回ガチャ 1,000 pt</button></div><p class="sub">同じバッジを引くとポイントを自動獲得します。ステップレース：30 pt／GⅠ通常版：100 pt／GⅠホロ版：500 pt。1,000 ptで1回引けます。獲得ポイントは重複したバッジを消費せず、所持数も減りません。ポイントはこの端末のコレクションデータに保存されます。</p><p class="sub">ステップレース75%／GⅠ通常21%／GⅠホロ4%。各枠内の対象レースは均等抽選。GⅠは承認済み24レースが対象です。ポイントガチャも同じ確率で、10連の確定枠はありません。</p><p id="message" class="status" role="status" aria-live="polite"></p><div id="result" class="result" hidden></div><p class="sub" id="drawHint">抽選後に開封画面が表示されます。演出はスキップできます。</p></section>
-<section class="panel" data-collection-panel><div class="bk-collection-heading"><h2>GⅠバッジ図鑑</h2><span id="bkCollectionOwned">0 / 98種類収集</span></div><p class="sub" id="g1Status">24レース・通常版とホロ版の48種類を読み込み中。承認済み画像はGitHub登録後に表示されます。</p><div class="tabs" role="group" aria-label="ピンバッジの表示切替"><button data-filter="all" aria-pressed="true">すべて</button><button data-filter="normal" aria-pressed="false">通常版</button><button data-filter="holo" aria-pressed="false">ホロ版</button><button data-filter="owned" aria-pressed="false" class="bk-legacy-filter">所持済み</button><button data-filter="missing" aria-pressed="false" class="bk-legacy-filter">未所持</button></div><div id="pins" class="pins"></div><div id="detail" class="detail hidden"></div></section>
+<section class="panel" data-collection-panel><div class="bk-collection-heading"><h2>GⅠバッジ図鑑</h2><span id="bkCollectionOwned">0 / 98種類収集</span></div><p class="sub" id="g1Status">24レース・通常版とホロ版の48種類を読み込み中。承認済み画像はGitHub登録後に表示されます。</p><div class="tabs" role="group" aria-label="ピンバッジの表示切替"><button data-filter="all" aria-pressed="true">すべて</button><button data-filter="normal" aria-pressed="false">通常版</button><button data-filter="holo" aria-pressed="false">ホロ版</button><button data-filter="owned" aria-pressed="false" class="bk-legacy-filter">所持済み</button><button data-filter="missing" aria-pressed="false" class="bk-legacy-filter">未所持</button></div><div class="bk-collection-select" hidden><label>表示するバッジ <select id="bkG1Filter"><option value="all">すべて（ホロ→通常）</option><option value="holo">ホロのみ</option><option value="normal">通常のみ</option></select></label></div><div id="pins" class="pins"></div><div id="detail" class="detail hidden"></div></section>
 <section class="panel" data-collection-panel id="stepBadgePanel" aria-labelledby="stepBadgeTitle"><h2 id="stepBadgeTitle">ステップレースバッジ</h2><p class="sub bk-step-description">GⅡ＝赤・GⅢ＝緑・L＝ブロンズの全50種。承認済みのオリジナル画像を収録した図鑑です。ガチャで獲得したものはカラー、未所持は暗く表示します。重複時はポイントを獲得できます。</p>
 <div class="bk-step-dropdowns" hidden>
 <label>所持状況<select id="bkStepOwnership"><option value="all">すべて</option><option value="owned">所持済みのみ</option><option value="missing">未所持のみ</option><option value="owned-first">所持済み優先</option></select></label>
 <label>グレード<select id="bkStepGrade"><option value="all">すべて</option><option value="G2">GⅡ</option><option value="G3">GⅢ</option><option value="L">L</option></select></label>
 </div><div class="step-controls" id="stepFilters" role="group" aria-label="ステップレースの格付け切替"><button type="button" data-step-grade="all" aria-pressed="true">すべて</button><button type="button" data-step-grade="G2" aria-pressed="false">GⅡ</button><button type="button" data-step-grade="G3" aria-pressed="false">GⅢ</button><button type="button" data-step-grade="L" aria-pressed="false">L</button><button type="button" data-step-grade="owned" aria-pressed="false">所持済み</button><button type="button" data-step-grade="missing" aria-pressed="false">未所持</button></div><p class="sub" id="stepStatus" role="status" aria-live="polite">バッジを読み込み中…</p><div id="stepGrid" class="step-grid"></div><div class="step-pager"><button type="button" class="secondary" id="stepPrev">前へ</button><span class="sub" id="stepPage"></span><button type="button" class="secondary" id="stepNext">次へ</button></div><div class="step-preview" id="stepPreview" hidden></div></section>
-<section class="panel" data-collection-panel><h2>コレクションデータの保存</h2><p class="sub">ピンバッジと準備財布は、この端末内に保存されます。既存の馬券バックアップとは別に、ここから書き出して保管してください。</p><div class="mini-actions"><button class="secondary" id="export">専用バックアップを保存</button><label>専用バックアップを復元 <input type="file" id="import" accept=".json,application/json"></label></div><p class="sub">本番モードとテストモードは別々に保存します。通常馬券の記録は変更しません。</p></section>
+<section class="panel bk-legacy-collection-backup" data-collection-panel hidden><h2>コレクションデータの保存</h2><p class="sub">ピンバッジと準備財布は、この端末内に保存されます。既存の馬券バックアップとは別に、ここから書き出して保管してください。</p><div class="mini-actions"><button class="secondary" id="export">専用バックアップを保存</button><label>専用バックアップを復元 <input type="file" id="import" accept=".json,application/json"></label></div><p class="sub">本番モードとテストモードは別々に保存します。通常馬券の記録は変更しません。</p></section>
+</div>
 </main><div id="revealOverlay" class="reveal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="revealHeading"><div class="reveal-dialog"><div class="reveal-top"><strong id="revealHeading">ガチャ結果</strong><button type="button" id="revealSkip" class="secondary">すべて表示</button></div><p id="revealCount" class="sub" aria-live="polite"></p><div id="revealStage" class="reveal-stage"></div><div class="reveal-actions"><button type="button" id="revealNext">開封する</button><button type="button" id="revealClose" class="secondary" hidden>結果を閉じる</button></div></div></div><footer>個人用ゲーム内の仮想通貨です。実際の馬券・賞金・金銭の決済はありません。ピンバッジはレースを題材にしたオリジナルの記念グッズです。</footer>
 <script>
 (function(){
@@ -225,14 +250,15 @@ function render(){
  const total=(g1Items.length||10)+stepEntries.length;
  $('wallet').textContent=fmt(state.wallet);$('points').textContent=state.points.toLocaleString('ja-JP')+' pt';$('drawPoints').disabled=!catalogReady||state.points<POINT_COST;$('owned').textContent=owned+' / '+total;$('progressFill').style.width=(owned/total*100)+'%';$('progressLabel').textContent='未収集：'+(total-owned)+'種類';
  $('drawOne').disabled=!catalogReady||state.wallet<5000;$('drawTen').disabled=!catalogReady||state.wallet<45000;
- const list=(g1Items.length?g1Items:RACES.flatMap(r=>['normal','holo'].map(v=>({r,v,key:itemKey(r,v),name:r.name})))).filter(x=>filter==='all'||filter===x.v||(filter==='missing'&&!state.owned[x.key])||(filter==='owned'&&state.owned[x.key]>0));
+ const list=(g1Items.length?g1Items:RACES.flatMap(r=>['normal','holo'].map(v=>({r,v,key:itemKey(r,v),name:r.name})))).filter(x=>filter==='all'||filter===x.v||(filter==='missing'&&!state.owned[x.key])||(filter==='owned'&&state.owned[x.key]>0))
+ .sort((a,b)=>(a.v==='holo'?0:1)-(b.v==='holo'?0:1));
  $('pins').replaceChildren();
  for(const x of list){
   const b=document.createElement('button');b.type='button';b.className='pin'+(state.owned[x.key]?'':' locked');
   const legacyRace=RACES.find(r=>r.id===x.r.id);
   if(x.filename&&g1AssetsReady){
    const img=document.createElement('img');img.src=badgeAssetURL({key:x.key,v:x.v,r:x.r});img.alt=x.name+'の'+(x.v==='holo'?'ホロ':'通常')+'バッジ';img.loading='lazy';img.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';
-   if(!state.owned[x.key])img.style.filter='grayscale(1) brightness(.25)';
+   if(!state.owned[x.key])img.classList.add('bk-unowned-art');
    b.append(img);
   }else if(legacyRace){b.innerHTML=pinArtwork(legacyRace,x.v);}
   else{const ph=document.createElement('div');ph.className='g1-placeholder';ph.textContent='画像登録待ち';b.append(ph);}
@@ -248,7 +274,7 @@ function showDetail(r,v){
  $('detail').classList.remove('hidden');
  $('detail').replaceChildren();
  if(item?.filename&&g1AssetsReady){
-  const image=document.createElement('img');image.src=badgeAssetURL({key:item.key,v:item.v,r:item.r});image.alt=item.name+'のバッジ';image.style.cssText='display:block;width:100%;max-width:250px;margin:auto;';if(!n)image.style.filter='grayscale(1) brightness(.25)';$('detail').append(image);
+  const image=document.createElement('img');image.src=badgeAssetURL({key:item.key,v:item.v,r:item.r});image.alt=item.name+'のバッジ';image.style.cssText='display:block;width:100%;max-width:250px;margin:auto;';if(!n)image.classList.add('bk-unowned-art');$('detail').append(image);
  }else if(RACES.some(x=>x.id===r.id)){const artwork=document.createElement('div');artwork.innerHTML=pinArtwork(r,v);$('detail').append(artwork.firstElementChild);}
  else{const placeholder=document.createElement('div');placeholder.className='g1-placeholder';placeholder.textContent='承認済み画像の登録待ち';$('detail').append(placeholder);}
  const h=document.createElement('h3'),p1=document.createElement('p'),p2=document.createElement('p');p1.className='sub';p2.className='sub';$('detail').append(h,p1,p2);
@@ -507,7 +533,7 @@ function displayStepBadges(){
  for(const entry of current){
   const tile=document.createElement('button');tile.type='button';tile.className='step-tile';
   const img=document.createElement('img');img.className='step-medal';img.src=badgeAssetURL({key:entry.id,v:'step',r:entry});img.alt=entry.race+'のバッジ';img.loading='lazy';img.decoding='async';
-  const ownedCount=state.owned[entry.id]||0;if(!ownedCount){tile.classList.add('locked');img.style.filter='grayscale(1) brightness(.25)';}
+  const ownedCount=state.owned[entry.id]||0;if(!ownedCount){tile.classList.add('locked');img.classList.add('bk-unowned-art');}
   const name=document.createElement('div');name.className='name';name.textContent=String(entry.number).padStart(2,'0')+' '+entry.race;
   const grade=document.createElement('div');grade.className='step-grade';grade.textContent=entry.grade==='G2'?'GⅡ':entry.grade==='G3'?'GⅢ':'L';
   const count=document.createElement('div');count.className='step-grade';count.textContent=ownedCount?'所持 ×'+ownedCount:'未所持';
@@ -521,7 +547,7 @@ function showStepBadge(entry){
  const preview=$('stepPreview');preview.replaceChildren();
  const title=document.createElement('strong');title.textContent=entry.race+'（'+(entry.grade==='G2'?'GⅡ':entry.grade==='G3'?'GⅢ':'L')+'）';
  const image=document.createElement('img');image.className='step-medal';image.src=badgeAssetURL({key:entry.id,v:'step',r:entry});image.alt=entry.race+'のバッジ';image.decoding='async';
- if(!(state.owned[entry.id]>0)){image.style.filter='grayscale(1) brightness(.25)';}
+ if(!(state.owned[entry.id]>0)){image.classList.add('bk-unowned-art');}
  const count=document.createElement('p');count.className='sub';count.textContent=state.owned[entry.id]?'所持数：'+state.owned[entry.id]:'未所持';
  preview.append(title,image,count);preview.hidden=false;preview.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
@@ -558,6 +584,8 @@ loadStepCatalog();
 if(document.documentElement.classList.contains('bk-embedded')){
  const nav=document.querySelector('.bk-collection-menu');
  nav.hidden=false;
+ document.querySelector('.bk-collection-select').hidden=false;
+ document.querySelector('.bk-legacy-collection-backup').hidden=true;
  document.querySelector('.bk-step-dropdowns').hidden=false;
  function showCollectionView(view){
   const isGacha=view!=='collection';
@@ -566,8 +594,10 @@ if(document.documentElement.classList.contains('bk-embedded')){
   document.querySelectorAll('[data-collection-panel]').forEach(el=>el.hidden=isGacha);
   document.documentElement.classList.toggle('bk-draw-fixed',isGacha);
   try{window.parent.postMessage({type:'baken:win5-gacha-view',fixed:isGacha},location.origin);}catch(e){}
+  document.querySelector('.bk-collection-scroll').scrollTop=0;
   window.scrollTo(0,0);
  }
+ $('bkG1Filter').addEventListener('change',e=>{filter=e.target.value;$('detail').classList.add('hidden');render();});
  nav.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>showCollectionView(btn.dataset.collectionView)));
  showCollectionView('gacha');
 }
