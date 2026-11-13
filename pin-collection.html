@@ -255,6 +255,27 @@ html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{
  html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.summary .metric{min-height:47px}
  html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{min-height:39px}
 }
+
+/* Match the artwork's natural 16:9 composition, preserving all medals and lettering. */
+html.bk-embedded.bk-draw-fixed .bk-gacha-hero{
+  flex:0 1 auto!important;
+  height:auto!important;
+  aspect-ratio:16/9;
+  min-height:0;
+  width:100%;
+  max-height:56%;
+  margin:0 0 7px!important;
+}
+html.bk-embedded.bk-draw-fixed .bk-gacha-hero .bk-hero-poster{
+  object-fit:fill!important;
+  object-position:center;
+}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]{
+  justify-content:space-between;
+}
+@media(max-height:590px){
+ html.bk-embedded.bk-draw-fixed .bk-gacha-hero{max-height:43%}
+}
 </style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
