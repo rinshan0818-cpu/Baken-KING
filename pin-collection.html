@@ -90,13 +90,53 @@ html.bk-embedded body{padding-bottom:24px}
 html.bk-embedded header{display:none}
 html.bk-embedded main{padding:1px 9px 24px;max-width:780px}
 html.bk-embedded main>.panel:first-child{margin-top:9px}
+/* WIN5 embedded compact gacha and separate collection, matched to main app navy. */
+html.bk-embedded,html.bk-embedded body{background:#fff}
+html.bk-embedded main{padding:0 4px 20px;max-width:780px}
+html.bk-embedded .panel{border-color:#dce5ef;box-shadow:none;border-radius:13px;padding:13px 11px;margin-top:8px}
+html.bk-embedded .panel h2{font-size:16px;margin-bottom:8px;color:#0b2d5b}
+html.bk-embedded .bk-collection-menu{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;margin:3px 0 6px}
+html.bk-embedded .bk-collection-menu[hidden]{display:none!important}
+html.bk-embedded .bk-collection-menu button{width:100%;min-height:39px;background:#edf2fb;color:#173e70;padding:8px 5px;border-radius:9px;font-size:12px}
+html.bk-embedded .bk-collection-menu button[aria-pressed="true"]{background:#0b2d5b;color:#fff}
+html.bk-embedded [data-gacha-panel][hidden],html.bk-embedded [data-collection-panel][hidden]{display:none!important}
+html.bk-embedded .bk-gacha-hero{height:117px;background:linear-gradient(135deg,#f1f5fc,#e3ecf8);border:1px solid #dce5ef;border-radius:13px;display:flex;justify-content:center;align-items:center;gap:1px;overflow:hidden;margin:5px 0 10px}
+html.bk-embedded .bk-gacha-hero img{width:31%;max-width:120px;height:107px;object-fit:contain;filter:drop-shadow(0 5px 7px #102d4b24)}
+html.bk-embedded .bk-gacha-hero img:nth-child(2){transform:scale(1.12);z-index:1}
+html.bk-embedded [data-gacha-panel]>.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+html.bk-embedded [data-gacha-panel]>.summary .metric{grid-column:auto!important;margin:0;padding:9px 10px;background:#f1f5fb;border-radius:10px;min-height:63px}
+html.bk-embedded [data-gacha-panel]>.summary .metric:first-child{display:none}
+html.bk-embedded [data-gacha-panel]>.summary .metric small{font-size:10px}
+html.bk-embedded [data-gacha-panel]>.summary .metric strong{font-size:clamp(18px,4vw,23px);margin-top:3px}
+html.bk-embedded [data-gacha-panel]>.progress,html.bk-embedded [data-gacha-panel]>#progressLabel,html.bk-embedded [data-gacha-panel]>.note,html.bk-embedded [data-gacha-panel]>.sub:not(#drawHint){display:none}
+html.bk-embedded [data-gacha-panel]>#drawHint{display:none}
+html.bk-embedded [data-gacha-panel]>.actions{gap:7px;margin:9px 0 0}
+html.bk-embedded [data-gacha-panel]>.actions button{padding:9px 3px;min-height:47px;font-size:clamp(12px,3.2vw,15px);border-radius:10px;background:#0b2d5b}
+html.bk-embedded [data-gacha-panel]>.actions button.secondary{background:#edf2fb;color:#123e74}
+html.bk-embedded [data-gacha-panel]>.actions button:disabled{background:#b5c1d1;color:#fff}
+html.bk-embedded #message{margin:8px 0 0;font-size:11px;min-height:0}
+html.bk-embedded .bk-collection-heading{display:flex;align-items:center;justify-content:space-between;gap:5px}
+html.bk-embedded .bk-collection-heading span{color:#577396;font-size:11px;font-weight:750;white-space:nowrap}
+html.bk-embedded .pins,html.bk-embedded .step-grid{gap:7px}
+html.bk-embedded .pin,html.bk-embedded .step-tile{padding:7px}
+html.bk-embedded .step-controls{gap:5px}
+@media(max-width:370px){html.bk-embedded .bk-gacha-hero{height:100px}html.bk-embedded .bk-gacha-hero img{height:94px}}
 </style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
-<section class="panel"><h2>コレクション</h2><div class="summary"><div class="metric"><small>所持バリエーション</small><strong id="owned">0 / 98</strong></div><div class="metric"><small>WIN5準備財布</small><strong id="wallet">¥300,000</strong></div><div class="metric"><small>交換ポイント</small><strong id="points">0 pt</strong></div></div><div class="progress"><div id="progressFill" style="width:0%"></div></div><p class="sub" id="progressLabel">未収集：98種類</p><p class="note">これはWIN5機能ができるまでの独立した準備財布です。初回30万円から開始し、通常馬券の残高・精算・購入履歴には一切影響しません。現在、WIN5の的中金はまだ自動入金されません。</p><div class="actions"><button id="drawOne">1回ガチャ ¥5,000</button><button id="drawTen">10連ガチャ ¥45,000</button></div><div class="actions" style="grid-template-columns:1fr"><button type="button" class="secondary" id="drawPoints">1回ガチャ 1,000 pt</button></div><p class="sub">同じバッジを引くとポイントを自動獲得します。ステップレース：30 pt／GⅠ通常版：100 pt／GⅠホロ版：500 pt。1,000 ptで1回引けます。獲得ポイントは重複したバッジを消費せず、所持数も減りません。ポイントはこの端末のコレクションデータに保存されます。</p><p class="sub">ステップレース75%／GⅠ通常21%／GⅠホロ4%。各枠内の対象レースは均等抽選。GⅠは承認済み24レースが対象です。ポイントガチャも同じ確率で、10連の確定枠はありません。</p><p id="message" class="status" role="status" aria-live="polite"></p><div id="result" class="result" hidden></div><p class="sub" id="drawHint">抽選後に開封画面が表示されます。演出はスキップできます。</p></section>
-<section class="panel"><h2>GⅠバッジ図鑑</h2><p class="sub" id="g1Status">24レース・通常版とホロ版の48種類を読み込み中。承認済み画像はGitHub登録後に表示されます。</p><div class="tabs" role="group" aria-label="ピンバッジの表示切替"><button data-filter="all" aria-pressed="true">すべて</button><button data-filter="normal" aria-pressed="false">通常版</button><button data-filter="holo" aria-pressed="false">ホロ版</button><button data-filter="owned" aria-pressed="false">所持済み</button><button data-filter="missing" aria-pressed="false">未所持</button></div><div id="pins" class="pins"></div><div id="detail" class="detail hidden"></div></section>
-<section class="panel" id="stepBadgePanel" aria-labelledby="stepBadgeTitle"><h2 id="stepBadgeTitle">ステップレースバッジ</h2><p class="sub">GⅡ＝赤・GⅢ＝緑・L＝ブロンズの全50種。承認済みのオリジナル画像を収録した図鑑です。ガチャで獲得したものはカラー、未所持は暗く表示します。重複時はポイントを獲得できます。</p><div class="step-controls" id="stepFilters" role="group" aria-label="ステップレースの格付け切替"><button type="button" data-step-grade="all" aria-pressed="true">すべて</button><button type="button" data-step-grade="G2" aria-pressed="false">GⅡ</button><button type="button" data-step-grade="G3" aria-pressed="false">GⅢ</button><button type="button" data-step-grade="L" aria-pressed="false">L</button><button type="button" data-step-grade="owned" aria-pressed="false">所持済み</button><button type="button" data-step-grade="missing" aria-pressed="false">未所持</button></div><p class="sub" id="stepStatus" role="status" aria-live="polite">バッジを読み込み中…</p><div id="stepGrid" class="step-grid"></div><div class="step-pager"><button type="button" class="secondary" id="stepPrev">前へ</button><span class="sub" id="stepPage"></span><button type="button" class="secondary" id="stepNext">次へ</button></div><div class="step-preview" id="stepPreview" hidden></div></section>
-<section class="panel"><h2>コレクションデータの保存</h2><p class="sub">ピンバッジと準備財布は、この端末内に保存されます。既存の馬券バックアップとは別に、ここから書き出して保管してください。</p><div class="mini-actions"><button class="secondary" id="export">専用バックアップを保存</button><label>専用バックアップを復元 <input type="file" id="import" accept=".json,application/json"></label></div><p class="sub">本番モードとテストモードは別々に保存します。通常馬券の記録は変更しません。</p></section>
+<div class="bk-collection-menu" aria-label="ガチャ内メニュー" hidden>
+ <button type="button" data-collection-view="gacha" aria-pressed="true">ガチャを引く</button>
+ <button type="button" data-collection-view="collection" aria-pressed="false">コレクション</button>
+</div>
+<section class="panel" data-gacha-panel><h2>ガチャ</h2>
+<div class="bk-gacha-hero" aria-label="バッジガチャのサンプル">
+ <img src="./assets/badges/display/step-01.webp?v=2" alt="ステップレースのバッジ" loading="eager">
+ <img src="./assets/badges/display/derby-normal.webp?v=2" alt="GⅠ通常バッジ" loading="eager">
+ <img src="./assets/badges/display/arima-holo.webp?v=2" alt="GⅠホロバッジ" loading="eager">
+</div><div class="summary"><div class="metric"><small>所持バリエーション</small><strong id="owned">0 / 98</strong></div><div class="metric"><small>WIN5準備財布</small><strong id="wallet">¥300,000</strong></div><div class="metric"><small>交換ポイント</small><strong id="points">0 pt</strong></div></div><div class="progress"><div id="progressFill" style="width:0%"></div></div><p class="sub" id="progressLabel">未収集：98種類</p><p class="note">これはWIN5機能ができるまでの独立した準備財布です。初回30万円から開始し、通常馬券の残高・精算・購入履歴には一切影響しません。現在、WIN5の的中金はまだ自動入金されません。</p><div class="actions"><button id="drawOne">1回ガチャ ¥5,000</button><button id="drawTen">10連ガチャ ¥45,000</button></div><div class="actions" style="grid-template-columns:1fr"><button type="button" class="secondary" id="drawPoints">1回ガチャ 1,000 pt</button></div><p class="sub">同じバッジを引くとポイントを自動獲得します。ステップレース：30 pt／GⅠ通常版：100 pt／GⅠホロ版：500 pt。1,000 ptで1回引けます。獲得ポイントは重複したバッジを消費せず、所持数も減りません。ポイントはこの端末のコレクションデータに保存されます。</p><p class="sub">ステップレース75%／GⅠ通常21%／GⅠホロ4%。各枠内の対象レースは均等抽選。GⅠは承認済み24レースが対象です。ポイントガチャも同じ確率で、10連の確定枠はありません。</p><p id="message" class="status" role="status" aria-live="polite"></p><div id="result" class="result" hidden></div><p class="sub" id="drawHint">抽選後に開封画面が表示されます。演出はスキップできます。</p></section>
+<section class="panel" data-collection-panel><div class="bk-collection-heading"><h2>GⅠバッジ図鑑</h2><span id="bkCollectionOwned">0 / 98種類収集</span></div><p class="sub" id="g1Status">24レース・通常版とホロ版の48種類を読み込み中。承認済み画像はGitHub登録後に表示されます。</p><div class="tabs" role="group" aria-label="ピンバッジの表示切替"><button data-filter="all" aria-pressed="true">すべて</button><button data-filter="normal" aria-pressed="false">通常版</button><button data-filter="holo" aria-pressed="false">ホロ版</button><button data-filter="owned" aria-pressed="false">所持済み</button><button data-filter="missing" aria-pressed="false">未所持</button></div><div id="pins" class="pins"></div><div id="detail" class="detail hidden"></div></section>
+<section class="panel" data-collection-panel id="stepBadgePanel" aria-labelledby="stepBadgeTitle"><h2 id="stepBadgeTitle">ステップレースバッジ</h2><p class="sub">GⅡ＝赤・GⅢ＝緑・L＝ブロンズの全50種。承認済みのオリジナル画像を収録した図鑑です。ガチャで獲得したものはカラー、未所持は暗く表示します。重複時はポイントを獲得できます。</p><div class="step-controls" id="stepFilters" role="group" aria-label="ステップレースの格付け切替"><button type="button" data-step-grade="all" aria-pressed="true">すべて</button><button type="button" data-step-grade="G2" aria-pressed="false">GⅡ</button><button type="button" data-step-grade="G3" aria-pressed="false">GⅢ</button><button type="button" data-step-grade="L" aria-pressed="false">L</button><button type="button" data-step-grade="owned" aria-pressed="false">所持済み</button><button type="button" data-step-grade="missing" aria-pressed="false">未所持</button></div><p class="sub" id="stepStatus" role="status" aria-live="polite">バッジを読み込み中…</p><div id="stepGrid" class="step-grid"></div><div class="step-pager"><button type="button" class="secondary" id="stepPrev">前へ</button><span class="sub" id="stepPage"></span><button type="button" class="secondary" id="stepNext">次へ</button></div><div class="step-preview" id="stepPreview" hidden></div></section>
+<section class="panel" data-collection-panel><h2>コレクションデータの保存</h2><p class="sub">ピンバッジと準備財布は、この端末内に保存されます。既存の馬券バックアップとは別に、ここから書き出して保管してください。</p><div class="mini-actions"><button class="secondary" id="export">専用バックアップを保存</button><label>専用バックアップを復元 <input type="file" id="import" accept=".json,application/json"></label></div><p class="sub">本番モードとテストモードは別々に保存します。通常馬券の記録は変更しません。</p></section>
 </main><div id="revealOverlay" class="reveal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="revealHeading"><div class="reveal-dialog"><div class="reveal-top"><strong id="revealHeading">ガチャ結果</strong><button type="button" id="revealSkip" class="secondary">すべて表示</button></div><p id="revealCount" class="sub" aria-live="polite"></p><div id="revealStage" class="reveal-stage"></div><div class="reveal-actions"><button type="button" id="revealNext">開封する</button><button type="button" id="revealClose" class="secondary" hidden>結果を閉じる</button></div></div></div><footer>個人用ゲーム内の仮想通貨です。実際の馬券・賞金・金銭の決済はありません。ピンバッジはレースを題材にしたオリジナルの記念グッズです。</footer>
 <script>
 (function(){
@@ -153,6 +193,7 @@ function pinArtwork(r,variant){
 }
 function render(){
  const owned=Object.entries(state.owned).filter(([k,v])=>v>0).length;
+ const collectionOwned=$('bkCollectionOwned');if(collectionOwned)collectionOwned.textContent=owned+' / 98種類収集';
  const catalogReady=stepEntries.length===50&&g1Items.length===48&&g1AssetsReady;
  const total=(g1Items.length||10)+stepEntries.length;
  $('wallet').textContent=fmt(state.wallet);$('points').textContent=state.points.toLocaleString('ja-JP')+' pt';$('drawPoints').disabled=!catalogReady||state.points<POINT_COST;$('owned').textContent=owned+' / '+total;$('progressFill').style.width=(owned/total*100)+'%';$('progressLabel').textContent='未収集：'+(total-owned)+'種類';
@@ -475,6 +516,22 @@ async function loadStepCatalog(){
  }catch(error){$('stepStatus').textContent='ステップレース図鑑を読み込めませんでした。通信状態を確認してください。';console.error(error);}
 }
 loadStepCatalog();
+
+// Embedded WIN5 view: separate a compact draw screen from the complete collection.
+// Standalone page keeps all existing sections, links and backup operations.
+if(document.documentElement.classList.contains('bk-embedded')){
+ const nav=document.querySelector('.bk-collection-menu');
+ nav.hidden=false;
+ function showCollectionView(view){
+  const isGacha=view!=='collection';
+  document.querySelectorAll('[data-collection-view]').forEach(btn=>btn.setAttribute('aria-pressed',String((btn.dataset.collectionView==='gacha')===isGacha)));
+  document.querySelectorAll('[data-gacha-panel]').forEach(el=>el.hidden=!isGacha);
+  document.querySelectorAll('[data-collection-panel]').forEach(el=>el.hidden=isGacha);
+  window.scrollTo(0,0);
+ }
+ nav.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>showCollectionView(btn.dataset.collectionView)));
+ showCollectionView('gacha');
+}
 
 render();
 })();
