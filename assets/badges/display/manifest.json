@@ -1,0 +1,497 @@
+{
+  "version": 1,
+  "count": 98,
+  "source": "approved-originals",
+  "files": [
+    {
+      "key": "step-01",
+      "file": "step-01.webp",
+      "bytes": 53850
+    },
+    {
+      "key": "step-02",
+      "file": "step-02.webp",
+      "bytes": 53778
+    },
+    {
+      "key": "step-03",
+      "file": "step-03.webp",
+      "bytes": 54000
+    },
+    {
+      "key": "step-04",
+      "file": "step-04.webp",
+      "bytes": 54104
+    },
+    {
+      "key": "step-05",
+      "file": "step-05.webp",
+      "bytes": 53456
+    },
+    {
+      "key": "step-06",
+      "file": "step-06.webp",
+      "bytes": 54164
+    },
+    {
+      "key": "step-07",
+      "file": "step-07.webp",
+      "bytes": 53688
+    },
+    {
+      "key": "step-08",
+      "file": "step-08.webp",
+      "bytes": 55220
+    },
+    {
+      "key": "step-09",
+      "file": "step-09.webp",
+      "bytes": 52878
+    },
+    {
+      "key": "step-10",
+      "file": "step-10.webp",
+      "bytes": 52104
+    },
+    {
+      "key": "step-11",
+      "file": "step-11.webp",
+      "bytes": 54464
+    },
+    {
+      "key": "step-12",
+      "file": "step-12.webp",
+      "bytes": 53724
+    },
+    {
+      "key": "step-13",
+      "file": "step-13.webp",
+      "bytes": 55012
+    },
+    {
+      "key": "step-14",
+      "file": "step-14.webp",
+      "bytes": 53192
+    },
+    {
+      "key": "step-15",
+      "file": "step-15.webp",
+      "bytes": 55260
+    },
+    {
+      "key": "step-16",
+      "file": "step-16.webp",
+      "bytes": 54728
+    },
+    {
+      "key": "step-17",
+      "file": "step-17.webp",
+      "bytes": 53126
+    },
+    {
+      "key": "step-18",
+      "file": "step-18.webp",
+      "bytes": 53786
+    },
+    {
+      "key": "step-19",
+      "file": "step-19.webp",
+      "bytes": 55432
+    },
+    {
+      "key": "step-20",
+      "file": "step-20.webp",
+      "bytes": 54332
+    },
+    {
+      "key": "step-21",
+      "file": "step-21.webp",
+      "bytes": 53820
+    },
+    {
+      "key": "step-22",
+      "file": "step-22.webp",
+      "bytes": 55334
+    },
+    {
+      "key": "step-23",
+      "file": "step-23.webp",
+      "bytes": 55792
+    },
+    {
+      "key": "step-24",
+      "file": "step-24.webp",
+      "bytes": 54808
+    },
+    {
+      "key": "step-25",
+      "file": "step-25.webp",
+      "bytes": 55352
+    },
+    {
+      "key": "step-26",
+      "file": "step-26.webp",
+      "bytes": 56312
+    },
+    {
+      "key": "step-27",
+      "file": "step-27.webp",
+      "bytes": 53924
+    },
+    {
+      "key": "step-28",
+      "file": "step-28.webp",
+      "bytes": 54652
+    },
+    {
+      "key": "step-29",
+      "file": "step-29.webp",
+      "bytes": 55596
+    },
+    {
+      "key": "step-30",
+      "file": "step-30.webp",
+      "bytes": 53584
+    },
+    {
+      "key": "step-31",
+      "file": "step-31.webp",
+      "bytes": 54162
+    },
+    {
+      "key": "step-32",
+      "file": "step-32.webp",
+      "bytes": 54526
+    },
+    {
+      "key": "step-33",
+      "file": "step-33.webp",
+      "bytes": 54804
+    },
+    {
+      "key": "step-34",
+      "file": "step-34.webp",
+      "bytes": 53544
+    },
+    {
+      "key": "step-35",
+      "file": "step-35.webp",
+      "bytes": 53880
+    },
+    {
+      "key": "step-36",
+      "file": "step-36.webp",
+      "bytes": 52538
+    },
+    {
+      "key": "step-37",
+      "file": "step-37.webp",
+      "bytes": 54510
+    },
+    {
+      "key": "step-38",
+      "file": "step-38.webp",
+      "bytes": 56728
+    },
+    {
+      "key": "step-39",
+      "file": "step-39.webp",
+      "bytes": 54226
+    },
+    {
+      "key": "step-40",
+      "file": "step-40.webp",
+      "bytes": 55048
+    },
+    {
+      "key": "step-41",
+      "file": "step-41.webp",
+      "bytes": 56454
+    },
+    {
+      "key": "step-42",
+      "file": "step-42.webp",
+      "bytes": 55370
+    },
+    {
+      "key": "step-43",
+      "file": "step-43.webp",
+      "bytes": 56926
+    },
+    {
+      "key": "step-44",
+      "file": "step-44.webp",
+      "bytes": 56402
+    },
+    {
+      "key": "step-45",
+      "file": "step-45.webp",
+      "bytes": 56364
+    },
+    {
+      "key": "step-46",
+      "file": "step-46.webp",
+      "bytes": 56710
+    },
+    {
+      "key": "step-47",
+      "file": "step-47.webp",
+      "bytes": 55904
+    },
+    {
+      "key": "step-48",
+      "file": "step-48.webp",
+      "bytes": 56284
+    },
+    {
+      "key": "step-49",
+      "file": "step-49.webp",
+      "bytes": 56174
+    },
+    {
+      "key": "step-50",
+      "file": "step-50.webp",
+      "bytes": 55374
+    },
+    {
+      "key": "derby_normal",
+      "file": "derby-normal.webp",
+      "bytes": 37162
+    },
+    {
+      "key": "derby_holo",
+      "file": "derby-holo.webp",
+      "bytes": 42448
+    },
+    {
+      "key": "arima_normal",
+      "file": "arima-normal.webp",
+      "bytes": 40852
+    },
+    {
+      "key": "arima_holo",
+      "file": "arima-holo.webp",
+      "bytes": 44328
+    },
+    {
+      "key": "tenno-autumn_normal",
+      "file": "tenno-autumn-normal.webp",
+      "bytes": 54816
+    },
+    {
+      "key": "tenno-autumn_holo",
+      "file": "tenno-autumn-holo.webp",
+      "bytes": 59926
+    },
+    {
+      "key": "oka_normal",
+      "file": "oka-normal.webp",
+      "bytes": 34366
+    },
+    {
+      "key": "oka_holo",
+      "file": "oka-holo.webp",
+      "bytes": 40182
+    },
+    {
+      "key": "japan-cup_normal",
+      "file": "japan-cup-normal.webp",
+      "bytes": 41660
+    },
+    {
+      "key": "japan-cup_holo",
+      "file": "japan-cup-holo.webp",
+      "bytes": 46890
+    },
+    {
+      "key": "february_normal",
+      "file": "february-normal.webp",
+      "bytes": 57272
+    },
+    {
+      "key": "february_holo",
+      "file": "february-holo.webp",
+      "bytes": 60360
+    },
+    {
+      "key": "takamatsunomiya_normal",
+      "file": "takamatsunomiya-normal.webp",
+      "bytes": 58712
+    },
+    {
+      "key": "takamatsunomiya_holo",
+      "file": "takamatsunomiya-holo.webp",
+      "bytes": 61276
+    },
+    {
+      "key": "osaka_normal",
+      "file": "osaka-normal.webp",
+      "bytes": 58214
+    },
+    {
+      "key": "osaka_holo",
+      "file": "osaka-holo.webp",
+      "bytes": 55260
+    },
+    {
+      "key": "satsuki_normal",
+      "file": "satsuki-normal.webp",
+      "bytes": 56818
+    },
+    {
+      "key": "satsuki_holo",
+      "file": "satsuki-holo.webp",
+      "bytes": 59144
+    },
+    {
+      "key": "tenno-spring_normal",
+      "file": "tenno-spring-normal.webp",
+      "bytes": 57110
+    },
+    {
+      "key": "tenno-spring_holo",
+      "file": "tenno-spring-holo.webp",
+      "bytes": 62554
+    },
+    {
+      "key": "nhk-mile_normal",
+      "file": "nhk-mile-normal.webp",
+      "bytes": 56156
+    },
+    {
+      "key": "nhk-mile_holo",
+      "file": "nhk-mile-holo.webp",
+      "bytes": 66138
+    },
+    {
+      "key": "victoria-mile_normal",
+      "file": "victoria-mile-normal.webp",
+      "bytes": 50828
+    },
+    {
+      "key": "victoria-mile_holo",
+      "file": "victoria-mile-holo.webp",
+      "bytes": 63874
+    },
+    {
+      "key": "oaks_normal",
+      "file": "oaks-normal.webp",
+      "bytes": 49764
+    },
+    {
+      "key": "oaks_holo",
+      "file": "oaks-holo.webp",
+      "bytes": 61514
+    },
+    {
+      "key": "yasuda_normal",
+      "file": "yasuda-normal.webp",
+      "bytes": 55678
+    },
+    {
+      "key": "yasuda_holo",
+      "file": "yasuda-holo.webp",
+      "bytes": 65788
+    },
+    {
+      "key": "takarazuka_normal",
+      "file": "takarazuka-normal.webp",
+      "bytes": 60898
+    },
+    {
+      "key": "takarazuka_holo",
+      "file": "takarazuka-holo.webp",
+      "bytes": 72422
+    },
+    {
+      "key": "sprinters_normal",
+      "file": "sprinters-normal.webp",
+      "bytes": 53790
+    },
+    {
+      "key": "sprinters_holo",
+      "file": "sprinters-holo.webp",
+      "bytes": 63988
+    },
+    {
+      "key": "shuka_normal",
+      "file": "shuka-normal.webp",
+      "bytes": 58760
+    },
+    {
+      "key": "shuka_holo",
+      "file": "shuka-holo.webp",
+      "bytes": 71822
+    },
+    {
+      "key": "kikka_normal",
+      "file": "kikka-normal.webp",
+      "bytes": 58816
+    },
+    {
+      "key": "kikka_holo",
+      "file": "kikka-holo.webp",
+      "bytes": 73426
+    },
+    {
+      "key": "elizabeth_normal",
+      "file": "elizabeth-normal.webp",
+      "bytes": 54712
+    },
+    {
+      "key": "elizabeth_holo",
+      "file": "elizabeth-holo.webp",
+      "bytes": 66322
+    },
+    {
+      "key": "mile-cs_normal",
+      "file": "mile-cs-normal.webp",
+      "bytes": 50488
+    },
+    {
+      "key": "mile-cs_holo",
+      "file": "mile-cs-holo.webp",
+      "bytes": 63310
+    },
+    {
+      "key": "champions_normal",
+      "file": "champions-normal.webp",
+      "bytes": 61472
+    },
+    {
+      "key": "champions_holo",
+      "file": "champions-holo.webp",
+      "bytes": 72098
+    },
+    {
+      "key": "hanshin-jf_normal",
+      "file": "hanshin-jf-normal.webp",
+      "bytes": 59054
+    },
+    {
+      "key": "hanshin-jf_holo",
+      "file": "hanshin-jf-holo.webp",
+      "bytes": 72530
+    },
+    {
+      "key": "asahi_normal",
+      "file": "asahi-normal.webp",
+      "bytes": 57748
+    },
+    {
+      "key": "asahi_holo",
+      "file": "asahi-holo.webp",
+      "bytes": 66962
+    },
+    {
+      "key": "hopeful_normal",
+      "file": "hopeful-normal.webp",
+      "bytes": 55004
+    },
+    {
+      "key": "hopeful_holo",
+      "file": "hopeful-holo.webp",
+      "bytes": 67690
+    }
+  ]
+}
