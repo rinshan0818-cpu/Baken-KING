@@ -1,0 +1,37 @@
+name: Build lightweight badge display assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/build-badge-display.py
+      - .github/workflows/build-badge-display.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: badge-display-optimization
+  cancel-in-progress: false
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pillow
+        run: python3 -m pip install --quiet Pillow
+      - name: Optimize approved badge images
+        run: python3 scripts/build-badge-display.py
+      - name: Commit display images and manifest
+        run: |
+          git add assets/badges/display/
+          if git diff --cached --quiet; then
+            echo "Display images are current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "assets: build lightweight display-ready badge WebP files"
+          git push
