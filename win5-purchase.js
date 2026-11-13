@@ -72,8 +72,8 @@ function render(){
  const live=getRaces();
  picks=picks.map((numbers,i)=>numbers.filter(n=>live[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
- const expired=!upcoming;
- dateSelect.disabled=expired;
+ const expired=!upcoming&&selectedDate>=today();
+ dateSelect.disabled=false;
  jump.replaceChildren();
  current().legs.forEach((leg,i)=>{
   const b=node('button',''+(i+1));
