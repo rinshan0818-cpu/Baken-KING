@@ -36,6 +36,29 @@
 @keyframes premium-holo{to{transform:rotate(360deg)}}
 @media(max-height:640px){.reveal-stage{min-height:240px}.reveal-pack{width:145px;height:195px}.reveal-card>img,.reveal-card>.pin-art{max-width:180px}}
 @media(prefers-reduced-motion:reduce){.reveal-stage::before,.reveal-stage::after,.reveal-pack,.reveal-pack::before,.reveal-card{animation:none!important}}
+
+/* Circular step medals: hide the white square non-destructively. */
+.step-medal{display:block;aspect-ratio:1/1;object-fit:contain;clip-path:circle(46% at 50% 50%);-webkit-clip-path:circle(46% at 50% 50%);background:transparent}
+.step-tile .step-medal{width:100%;height:auto}
+.step-preview .step-medal{width:min(100%,330px);height:auto;margin:auto}
+.reveal-card>.step-medal{width:min(100%,260px);height:auto;max-height:none}
+.reveal-stage.reveal-step .step-medal{filter:drop-shadow(0 2px 10px #b99a5866)}
+/* Medal presentation case: a gold-trimmed velvet box rather than a card pack. */
+.award-case{position:relative;width:218px;height:205px;perspective:650px;filter:drop-shadow(0 15px 22px #0009);isolation:isolate}
+.award-case__base{position:absolute;inset:55px 0 0;border:4px solid #caa05e;border-radius:22px 22px 28px 28px;background:radial-gradient(ellipse at 50% 37%,#243c58 4%,#111c31 60%,#081224 100%);box-shadow:inset 0 0 0 5px #081426,inset 0 0 0 7px #ad8c564e,0 8px 0 #71522b;display:grid;place-items:center}
+.award-case__base::before{content:"";width:104px;height:104px;border-radius:50%;border:2px solid #d5af724d;box-shadow:0 0 30px #d9b46e3a,inset 0 0 22px #c29d4c33;background:radial-gradient(circle,#f4d28c12,transparent 72%)}
+.award-case__lid{position:absolute;z-index:2;left:0;right:0;top:10px;height:129px;border-radius:23px 23px 16px 16px;border:4px solid #e0b876;background:linear-gradient(160deg,#263e5d,#08162a 65%);box-shadow:inset 0 0 0 5px #0a1527,inset 0 0 0 7px #bca06c8a,0 10px 15px #0006;display:grid;place-items:center;transform-origin:50% 10%;transition:transform .75s cubic-bezier(.2,.74,.2,1),opacity .75s ease}
+.award-case__lid span{text-align:center;color:#f1d59b;font:700 17px Georgia,serif;letter-spacing:.1em;text-shadow:0 1px 6px #000}
+.award-case__lid small{display:block;margin-top:8px;color:#e6c78f;font:400 9px Georgia,serif;letter-spacing:.16em}
+.reveal-stage.case-opening .award-case__lid{transform:rotateX(-112deg) translateY(-6px);opacity:.42}
+.reveal-stage.case-opening::after{content:"";position:absolute;inset:4%;z-index:1;background:radial-gradient(ellipse at 50% 50%,#fff5d0a8 0%,#efcd8466 18%,transparent 61%);animation:case-light .78s ease-out both;pointer-events:none}
+.reveal-card{animation:medal-appear 1.05s cubic-bezier(.16,.72,.22,1) both}
+.reveal-card>.step-medal{animation:medal-shine 1.15s ease-out both}
+.reveal-stage.reveal-holo .reveal-card{animation-duration:1.3s}
+@keyframes case-light{from{opacity:0;transform:scale(.45)}45%{opacity:1}to{opacity:.2;transform:scale(1.3)}}
+@keyframes medal-appear{0%{opacity:0;transform:translateY(30px) scale(.77);filter:blur(9px) brightness(1.5)}48%{opacity:.72;filter:blur(3px) brightness(1.25)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) brightness(1)}}
+@keyframes medal-shine{0%{filter:brightness(1.9)}100%{filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){.award-case__lid{transition:none!important}.reveal-card,.reveal-card>.step-medal,.reveal-stage.case-opening::after{animation:none!important}}
 </style></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
@@ -62,7 +85,7 @@ const POINT_COST=1000;
 const DUPLICATE_POINTS={step:30,normal:100,holo:500};
 const $=id=>document.getElementById(id);
 let filter='all',lastDraw=[],g1Items=[];
-let revealItems=[],revealIndex=-1,revealPreviousFocus=null;
+let revealItems=[],revealIndex=-1,revealPreviousFocus=null,revealTimer=null,revealBusy=false;
 let g1AssetsReady=false;
 function empty(){return {version:1,wallet:INITIAL,points:0,owned:{},history:[]};}
 function valid(v){if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(derby|arima|tenno-autumn|oka|japan-cup)_(normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
@@ -140,7 +163,7 @@ function pickBadge(){
 }
 function drawArt(d){
  if(d.v==='step'){
-  const img=document.createElement('img');img.src=stepImageURL(d.r);img.alt=d.r.race+'のバッジ';img.loading='lazy';img.style.cssText='max-width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;';
+  const img=document.createElement('img');img.className='step-medal';img.src=stepImageURL(d.r);img.alt=d.r.race+'のバッジ';img.loading='lazy';img.style.cssText='max-width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;';
   return img;
  }
  const registered=g1Items.find(x=>x.key===d.key);
@@ -187,23 +210,29 @@ document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click'
 $('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({type:'BAKEN_KING_PIN_COLLECTION',mode,data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='baken-king-pin-collection-'+mode+'-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)});
 $('import').addEventListener('change',async(e)=>{try{const f=e.target.files[0];if(!f)return;const obj=JSON.parse(await f.text());if(obj.type!=='BAKEN_KING_PIN_COLLECTION'||obj.mode!==mode||!valid(obj.data))throw Error('形式またはモードが違います');if(!confirm('現在のコレクションと準備財布を、選択したバックアップで上書きしますか？'))return;persist({...obj.data,points:obj.data.points??0});$('result').hidden=true;render();$('message').textContent='復元しました。';}catch(err){$('message').textContent='復元できませんでした：'+err.message}finally{e.target.value='';}});
 
+function prepareAwardCase(){
+ const stage=$('revealStage');stage.className='reveal-stage';stage.replaceChildren();
+ const award=document.createElement('div');award.className='award-case';
+ const base=document.createElement('div');base.className='award-case__base';
+ const lid=document.createElement('div');lid.className='award-case__lid';
+ const title=document.createElement('span');title.textContent='BAKEN-KING';
+ const subtitle=document.createElement('small');subtitle.textContent='MEDAL COLLECTION';title.append(subtitle);
+ lid.append(title);award.append(base,lid);stage.append(award);
+}
 function beginReveal(drawn){
- revealItems=drawn;revealIndex=-1;revealPreviousFocus=document.activeElement;
+ if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
+ revealBusy=false;revealItems=drawn;revealIndex=-1;revealPreviousFocus=document.activeElement;
  const overlay=$('revealOverlay');overlay.hidden=false;document.body.classList.add('reveal-open');
  $('revealHeading').textContent=drawn.length===10?'10連ガチャ開封':'ガチャ開封';
- $('revealCount').textContent='全'+drawn.length+'枚 — プレミアムパック';
- const stage=$('revealStage');stage.className='reveal-stage';stage.replaceChildren();
- const pack=document.createElement('div');pack.className='reveal-pack';
- const heading=document.createElement('div');heading.textContent='BAKEN-KING';
- const sub=document.createElement('small');sub.textContent='PREMIUM BADGE COLLECTION';heading.append(sub);pack.append(heading);stage.append(pack);
- $('revealNext').hidden=false;$('revealNext').textContent='開封する';
+ $('revealCount').textContent='全'+drawn.length+'枚 — 記念章ケース';
+ prepareAwardCase();
+ $('revealNext').disabled=false;$('revealNext').hidden=false;$('revealNext').textContent='ケースを開く';
  $('revealClose').hidden=true;$('revealSkip').hidden=false;$('revealNext').focus();
 }
-function revealNext(){
- if(!revealItems.length)return;
- if(revealIndex>=revealItems.length-1){closeReveal();return;}
- revealIndex++;
- const d=revealItems[revealIndex],stage=$('revealStage');stage.replaceChildren();
+function showRevealedBadge(d){
+ revealBusy=false;revealTimer=null;
+ if($('revealOverlay').hidden)return;
+ const stage=$('revealStage');stage.replaceChildren();
  stage.className='reveal-stage '+(d.v==='holo'?'reveal-holo':d.v==='step'?'reveal-step':'reveal-g1-normal');
  const card=document.createElement('div');card.className='reveal-card';
  const name=document.createElement('div');name.className='name';name.textContent=d.v==='step'?d.r.race:d.r.name;
@@ -211,18 +240,38 @@ function revealNext(){
  status.textContent=d.first?'NEW!':'重複 +'+d.pointsEarned+' pt';
  card.append(drawArt(d),name,status);stage.append(card);
  $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚';
+ $('revealNext').disabled=false;
  $('revealNext').textContent=revealIndex===revealItems.length-1?'結果を確認':'次のバッジ';
+}
+function revealNext(){
+ if(!revealItems.length||revealBusy)return;
+ if(revealIndex>=revealItems.length-1){closeReveal();return;}
+ revealIndex++;
+ const d=revealItems[revealIndex];
+ revealBusy=true;$('revealNext').disabled=true;
+ prepareAwardCase();
+ $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚 — 開封中';
+ const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ // Two animation frames let Safari paint the closed case before the lid opens.
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(!revealBusy||$('revealOverlay').hidden)return;
+  $('revealStage').classList.add('case-opening');
+ }));
+ revealTimer=setTimeout(()=>showRevealedBadge(d),reduced?90:820);
 }
 function revealSkip(){
  if(!revealItems.length)return;
- revealIndex=revealItems.length-1;
+ if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
+ revealBusy=false;revealIndex=revealItems.length-1;
  const stage=$('revealStage');stage.className='reveal-stage';stage.replaceChildren();
  const info=document.createElement('div');info.style.cssText='padding:18px;text-align:center;line-height:1.8;color:#f4dfaa;font-weight:700';
- info.textContent='全'+revealItems.length+'枚を開封しました。画面下の結果一覧で確認できます。';
+ info.textContent='全'+revealItems.length+'枚の結果を確認できます。下の一覧をご覧ください。';
  stage.append(info);$('revealCount').textContent=revealItems.length+' / '+revealItems.length+'枚';
- $('revealNext').hidden=true;$('revealClose').hidden=false;$('revealClose').focus();
+ $('revealNext').disabled=false;$('revealNext').hidden=true;$('revealClose').hidden=false;$('revealClose').focus();
 }
 function closeReveal(){
+ if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
+ revealBusy=false;
  $('revealOverlay').hidden=true;document.body.classList.remove('reveal-open');
  revealItems=[];revealIndex=-1;
  if(revealPreviousFocus?.isConnected)revealPreviousFocus.focus();
@@ -271,7 +320,7 @@ function displayStepBadges(){
  const grid=$('stepGrid');grid.replaceChildren();
  for(const entry of current){
   const tile=document.createElement('button');tile.type='button';tile.className='step-tile';
-  const img=document.createElement('img');img.src=stepImageURL(entry);img.alt=entry.race+'のバッジ';img.loading='lazy';img.decoding='async';
+  const img=document.createElement('img');img.className='step-medal';img.src=stepImageURL(entry);img.alt=entry.race+'のバッジ';img.loading='lazy';img.decoding='async';
   const ownedCount=state.owned[entry.id]||0;if(!ownedCount){tile.classList.add('locked');img.style.filter='grayscale(1) brightness(.25)';}
   const name=document.createElement('div');name.className='name';name.textContent=String(entry.number).padStart(2,'0')+' '+entry.race;
   const grade=document.createElement('div');grade.className='step-grade';grade.textContent=entry.grade==='G2'?'GⅡ':entry.grade==='G3'?'GⅢ':'L';
@@ -285,7 +334,7 @@ function displayStepBadges(){
 function showStepBadge(entry){
  const preview=$('stepPreview');preview.replaceChildren();
  const title=document.createElement('strong');title.textContent=entry.race+'（'+(entry.grade==='G2'?'GⅡ':entry.grade==='G3'?'GⅢ':'L')+'）';
- const image=document.createElement('img');image.src=stepImageURL(entry);image.alt=entry.race+'のバッジ';image.decoding='async';
+ const image=document.createElement('img');image.className='step-medal';image.src=stepImageURL(entry);image.alt=entry.race+'のバッジ';image.decoding='async';
  if(!(state.owned[entry.id]>0)){image.style.filter='grayscale(1) brightness(.25)';}
  const count=document.createElement('p');count.className='sub';count.textContent=state.owned[entry.id]?'所持数：'+state.owned[entry.id]:'未所持';
  preview.append(title,image,count);preview.hidden=false;preview.scrollIntoView({block:'nearest',behavior:'smooth'});
