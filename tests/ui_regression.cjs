@@ -96,7 +96,7 @@ const baseSelector='main.wrap > [data-tab]';
     diagnosticHidden:!item('bkCopyNavLog')?.getClientRects().length
    };
   });
-  assert.deepEqual(settingsLayout.headings,['アカウント・友達','通知・アプリ','データ管理'],
+  assert.deepEqual(settingsLayout.headings,['アカウント・友達','通知・アプリ','G1ピンバッジ','データ管理'],
     'Settings group labels changed: '+JSON.stringify(settingsLayout));
   assert.equal(settingsLayout.backups,1,'Backup must be shown in one dedicated panel');
   assert.equal(settingsLayout.oldPanels,0,'Duplicate account-backup panel returned');
