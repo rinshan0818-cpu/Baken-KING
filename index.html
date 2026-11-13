@@ -2404,6 +2404,11 @@ section[data-tab="win5"] .bk-win5-subnav>button[aria-pressed="true"]{background:
 .bk-win5-purchase h3{font-size:19px;color:#10345d;margin:0 0 10px}
 .bk-win5-purchase .muted{line-height:1.85;margin:11px auto;max-width:380px}
 .bk-win5-coming{display:inline-block;margin:10px 0 2px;background:#eaf0f8;border:1px solid #cedaea;color:#466389;border-radius:18px;font-size:12px;font-weight:700;padding:7px 15px}
+/* Draw tab is fixed; the collection view remains independently scrollable. */
+body.bk-win5-draw-fixed{height:100dvh;overflow:hidden;overscroll-behavior:none}
+body.bk-win5-draw-fixed .bk-win5-screen{overflow:hidden}
+body.bk-win5-draw-fixed #bkWin5Frame{overflow:hidden}
+@supports not (height:100dvh){body.bk-win5-draw-fixed{height:100vh}}
 </style></head><body><header class="top"><div class="bk-top-inner"><div class="bk-header-status" aria-label="テストモード"></div><div class="bk-header-controls"><button type="button" class="bk-sound-mute-trigger" id="bkForceMute" aria-label="アプリ内チャイムを強制オフ" title="チャイムをオフ" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><g class="bk-sound-icon-on"><path d="M15 9a4 4 0 0 1 0 6"/><path d="M18 6a8 8 0 0 1 0 12"/></g><g class="bk-sound-icon-off"><path d="m16 9 5 6m0-6-5 6"/></g></svg><span class="bk-sound-state-label" aria-hidden="true">ON</span></button><button type="button" class="bk-settings-trigger" data-nav="settings" aria-label="設定を開く" title="設定"><svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.86 1.86-.06-.06A1.7 1.7 0 0 0 16 18.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.06V21H9.4v-.94a1.7 1.7 0 0 0-1.4-1.66 1.7 1.7 0 0 0-1.88.34l-.06.06-1.86-1.86.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.06-.4H2v-3.2h.94A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88L4.2 7.06 6.06 5.2l.06.06A1.7 1.7 0 0 0 8 5.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.06V3h5.2v.94A1.7 1.7 0 0 0 16 5.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.86 1.86-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.06.4H22v3.2h-.94A1.7 1.7 0 0 0 19.4 15Z"/></svg></button></div></div></header><main class="wrap"><section class="card bk-home" data-tab="home">
 <div class="row space bk-home-head"><h2>マイ成績</h2><span id="season" class="tag"></span></div>
 <div class="bk-home-primary">
@@ -3986,9 +3991,11 @@ function showTab(tab){
  document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==tab);
  document.querySelectorAll('[data-nav]').forEach(el=>{const active=el.dataset.nav===tab;el.classList.toggle('active',active);el.setAttribute('aria-current',active?'page':'false')});
  document.body.classList.toggle('bk-payout-locked',tab==='payout');
+ if(tab!=='win5')document.body.classList.remove('bk-win5-draw-fixed');
  if(tab==='win5'){
   const win5Frame=document.getElementById('bkWin5Frame');
   if(win5Frame&&!win5Frame.getAttribute('src')&&document.querySelector('[data-win5-section="gacha"]')?.getAttribute('aria-pressed')==='true')win5Frame.src=win5Frame.dataset.src;
+  requestAnimationFrame(bkFitWin5Frame);
  }
  const summary=document.getElementById('dataSummary');
  if(summary)summary.textContent='累計購入 '+fmt(s.totalStake)+' ／ 累計払戻 '+fmt(s.totalPaid)+' ／ 生涯回収率 '+(s.totalStake?(100*s.totalPaid/s.totalStake).toFixed(1)+'%':'—')+' ／ 購入 '+s.bets.length+'件';
@@ -4003,6 +4010,26 @@ function bkOpenNavigationTab(tab){
  if(tab==='payout'){machineCancelRead();machineSelectedId=null;machineVisibleId=null;machineRender()}
  showTab(tab)
 }
+// The same-origin collection iframe signals whether the draw surface is fixed.
+// Keep the main app stationary only on the compact draw screen; let the catalog scroll.
+function bkFitWin5Frame(){
+ const frame=document.getElementById('bkWin5Frame');
+ if(!frame||!frame.getAttribute('src'))return;
+ const nav=document.querySelector('.bottom-nav');
+ if(!nav)return;
+ const top=frame.getBoundingClientRect().top;
+ const bottom=nav.getBoundingClientRect().top;
+ const available=Math.max(280,Math.round(bottom-top-5));
+ frame.style.height=available+'px';
+}
+window.addEventListener('message',event=>{
+ const frame=document.getElementById('bkWin5Frame');
+ if(event.origin!==location.origin||!frame||event.source!==frame.contentWindow||event.data?.type!=='baken:win5-gacha-view')return;
+ const fixed=event.data.fixed===true;
+ document.body.classList.toggle('bk-win5-draw-fixed',fixed);
+ requestAnimationFrame(bkFitWin5Frame);
+});
+window.addEventListener('resize',()=>{if(bkActiveTab==='win5')requestAnimationFrame(bkFitWin5Frame)});
 // WIN5 has two independent inner pages, like the Data tab.
 function bkShowWin5Section(section){
  if(section!=='purchase'&&section!=='gacha')section='purchase';
@@ -4013,6 +4040,7 @@ function bkShowWin5Section(section){
  if(section==='gacha'){
   const frame=document.getElementById('bkWin5Frame');
   if(frame&&!frame.getAttribute('src'))frame.src=frame.dataset.src;
+  requestAnimationFrame(bkFitWin5Frame);
  }
 }
 document.querySelectorAll('[data-win5-section]').forEach(btn=>btn.addEventListener('click',()=>bkShowWin5Section(btn.dataset.win5Section)));
