@@ -21,6 +21,31 @@ const node=(tag,txt)=>{const n=document.createElement(tag);if(txt!==undefined)n.
 const styles=node('style');
 styles.textContent=`.w5-select{width:auto;max-width:65%;padding:8px}.w5-race{background:#fff;border:1px solid #d5e1ee;border-radius:14px;padding:13px;margin:10px 0;box-shadow:0 3px 12px #112d5008}.w5-race h3{margin:0 0 5px;font-size:15px;color:#102f5c;line-height:1.35}.w5-horses{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.w5-horses button{background:#f1f5fb;color:#193451;border:1.5px solid #c9d8eb;padding:0;display:flex;justify-content:center;align-items:center;min-width:0;min-height:47px;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;border-radius:10px;touch-action:manipulation}.w5-horses button[aria-pressed=true]{background:#174e9a;border:2px solid #174e9a;color:#fff;box-shadow:0 2px 7px #113f8130}.w5-horses button:disabled{opacity:.45}.w5-bar{background:#eef4fd;border:1px solid #c7d9f0;border-radius:14px;padding:13px;margin-top:12px;position:sticky;bottom:calc(74px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 -3px 18px #092b5820}.w5-bar button{width:100%;margin-top:8px}.w5-hist{padding:12px;margin-top:14px;background:#f5f7fa;border-radius:12px}.w5-record{border-top:1px solid #d7e2f0;padding:9px 0;font-size:12px;line-height:1.7}.w5-modal{position:fixed;inset:0;background:#10233dbc;z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px}.w5-dialog{background:#fff;color:#172c4a;width:min(100%,440px);max-height:85dvh;overflow:auto;border-radius:17px;padding:18px;line-height:1.7}.w5-dialog button{margin:5px}.w5-note{font-size:12px;line-height:1.65;color:#596f89}.w5-digital{background:linear-gradient(145deg,#071d3c,#123f79 67%,#245da0);color:white;border-radius:19px;padding:18px 16px;box-shadow:0 10px 27px #061d3d38;overflow:hidden;position:relative}.w5-digital:after{content:"";position:absolute;top:-75px;right:-55px;width:180px;height:180px;border:1px solid #ffffff25;border-radius:50%;pointer-events:none}.w5-digital-head{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #ffffff42;padding-bottom:13px}.w5-digital-brand{font-size:27px;font-weight:900;letter-spacing:1px}.w5-digital-sub{font-size:10px;color:#c7d9f2;letter-spacing:.08em}.w5-digital-state{font-size:10px;background:#ffffff27;border:1px solid #ffffff40;border-radius:20px;padding:5px 9px;white-space:nowrap}.w5-digital-leg{display:grid;grid-template-columns:48px 1fr;gap:9px;border-bottom:1px solid #ffffff24;padding:10px 0;align-items:center}.w5-digital-index{font-size:11px;color:#c0d6f2;font-weight:850}.w5-digital-race{font-size:12px;color:#e2edfa}.w5-digital-picks{font-size:18px;font-weight:850;letter-spacing:.08em;overflow-wrap:anywhere}.w5-digital-foot{display:flex;justify-content:space-between;align-items:end;gap:10px;padding-top:17px}.w5-digital-foot small{display:block;color:#bbd5f5;font-size:10px;margin-bottom:3px}.w5-digital-foot strong{font-size:25px}.w5-digital-code{margin-top:14px;font-size:10px;letter-spacing:.12em;color:#aac9e9;border-top:1px solid #ffffff28;padding-top:9px}.w5-confirm-row{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #e4ebf3}.w5-action-row{display:flex;gap:8px;margin-top:15px}.w5-action-row button{flex:1;min-width:0}.w5-overview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:8px 0 14px}.w5-overview div{text-align:center;background:#edf3fb;border-radius:9px;padding:9px 2px}.w5-overview small{display:block;font-size:10px;color:#58718f}.w5-overview strong{font-size:17px;color:#123d73}.w5-topline{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px}`;
 styles.textContent+=`.w5-source-link{display:inline-block;font-size:11px;color:#2259a1;text-decoration:underline;margin:0 0 8px 2px}.w5-jump{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;position:sticky;top:0;z-index:3;background:#f5f7fb;padding:6px 2px 8px}.w5-jump-button{font-size:15px!important;font-weight:800;padding:8px 2px;background:#eaf0f8!important;color:#33577d!important;border:1px solid #cadaeb!important}.w5-jump-filled{background:#174e9a!important;color:#fff!important;border-color:#174e9a!important}.w5-expired{padding:13px;background:#fff0d9;border:1px solid #ebd2a3;border-radius:11px}.w5-race{scroll-margin-top:70px}.w5-race:focus-within{border-color:#a1bce4}.w5-race h3{letter-spacing:-.02em}`;
+styles.textContent+=`
+.w5-dialog{padding:0;max-height:min(90dvh,780px);display:flex;flex-direction:column;overscroll-behavior:contain;box-shadow:0 22px 65px #05162e65}
+.w5-modal-head{padding:17px 17px 12px;border-bottom:1px solid #e7edf5;background:#fff;flex-shrink:0}
+.w5-modal-head h3{margin:0;font-size:18px;color:#102f58}
+.w5-modal-content{padding:13px 17px 16px;overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0}
+.w5-modal-actions{display:flex;gap:9px;padding:12px 17px calc(13px + env(safe-area-inset-bottom));border-top:1px solid #e1e8f2;background:#fff;flex-shrink:0}
+.w5-modal-actions button{flex:1;min-height:46px;margin:0;line-height:1.2;font-size:13px}
+.w5-confirm-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);align-items:center;padding:12px 0;gap:9px}
+.w5-confirm-row span{font-size:13px;color:#415b7a;white-space:nowrap}
+.w5-confirm-row strong{font-size:16px;text-align:right;line-height:1.5;overflow-wrap:anywhere;color:#122f55}
+.w5-confirm-summary{background:#edf4fe;border:1px solid #d4e4f8;border-radius:12px;padding:13px 12px;margin-top:12px}
+.w5-confirm-summary .w5-confirm-line{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:4px 0}
+.w5-confirm-summary .w5-confirm-amount{font-size:25px;color:#123b77;font-weight:900}
+.w5-confirm-caption{font-size:11px;color:#647991;line-height:1.5}
+.w5-modal .w5-digital{padding:17px 14px}
+.w5-digital-leg{grid-template-columns:45px minmax(0,1fr);gap:9px}
+.w5-digital-picks{font-size:clamp(15px,4.3vw,19px);line-height:1.45;letter-spacing:.015em;word-break:break-word}
+.w5-digital-foot strong{font-size:clamp(19px,5.6vw,25px)}
+.w5-history-preview{padding:12px 0}
+.w5-record .w5-record-meta{display:flex;justify-content:space-between;align-items:center;gap:9px}
+.w5-record .w5-record-meta strong{font-size:16px;color:#153e72}
+.w5-record button{min-height:43px;width:100%;margin-top:10px}
+.w5-ticket-hint{font-size:11px;line-height:1.6;color:#6a7c91;margin:10px 2px 0}
+@media(max-width:360px){.w5-modal-head{padding:14px 12px}.w5-modal-content{padding:11px 12px 13px}.w5-modal-actions{padding:11px 12px calc(12px + env(safe-area-inset-bottom))}.w5-confirm-row strong{font-size:14px}.w5-digital-brand{font-size:23px}}
+`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
@@ -103,62 +128,107 @@ function render(){
  const purchased=demoTickets;
  purchased.slice(-20).reverse().forEach(t=>{
  const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　UIプレビュー'));
- t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>{const cover=node('div');cover.className='w5-modal';const panel=node('div');panel.className='w5-dialog';panel.append(node('h3','WIN5 デジタル投票券'),digitalTicket(t));const close=node('button','閉じる');close.style.width='100%';close.onclick=()=>cover.remove();panel.append(close);cover.append(panel);document.body.append(cover)};box.append(show);history.append(box)});
+ t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);history.append(box)});
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
 dateSelect.onchange=()=>{dateManuallyChosen=true;selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
 unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);render()};
 const demoTickets=[];
 
+
 function digitalTicket(ticket){
  const card=node('div');card.className='w5-digital';
  const header=node('div');header.className='w5-digital-head';
- const brand=node('div');const b=node('div','WIN 5');b.className='w5-digital-brand';brand.append(b);
- const sub=node('div','BAKEN-KING / DIGITAL TICKET');sub.className='w5-digital-sub';brand.append(sub);
- const state=node('span','UI SAMPLE');state.className='w5-digital-state';header.append(brand,state);card.append(header);
+ const brand=node('div');
+ const title=node('div','WIN 5');title.className='w5-digital-brand';
+ const subtitle=node('div','BAKEN-KING / DIGITAL TICKET');subtitle.className='w5-digital-sub';
+ brand.append(title,subtitle);
+ const status=node('span','UI SAMPLE');status.className='w5-digital-state';
+ header.append(brand,status);card.append(header);
  ticket.legs.forEach((leg,i)=>{
-  const line=node('div');line.className='w5-digital-leg';
-  const index=node('span','WIN'+(i+1));index.className='w5-digital-index';
-  const body=node('div');const race=node('div',leg.venue+leg.raceNumber+'R');race.className='w5-digital-race';
-  const nums=node('div',leg.numbers.join(' ・ '));nums.className='w5-digital-picks';
-  body.append(race,nums);line.append(index,body);card.append(line);
+  const row=node('div');row.className='w5-digital-leg';
+  const number=node('span','WIN'+(i+1));number.className='w5-digital-index';
+  const info=node('div'),race=node('div',leg.venue+leg.raceNumber+'R'),numbers=node('div',leg.numbers.join(' ・ '));
+  race.className='w5-digital-race';numbers.className='w5-digital-picks';
+  info.append(race,numbers);row.append(number,info);card.append(row);
  });
- const foot=node('div');foot.className='w5-digital-foot';
- const count=node('div');const cLabel=node('small','組み合わせ');count.append(cLabel,node('strong',ticket.points+'点'));
- const cost=node('div');cost.style.textAlign='right';cost.append(node('small','合計金額'),node('strong',fmt(ticket.stake)));
- foot.append(count,cost);card.append(foot);
- const code=node('div','WIN5 · '+ticket.date.replace(/-/g,'.')+' · PREVIEW');code.className='w5-digital-code';card.append(code);
+ const totals=node('div');totals.className='w5-digital-foot';
+ const count=node('div');count.append(node('small','購入点数'),node('strong',ticket.points+'点'));
+ const amount=node('div');amount.style.textAlign='right';amount.append(node('small','購入金額'),node('strong',fmt(ticket.stake)));
+ totals.append(count,amount);card.append(totals);
+ const code=node('div','WIN5 · '+ticket.date.replace(/-/g,'.')+' · PREVIEW');
+ code.className='w5-digital-code';card.append(code);
  return card;
+}
+function modal(title,body,actions){
+ const overlay=node('div');overlay.className='w5-modal';
+ const panel=node('section');panel.className='w5-dialog';panel.setAttribute('role','dialog');
+ panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label',title);
+ const top=node('div');top.className='w5-modal-head';top.append(node('h3',title));
+ const content=node('div');content.className='w5-modal-content';content.append(body);
+ const footer=node('div');footer.className='w5-modal-actions';actions.forEach(action=>footer.append(action));
+ panel.append(top,content,footer);overlay.append(panel);document.body.append(overlay);
+ const previous=document.activeElement;
+ const focusable=()=>[...panel.querySelectorAll('button:not([disabled])')];
+ const onKey=event=>{
+  if(event.key==='Escape'){event.preventDefault();close();return}
+  if(event.key!=='Tab')return;
+  const buttons=focusable();if(!buttons.length)return;
+  const first=buttons[0],last=buttons[buttons.length-1];
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+ };
+ const close=()=>{document.removeEventListener('keydown',onKey);overlay.remove();previous?.focus?.()};
+ overlay.onclick=e=>{if(e.target===overlay)close()};
+ document.addEventListener('keydown',onKey);
+ (focusable()[0]||panel).focus();
+ return close;
+}
+function showTicket(ticket){
+ const body=node('div','w5-history-preview');
+ body.append(digitalTicket(ticket));
+ const hint=node('p','画面確認用のデジタル投票券です。実際の購入・残高変更はありません。');hint.className='w5-ticket-hint';body.append(hint);
+ const closeButton=node('button','閉じる');let close;
+ closeButton.onclick=()=>close();
+ close=modal('WIN5 デジタル投票券',body,[closeButton]);
 }
 buy.onclick=()=>{
  const before=check();if(!before.ok){render();return}
- const overlay=node('div');overlay.className='w5-modal';
- const dialog=node('div');dialog.className='w5-dialog';
- dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
- dialog.append(node('h3','WIN5 購入内容の確認'));
+ const chosenDate=selectedDate;
+ const chosenPicks=picks.map(v=>v.slice());
+ const legs=current().legs.map((leg,i)=>({...leg,numbers:chosenPicks[i].slice()}));
+ const contents=node('div');
  const overview=node('div');overview.className='w5-overview';
- before.count.forEach((n,i)=>{const cell=node('div');cell.append(node('small','WIN'+(i+1)),node('strong',n+'頭'));overview.append(cell)});
- dialog.append(overview);
- current().legs.forEach((l,i)=>{
-  const row=node('div');row.className='w5-confirm-row';
-  row.append(node('span',l.venue+l.raceNumber+'R'),node('strong',picks[i].join('・')));dialog.append(row);
+ before.count.forEach((n,i)=>{
+  const item=node('div');item.append(node('small','WIN'+(i+1)),node('strong',n+'頭'));overview.append(item)
  });
- const cost=node('div');cost.className='w5-confirm-row';cost.append(node('strong',before.points+'点 × '+fmt(before.price)),node('strong',fmt(before.stake)));dialog.append(cost);
- const warning=node('p','UIサンプルです。実際の購入・残高引き落としはありません。');warning.className='w5-note';dialog.append(warning);
- const actions=node('div');actions.className='w5-action-row';
- const back=node('button','戻って修正'),confirm=node('button','投票券を見る');back.className='outline';back.onclick=()=>overlay.remove();
- confirm.onclick=()=>{
-  const updated=check();if(!updated.ok||updated.stake!==before.stake||updated.points!==before.points){overlay.remove();render();return}
-  const ticket={id:demoTickets.length+1,date:selectedDate,stake:before.stake,unitStake:before.price,points:before.points,status:'preview',legs:current().legs.map((l,i)=>({...l,numbers:picks[i].slice()}))};
-  demoTickets.push(ticket);overlay.remove();
-  const ticketOverlay=node('div');ticketOverlay.className='w5-modal';
-  const panel=node('div');panel.className='w5-dialog';panel.append(node('h3','WIN5 デジタル投票券'),digitalTicket(ticket));
-  const note=node('p','デザイン確認用の投票券です。履歴はこの画面を開いている間だけ保持されます。');note.className='w5-note';panel.append(note);
-  const done=node('button','閉じる');done.style.width='100%';done.onclick=()=>ticketOverlay.remove();
-  panel.append(done);ticketOverlay.append(panel);document.body.append(ticketOverlay);render();
+ contents.append(overview);
+ legs.forEach((leg,i)=>{
+  const row=node('div');row.className='w5-confirm-row';
+  row.append(node('span','WIN'+(i+1)+'　'+leg.venue+leg.raceNumber+'R'),node('strong',leg.numbers.join('・')));
+  contents.append(row);
+ });
+ const summary=node('div');summary.className='w5-confirm-summary';
+ const line=node('div');line.className='w5-confirm-line';
+ line.append(node('span',before.points+'点 × '+fmt(before.price)),node('strong',fmt(before.stake)));
+ const second=node('div');second.className='w5-confirm-line';
+ second.append(node('span','合計金額'));
+ const big=node('strong',fmt(before.stake));big.className='w5-confirm-amount';second.append(big);
+ summary.append(line,second);contents.append(summary);
+ const hint=node('p','これはUIプレビューです。残高の減算や購入データの保存は行いません。');hint.className='w5-confirm-caption';contents.append(hint);
+ const back=node('button','戻って修正'),preview=node('button','投票券を表示');back.className='outline';
+ let close;
+ back.onclick=()=>close();
+ preview.onclick=()=>{
+  const after=check();
+  if(!after.ok||after.stake!==before.stake||after.points!==before.points||
+   selectedDate!==chosenDate||JSON.stringify(picks)!==JSON.stringify(chosenPicks)){
+   close();render();return;
+  }
+  const ticket={id:demoTickets.length+1,date:chosenDate,stake:before.stake,unitStake:before.price,points:before.points,status:'preview',legs};
+  demoTickets.push(ticket);close();render();showTicket(ticket);
  };
- actions.append(back,confirm);dialog.append(actions);overlay.append(dialog);document.body.append(overlay);
- overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};back.focus();
+ close=modal('WIN5 購入内容の確認',contents,[back,preview]);
 };
 
 window.addEventListener('baken:cards-imported',render);
