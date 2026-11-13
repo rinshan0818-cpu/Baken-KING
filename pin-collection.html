@@ -116,7 +116,7 @@ let displayBadgeFiles=new Set();
 let displayBadgeVersion=1;
 let g1AssetsReady=false;
 function empty(){return {version:1,wallet:INITIAL,points:0,owned:{},history:[]};}
-function valid(v){if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(derby|arima|tenno-autumn|oka|japan-cup)_(normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
+function valid(v){if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(?:derby|arima|tenno-autumn|oka|japan-cup|february|takamatsunomiya|osaka|satsuki|tenno-spring|nhk-mile|victoria-mile|oaks|yasuda|takarazuka|sprinters|shuka|kikka|elizabeth|mile-cs|champions|hanshin-jf|asahi|hopeful)_(?:normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
 function load(){try{const s=localStorage.getItem(KEY);if(!s)return empty();const v=JSON.parse(s);return valid(v)?{...v,points:v.points??0}:empty()}catch{return empty()}}
 let state=load();
 function persist(next){if(!valid(next))throw Error('コレクションデータの検証に失敗しました');const s=JSON.stringify(next);localStorage.setItem(KEY,s);state=next;}
@@ -230,7 +230,7 @@ function draw(n,price,currency='wallet'){
   beginReveal(drawn);
   const cost=isPointDraw?price.toLocaleString('ja-JP')+' pt':fmt(price);
   $('message').textContent=cost+'を使用。'+(earned?'重複ボーナス +'+earned.toLocaleString('ja-JP')+' pt。':'')+'ポイント残高：'+state.points.toLocaleString('ja-JP')+' pt';
- }catch(e){$('message').textContent='ガチャを実行できませんでした。通信と端末の空き容量を確認してください。';console.error(e);}
+ }catch(e){$('message').textContent=e?.name==='QuotaExceededError'?'端末の保存容量が不足しています。コレクションのバックアップを保存してください。':e?.message==='コレクションデータの検証に失敗しました'?'コレクションの保存データを確認できませんでした。':'ガチャ処理でエラーが発生しました。履歴を確認してから再操作してください。';console.error('badge gacha error:',e);}
 }
 $('drawOne').addEventListener('click',()=>draw(1,5000));$('drawTen').addEventListener('click',()=>draw(10,45000));
 $('drawPoints').addEventListener('click',()=>draw(1,POINT_COST,'points'));
