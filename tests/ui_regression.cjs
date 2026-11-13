@@ -49,7 +49,16 @@ const baseSelector='main.wrap > [data-tab]';
   assert.equal(await collectionFrame.locator('#revealOverlay').isVisible(),false,'Closing summary must return to the fixed draw screen');
 
   // Compact embedded view keeps drawing controls first and the large collection separately.
-  assert.equal(await collectionFrame.locator('.bk-gacha-hero img').count(),3,'Gacha overview must show three badge previews');
+  assert.equal(await collectionFrame.locator('.bk-hero-poster').count(),1,'Approved premium medal case poster must be present');
+  await collectionFrame.locator('.bk-hero-poster').waitFor({state:'visible'});
+  const hero=await collectionFrame.locator('.bk-hero-poster').evaluate(image=>({
+   loaded:image.complete&&image.naturalWidth>0,
+   source:image.getAttribute('src'),
+   posterVisible:getComputedStyle(image).display!=='none'
+  }));
+  assert.equal(hero.loaded,true,'WIN5 premium poster image must load');
+  assert.match(hero.source,/collection-hero\.webp/,'WIN5 poster must use the approved artwork');
+  assert.equal(hero.posterVisible,true,'WIN5 poster must be visible in embedded mode');
   assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),true,'Gacha overview must be visible');
   await page.waitForFunction(()=>document.body.classList.contains('bk-win5-draw-fixed'));
   const fixedLayout=await collectionFrame.locator('html').evaluate(el=>({
@@ -58,6 +67,14 @@ const baseSelector='main.wrap > [data-tab]';
   }));
   assert.equal(fixedLayout.fixed,true,'Gacha draw screen must be in fixed mode');
   assert.equal(fixedLayout.overflow,'hidden','Embedded draw screen must not scroll');
+  const fits=await collectionFrame.locator('[data-gacha-panel]').evaluate(panel=>{
+   const scroller=panel.parentElement;
+   const bounds=scroller.getBoundingClientRect(),end=panel.getBoundingClientRect();
+   return {noScroll:scroller.scrollHeight<=scroller.clientHeight+2,visibleEnd:end.bottom<=bounds.bottom+2};
+  });
+  assert.equal(fits.noScroll,true,'WIN5 draw content must fit without scrolling');
+  assert.equal(fits.visibleEnd,true,'WIN5 draw controls must stay above bottom nav');
+
 
   assert.equal(await collectionFrame.locator('[data-collection-panel]').first().isVisible(),false,'Collection should not crowd the initial draw screen');
   await collectionFrame.locator('[data-collection-view="collection"]').click();
