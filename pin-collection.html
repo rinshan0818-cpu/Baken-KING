@@ -113,6 +113,7 @@ let filter='all',lastDraw=[],g1Items=[];
 let revealItems=[],revealIndex=-1,revealPreviousFocus=null,revealTimer=null,revealFinishTimer=null,revealBusy=false,revealLoadToken=0,revealRetry=false;
 const badgePreloads=new Map();
 let displayBadgeFiles=new Set();
+let displayBadgeVersion=1;
 let g1AssetsReady=false;
 function empty(){return {version:1,wallet:INITIAL,points:0,owned:{},history:[]};}
 function valid(v){if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(derby|arima|tenno-autumn|oka|japan-cup)_(normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
@@ -238,7 +239,7 @@ $('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({t
 $('import').addEventListener('change',async(e)=>{try{const f=e.target.files[0];if(!f)return;const obj=JSON.parse(await f.text());if(obj.type!=='BAKEN_KING_PIN_COLLECTION'||obj.mode!==mode||!valid(obj.data))throw Error('形式またはモードが違います');if(!confirm('現在のコレクションと準備財布を、選択したバックアップで上書きしますか？'))return;persist({...obj.data,points:obj.data.points??0});$('result').hidden=true;render();$('message').textContent='復元しました。';}catch(err){$('message').textContent='復元できませんでした：'+err.message}finally{e.target.value='';}});
 
 function badgeAssetURL(d){
- if(displayBadgeFiles.has(d.key)){const file=d.v==='step'?d.key+'.webp':d.key.replace(/_(normal|holo)$/,'-$1')+'.webp';return './assets/badges/display/'+encodeURIComponent(file);}
+ if(displayBadgeFiles.has(d.key)){const file=d.v==='step'?d.key+'.webp':d.key.replace(/_(normal|holo)$/,'-$1')+'.webp';return './assets/badges/display/'+encodeURIComponent(file)+'?v='+displayBadgeVersion;}
  if(d.v==='step')return stepImageURL(d.r);
  const registered=g1Items.find(x=>x.key===d.key);
  return g1AssetsReady&&registered?'./collection/pins/'+encodeURIComponent(registered.filename):null;
@@ -250,7 +251,7 @@ async function loadDisplayBadgeManifest(){
   const data=await r.json();
   if(data.count!==98||!Array.isArray(data.files)||data.files.length!==98)return;
   const set=new Set(data.files.map(x=>x.key));if(set.size!==98)return;
-  displayBadgeFiles=set;
+  displayBadgeFiles=set;displayBadgeVersion=Number.isInteger(data.version)?data.version:1;
  }catch(e){console.info('Using original approved badge images');}
 }
 loadDisplayBadgeManifest();
