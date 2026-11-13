@@ -1,10 +1,10 @@
 {
   "version": "2026-11-12",
-  "status": "approved-artwork-archive",
+  "status": "approved-artwork-on-github",
   "count": 48,
   "raceCount": 24,
   "archivedInChatGPTLibrary": "/Baken-KING/G1 Pins/BakenKING_G1_Pin_48_Approved_Archive.zip",
-  "githubImagesUploaded": false,
+  "githubImagesUploaded": true,
   "rarities": {
     "4": "G1通常版",
     "5": "G1ホログラム版"
