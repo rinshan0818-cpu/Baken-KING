@@ -65,7 +65,7 @@ function render(){
  const purchased=demoTickets;
  purchased.slice(-20).reverse().forEach(t=>{
  const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　UIプレビュー'));
- t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));history.append(box)});
+ t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>{const cover=node('div');cover.className='w5-modal';const panel=node('div');panel.className='w5-dialog';panel.append(node('h3','WIN5 デジタル投票券'),digitalTicket(t));const close=node('button','閉じる');close.style.width='100%';close.onclick=()=>cover.remove();panel.append(close);cover.append(panel);document.body.append(cover)};box.append(show);history.append(box)});
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
 dateSelect.onchange=()=>{selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
