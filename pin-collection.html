@@ -50,13 +50,13 @@
 .award-case__lid{position:absolute;z-index:2;left:0;right:0;top:10px;height:129px;border-radius:23px 23px 16px 16px;border:4px solid #e0b876;background:linear-gradient(160deg,#263e5d,#08162a 65%);box-shadow:inset 0 0 0 5px #0a1527,inset 0 0 0 7px #bca06c8a,0 10px 15px #0006;display:grid;place-items:center;transform-origin:50% 36%;transform-style:preserve-3d;backface-visibility:visible}
 .award-case__lid span{text-align:center;color:#f1d59b;font:700 17px Georgia,serif;letter-spacing:.1em;text-shadow:0 1px 6px #000}
 .award-case__lid small{display:block;margin-top:8px;color:#e6c78f;font:400 9px Georgia,serif;letter-spacing:.16em}
-.reveal-stage.case-opening .award-case__lid{animation:case-lid-lift .96s cubic-bezier(.22,.68,.2,1) both}
+.reveal-stage.case-opening .award-case__lid{animation:case-lid-lift .78s cubic-bezier(.22,.68,.2,1) both}
 @keyframes case-lid-lift{
   0%{transform:translate3d(0,0,0) rotateX(0deg)}
   17%{transform:translate3d(0,-8px,5px) rotateX(3deg)}
   42%{transform:translate3d(0,-17px,12px) rotateX(30deg)}
-  78%{transform:translate3d(0,-24px,18px) rotateX(76deg)}
-  100%{transform:translate3d(0,-25px,18px) rotateX(84deg)}
+  78%{transform:translate3d(0,-31px,18px) rotateX(55deg)}
+  100%{transform:translate3d(0,-37px,18px) rotateX(62deg)}
 }
 .reveal-stage.case-opening::after{content:"";position:absolute;inset:4%;z-index:1;background:radial-gradient(ellipse at 50% 50%,#fff5d0a8 0%,#efcd8466 18%,transparent 61%);animation:case-light .76s .16s ease-out both;pointer-events:none}
 .reveal-card{animation:medal-appear 1.05s cubic-bezier(.16,.72,.22,1) both}
@@ -112,6 +112,7 @@ const $=id=>document.getElementById(id);
 let filter='all',lastDraw=[],g1Items=[];
 let revealItems=[],revealIndex=-1,revealPreviousFocus=null,revealTimer=null,revealFinishTimer=null,revealBusy=false,revealLoadToken=0,revealRetry=false;
 const badgePreloads=new Map();
+let displayBadgeFiles=new Set();
 let g1AssetsReady=false;
 function empty(){return {version:1,wallet:INITIAL,points:0,owned:{},history:[]};}
 function valid(v){if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(derby|arima|tenno-autumn|oka|japan-cup)_(normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
@@ -155,7 +156,7 @@ function render(){
   const b=document.createElement('button');b.type='button';b.className='pin'+(state.owned[x.key]?'':' locked');
   const legacyRace=RACES.find(r=>r.id===x.r.id);
   if(x.filename&&g1AssetsReady){
-   const img=document.createElement('img');img.src='./collection/pins/'+encodeURIComponent(x.filename);img.alt=x.name+'の'+(x.v==='holo'?'ホロ':'通常')+'バッジ';img.loading='lazy';img.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';
+   const img=document.createElement('img');img.src=badgeAssetURL({key:x.key,v:x.v,r:x.r});img.alt=x.name+'の'+(x.v==='holo'?'ホロ':'通常')+'バッジ';img.loading='lazy';img.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';
    if(!state.owned[x.key])img.style.filter='grayscale(1) brightness(.25)';
    b.append(img);
   }else if(legacyRace){b.innerHTML=pinArtwork(legacyRace,x.v);}
@@ -172,7 +173,7 @@ function showDetail(r,v){
  $('detail').classList.remove('hidden');
  $('detail').replaceChildren();
  if(item?.filename&&g1AssetsReady){
-  const image=document.createElement('img');image.src='./collection/pins/'+encodeURIComponent(item.filename);image.alt=item.name+'のバッジ';image.style.cssText='display:block;width:100%;max-width:250px;margin:auto;';if(!n)image.style.filter='grayscale(1) brightness(.25)';$('detail').append(image);
+  const image=document.createElement('img');image.src=badgeAssetURL({key:item.key,v:item.v,r:item.r});image.alt=item.name+'のバッジ';image.style.cssText='display:block;width:100%;max-width:250px;margin:auto;';if(!n)image.style.filter='grayscale(1) brightness(.25)';$('detail').append(image);
  }else if(RACES.some(x=>x.id===r.id)){const artwork=document.createElement('div');artwork.innerHTML=pinArtwork(r,v);$('detail').append(artwork.firstElementChild);}
  else{const placeholder=document.createElement('div');placeholder.className='g1-placeholder';placeholder.textContent='承認済み画像の登録待ち';$('detail').append(placeholder);}
  const h=document.createElement('h3'),p1=document.createElement('p'),p2=document.createElement('p');p1.className='sub';p2.className='sub';$('detail').append(h,p1,p2);
@@ -189,11 +190,11 @@ function pickBadge(){
 }
 function drawArt(d){
  if(d.v==='step'){
-  const img=document.createElement('img');img.className='step-medal';img.src=stepImageURL(d.r);img.alt=d.r.race+'のバッジ';img.loading='eager';img.decoding='async';img.style.cssText='max-width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;';
+  const img=document.createElement('img');img.className='step-medal';img.src=badgeAssetURL(d);img.alt=d.r.race+'のバッジ';img.loading='eager';img.decoding='async';img.style.cssText='max-width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;';
   return img;
  }
  const registered=g1Items.find(x=>x.key===d.key);
- if(g1AssetsReady&&registered){const image=document.createElement('img');image.src='./collection/pins/'+encodeURIComponent(registered.filename);image.alt=registered.name+'のバッジ';image.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';return image;}
+ if(g1AssetsReady&&registered){const image=document.createElement('img');image.src=badgeAssetURL(d);image.alt=registered.name+'のバッジ';image.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';return image;}
  const wrapper=document.createElement('div');wrapper.innerHTML=pinArtwork(d.r,d.v);return wrapper.firstElementChild;
 }
 function draw(n,price,currency='wallet'){
@@ -237,16 +238,29 @@ $('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({t
 $('import').addEventListener('change',async(e)=>{try{const f=e.target.files[0];if(!f)return;const obj=JSON.parse(await f.text());if(obj.type!=='BAKEN_KING_PIN_COLLECTION'||obj.mode!==mode||!valid(obj.data))throw Error('形式またはモードが違います');if(!confirm('現在のコレクションと準備財布を、選択したバックアップで上書きしますか？'))return;persist({...obj.data,points:obj.data.points??0});$('result').hidden=true;render();$('message').textContent='復元しました。';}catch(err){$('message').textContent='復元できませんでした：'+err.message}finally{e.target.value='';}});
 
 function badgeAssetURL(d){
+ if(displayBadgeFiles.has(d.key)){const file=d.v==='step'?d.key+'.webp':d.key.replace(/_(normal|holo)$/,'-$1')+'.webp';return './assets/badges/display/'+encodeURIComponent(file);}
  if(d.v==='step')return stepImageURL(d.r);
  const registered=g1Items.find(x=>x.key===d.key);
  return g1AssetsReady&&registered?'./collection/pins/'+encodeURIComponent(registered.filename):null;
 }
+async function loadDisplayBadgeManifest(){
+ try{
+  const r=await fetch('./assets/badges/display/manifest.json',{cache:'no-cache'});
+  if(!r.ok)return;
+  const data=await r.json();
+  if(data.count!==98||!Array.isArray(data.files)||data.files.length!==98)return;
+  const set=new Set(data.files.map(x=>x.key));if(set.size!==98)return;
+  displayBadgeFiles=set;
+ }catch(e){console.info('Using original approved badge images');}
+}
+loadDisplayBadgeManifest();
 function preloadBadge(d){
  const url=badgeAssetURL(d);
  if(!url)return Promise.resolve(null);
  if(badgePreloads.has(url))return badgePreloads.get(url);
  const img=new Image();
- img.loading='eager';img.decoding='async';
+ img.loading='eager';
+ img.fetchPriority='high';img.decoding='async';
  img.alt=(d.v==='step'?d.r.race:d.r.name)+'のバッジ';
  if(d.v==='step'){img.className='step-medal';img.style.cssText='max-width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;';}
  else img.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';
@@ -255,7 +269,11 @@ function preloadBadge(d){
    try{if(typeof img.decode==='function')await img.decode();}catch(e){/* A loaded image is still usable when decode() rejects. */}
    resolve(img);
   };
-  img.onerror=()=>resolve(null);
+  img.onerror=()=>{
+   const original=d.v==='step'?stepImageURL(d.r):'./collection/pins/'+encodeURIComponent(g1Items.find(x=>x.key===d.key)?.filename||'');
+   if(img.src.endsWith(encodeURIComponent(original.split('/').pop())))return resolve(null);
+   img.onerror=()=>resolve(null);img.src=original;
+  };
   img.src=url;
   if(img.complete&&img.naturalWidth>0)img.onload();
  });
@@ -327,8 +345,8 @@ async function revealNext(){
  const d=revealItems[revealIndex],token=++revealLoadToken;
  revealBusy=true;$('revealNext').disabled=true;
  prepareAwardCase();
- $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚 — 画像を準備中';
- $('revealNext').textContent='画像を準備中…';
+ $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚 — 準備中';
+ $('revealNext').textContent='準備中…';
  // Keep the lid closed until the image is ready; never pause mid-opening.
  const art=await waitForBadge(d);
  if(token!==revealLoadToken||$('revealOverlay').hidden||!revealBusy)return;
@@ -344,7 +362,7 @@ async function revealNext(){
   if(token!==revealLoadToken||!revealBusy||$('revealOverlay').hidden)return;
   $('revealStage').classList.add('case-opening');
  }));
- revealTimer=setTimeout(()=>showRevealedBadge(d,token,art),reduced?90:960);
+ revealTimer=setTimeout(()=>showRevealedBadge(d,token,art),reduced?90:730);
 }
 function revealSkip(){
  if(!revealItems.length)return;
@@ -409,7 +427,7 @@ function displayStepBadges(){
  const grid=$('stepGrid');grid.replaceChildren();
  for(const entry of current){
   const tile=document.createElement('button');tile.type='button';tile.className='step-tile';
-  const img=document.createElement('img');img.className='step-medal';img.src=stepImageURL(entry);img.alt=entry.race+'のバッジ';img.loading='lazy';img.decoding='async';
+  const img=document.createElement('img');img.className='step-medal';img.src=badgeAssetURL({key:entry.id,v:'step',r:entry});img.alt=entry.race+'のバッジ';img.loading='lazy';img.decoding='async';
   const ownedCount=state.owned[entry.id]||0;if(!ownedCount){tile.classList.add('locked');img.style.filter='grayscale(1) brightness(.25)';}
   const name=document.createElement('div');name.className='name';name.textContent=String(entry.number).padStart(2,'0')+' '+entry.race;
   const grade=document.createElement('div');grade.className='step-grade';grade.textContent=entry.grade==='G2'?'GⅡ':entry.grade==='G3'?'GⅢ':'L';
@@ -423,7 +441,7 @@ function displayStepBadges(){
 function showStepBadge(entry){
  const preview=$('stepPreview');preview.replaceChildren();
  const title=document.createElement('strong');title.textContent=entry.race+'（'+(entry.grade==='G2'?'GⅡ':entry.grade==='G3'?'GⅢ':'L')+'）';
- const image=document.createElement('img');image.className='step-medal';image.src=stepImageURL(entry);image.alt=entry.race+'のバッジ';image.decoding='async';
+ const image=document.createElement('img');image.className='step-medal';image.src=badgeAssetURL({key:entry.id,v:'step',r:entry});image.alt=entry.race+'のバッジ';image.decoding='async';
  if(!(state.owned[entry.id]>0)){image.style.filter='grayscale(1) brightness(.25)';}
  const count=document.createElement('p');count.className='sub';count.textContent=state.owned[entry.id]?'所持数：'+state.owned[entry.id]:'未所持';
  preview.append(title,image,count);preview.hidden=false;preview.scrollIntoView({block:'nearest',behavior:'smooth'});
