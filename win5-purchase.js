@@ -47,6 +47,24 @@ styles.textContent+=`
 .w5-ticket-hint{font-size:11px;line-height:1.6;color:#6a7c91;margin:10px 2px 0}
 @media(max-width:360px){.w5-modal-head{padding:14px 12px}.w5-modal-content{padding:11px 12px 13px}.w5-modal-actions{padding:11px 12px calc(12px + env(safe-area-inset-bottom))}.w5-confirm-row strong{font-size:14px}.w5-digital-brand{font-size:23px}}
 `;
+styles.textContent+=`
+.w5-hist{padding:9px 12px;margin-top:16px}
+.w5-hist>summary{font-weight:800;color:#254a76;cursor:pointer;list-style-position:inside;min-height:42px;display:list-item;align-content:center}
+.w5-hist[open]>summary{border-bottom:1px solid #dbe5f1;margin-bottom:10px}
+.w5-bar{padding:10px 11px;bottom:calc(66px + env(safe-area-inset-bottom));max-width:100%}
+.w5-control-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.w5-control-row label{min-width:92px;max-width:118px;font-size:11px;line-height:1.2;color:#426184;flex-shrink:0}
+.w5-control-row input{width:100%;min-width:0;max-width:112px;min-height:39px;margin-top:4px!important;padding:5px 7px;font-size:16px}
+.w5-purchase-total{text-align:right;min-width:0;flex:1}
+.w5-purchase-total p{margin:2px 0;overflow-wrap:anywhere}
+.w5-purchase-total p:first-child{font-weight:900;font-size:17px;color:#123f77;font-variant-numeric:tabular-nums}
+.w5-purchase-total p:last-child{font-size:11px;color:#536e8f;line-height:1.3}
+.w5-purchase-actions{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;margin-top:8px}
+.w5-purchase-actions button{margin:0;min-width:0;min-height:43px;line-height:1.2;font-size:13px}
+.w5-jump-button{min-height:40px!important;font-size:12px!important;padding:6px 2px!important;white-space:nowrap}
+.w5-horses button:focus-visible,.w5-jump-button:focus-visible,.w5-purchase-actions button:focus-visible{outline:3px solid #f7b632;outline-offset:2px}
+@media(max-width:355px){.w5-purchase-actions{grid-template-columns:90px minmax(0,1fr)}.w5-purchase-total p:first-child{font-size:15px}.w5-horses{gap:4px}}
+`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
@@ -63,8 +81,12 @@ const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
 const total=node('p'),message=node('p');message.className='w5-note';
 const buy=node('button','購入内容を確認'),clear=node('button','選択をクリア');clear.className='outline';
-bar.append(unitLabel,total,message,buy,clear);
-const history=node('div');history.className='w5-hist';
+const controlRow=node('div');controlRow.className='w5-control-row';
+const countBox=node('div');countBox.className='w5-purchase-total';
+countBox.append(total,message);controlRow.append(unitLabel,countBox);
+const actionRow=node('div');actionRow.className='w5-purchase-actions';actionRow.append(clear,buy);
+bar.append(controlRow,actionRow);
+const history=node('details');history.className='w5-hist';history.open=false;
 const jump=node('div');jump.className='w5-jump';
 const demoSwitch=node('button','デモ表示に切替');demoSwitch.type='button';demoSwitch.className='outline w5-demo-switch';
 demoSwitch.setAttribute('aria-pressed','false');
@@ -130,7 +152,7 @@ function render(){
  dateSelect.disabled=false;
  jump.replaceChildren();
  current().legs.forEach((leg,i)=>{
-  const b=node('button',''+(i+1));
+  const b=node('button','WIN'+(i+1)+(x.count[i]?' ✓':''));
   b.type='button';b.className='w5-jump-button'+(x.count[i]?' w5-jump-filled':'');
   b.setAttribute('aria-label','WIN'+(i+1)+' '+leg.venue+leg.raceNumber+'Rへ移動');
   b.onclick=()=>document.getElementById('w5-leg-'+i)?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -150,10 +172,10 @@ function render(){
  const b=node('button',String(n));b.type='button';b.disabled=!available(h);b.setAttribute('aria-label','WIN'+(i+1)+' '+leg.venue+leg.raceNumber+'R　馬番'+n+'　'+(picks[i].includes(n)?'選択済み、タップで解除':'タップで選択'));b.setAttribute('aria-pressed',String(picks[i].includes(n)));
  b.onclick=()=>{picks[i]=picks[i].includes(n)?picks[i].filter(x=>x!==n):[...picks[i],n].sort((a,b)=>a-b);render()};grid.append(b)});
  section.append(grid)}races.append(section)});
- total.textContent=x.count.every(n=>n>0)?x.points+'点 × '+fmt(x.price)+' ＝ '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5レース ／ 全レース選択で合計表示';
+ total.textContent=x.count.every(n=>n>0)?x.points+'点・合計 '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5 レース';
  buy.disabled=expired||!x.ok;
- message.textContent=expired?'公開済みの日程が終了しました':!x.cards.every(Boolean)?'対象5レースの出馬表を待っています':x.count.some(n=>n===0)?'5レースすべてで1頭以上選択してください':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'プレビュー上限100万円を超えています':'UIプレビュー：残高の変更はありません';
- history.replaceChildren(node('strong','WIN5 購入履歴'));
+ message.textContent=expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'プレビュー上限100万円':'UIプレビュー・残高変更なし';
+ const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 投票券プレビュー履歴（'+demoTickets.length+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=demoTickets;
  purchased.slice(-20).reverse().forEach(t=>{
  const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　UIプレビュー'));
