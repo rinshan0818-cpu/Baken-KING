@@ -21,6 +21,7 @@ const node=(tag,txt)=>{const n=document.createElement(tag);if(txt!==undefined)n.
 const styles=node('style');
 styles.textContent=`.w5-select{width:auto;max-width:65%;padding:8px}.w5-race{background:#fff;border:1px solid #d5e1ee;border-radius:14px;padding:13px;margin:10px 0;box-shadow:0 3px 12px #112d5008}.w5-race h3{margin:0 0 5px;font-size:15px;color:#102f5c;line-height:1.35}.w5-horses{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.w5-horses button{background:#f1f5fb;color:#193451;border:1.5px solid #c9d8eb;padding:0;display:flex;justify-content:center;align-items:center;min-width:0;min-height:47px;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;border-radius:10px;touch-action:manipulation}.w5-horses button[aria-pressed=true]{background:#174e9a;border:2px solid #174e9a;color:#fff;box-shadow:0 2px 7px #113f8130}.w5-horses button:disabled{opacity:.45}.w5-bar{background:#eef4fd;border:1px solid #c7d9f0;border-radius:14px;padding:13px;margin-top:12px;position:sticky;bottom:calc(74px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 -3px 18px #092b5820}.w5-bar button{width:100%;margin-top:8px}.w5-hist{padding:12px;margin-top:14px;background:#f5f7fa;border-radius:12px}.w5-record{border-top:1px solid #d7e2f0;padding:9px 0;font-size:12px;line-height:1.7}.w5-modal{position:fixed;inset:0;background:#10233dbc;z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px}.w5-dialog{background:#fff;color:#172c4a;width:min(100%,440px);max-height:85dvh;overflow:auto;border-radius:17px;padding:18px;line-height:1.7}.w5-dialog button{margin:5px}.w5-note{font-size:12px;line-height:1.65;color:#596f89}.w5-digital{background:linear-gradient(145deg,#071d3c,#123f79 67%,#245da0);color:white;border-radius:19px;padding:18px 16px;box-shadow:0 10px 27px #061d3d38;overflow:hidden;position:relative}.w5-digital:after{content:"";position:absolute;top:-75px;right:-55px;width:180px;height:180px;border:1px solid #ffffff25;border-radius:50%;pointer-events:none}.w5-digital-head{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #ffffff42;padding-bottom:13px}.w5-digital-brand{font-size:27px;font-weight:900;letter-spacing:1px}.w5-digital-sub{font-size:10px;color:#c7d9f2;letter-spacing:.08em}.w5-digital-state{font-size:10px;background:#ffffff27;border:1px solid #ffffff40;border-radius:20px;padding:5px 9px;white-space:nowrap}.w5-digital-leg{display:grid;grid-template-columns:48px 1fr;gap:9px;border-bottom:1px solid #ffffff24;padding:10px 0;align-items:center}.w5-digital-index{font-size:11px;color:#c0d6f2;font-weight:850}.w5-digital-race{font-size:12px;color:#e2edfa}.w5-digital-picks{font-size:18px;font-weight:850;letter-spacing:.08em;overflow-wrap:anywhere}.w5-digital-foot{display:flex;justify-content:space-between;align-items:end;gap:10px;padding-top:17px}.w5-digital-foot small{display:block;color:#bbd5f5;font-size:10px;margin-bottom:3px}.w5-digital-foot strong{font-size:25px}.w5-digital-code{margin-top:14px;font-size:10px;letter-spacing:.12em;color:#aac9e9;border-top:1px solid #ffffff28;padding-top:9px}.w5-confirm-row{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #e4ebf3}.w5-action-row{display:flex;gap:8px;margin-top:15px}.w5-action-row button{flex:1;min-width:0}.w5-overview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:8px 0 14px}.w5-overview div{text-align:center;background:#edf3fb;border-radius:9px;padding:9px 2px}.w5-overview small{display:block;font-size:10px;color:#58718f}.w5-overview strong{font-size:17px;color:#123d73}.w5-topline{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px}`;
 styles.textContent+=`.w5-source-link{display:inline-block;font-size:11px;color:#2259a1;text-decoration:underline;margin:0 0 8px 2px}.w5-jump{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;position:sticky;top:0;z-index:3;background:#f5f7fb;padding:6px 2px 8px}.w5-jump-button{font-size:15px!important;font-weight:800;padding:8px 2px;background:#eaf0f8!important;color:#33577d!important;border:1px solid #cadaeb!important}.w5-jump-filled{background:#174e9a!important;color:#fff!important;border-color:#174e9a!important}.w5-expired{padding:13px;background:#fff0d9;border:1px solid #ebd2a3;border-radius:11px}.w5-race{scroll-margin-top:70px}.w5-race:focus-within{border-color:#a1bce4}.w5-race h3{letter-spacing:-.02em}`;
+styles.textContent+=`.w5-demo-switch{display:block;margin:2px 0 11px auto;padding:7px 11px!important;min-height:36px!important;font-size:12px!important}.w5-demo-switch[aria-pressed=true]{background:#e5f0ff!important;border-color:#90b7ea!important;color:#154c91!important}`;
 styles.textContent+=`
 .w5-dialog{padding:0;max-height:min(90dvh,780px);display:flex;flex-direction:column;overscroll-behavior:contain;box-shadow:0 22px 65px #05162e65}
 .w5-modal-head{padding:17px 17px 12px;border-bottom:1px solid #e7edf5;background:#fff;flex-shrink:0}
@@ -50,6 +51,7 @@ const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
 const upcoming=schedule.find(x=>x.date>=today());
+let demoMode=false;
 let selectedDate=(upcoming||schedule[schedule.length-1]).date;
 let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
@@ -62,12 +64,36 @@ const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.t
 const total=node('p'),message=node('p');message.className='w5-note';
 const buy=node('button','購入内容を確認'),clear=node('button','選択をクリア');clear.className='outline';
 bar.append(unitLabel,total,message,buy,clear);
-const history=node('div');history.className='w5-hist';const jump=node('div');jump.className='w5-jump';body.append(head,note,sourceLink,jump,races,bar,history);host.replaceChildren(styles,body);
+const history=node('div');history.className='w5-hist';
+const jump=node('div');jump.className='w5-jump';
+const demoSwitch=node('button','デモ表示に切替');demoSwitch.type='button';demoSwitch.className='outline w5-demo-switch';
+demoSwitch.setAttribute('aria-pressed','false');
+body.append(head,note,sourceLink,demoSwitch,jump,races,bar,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
 // Read exactly the same validated race-card cache used by the regular prediction screen.
 const CARD_KEY='baken-king-personal-cards-v1';
+const DRAFT_KEY='baken-king-win5-ui-draft-v1';
+const demoCounts=[16,14,12,18,15];
+const demoRaces=()=>current().legs.map((leg,i)=>({
+ date:selectedDate,venue:leg.venue,raceNumber:leg.raceNumber,
+ scheduledStartAt:selectedDate+'T'+['14:40','14:50','15:00','15:10','15:20'][i]+':00+09:00',
+ horses:Array.from({length:demoCounts[i]},(_,n)=>({number:n+1,name:'デモ馬'}))
+}));
+function storeDraft(){
+ try{localStorage.setItem(DRAFT_KEY,JSON.stringify({date:selectedDate,picks,unit:unit.value,demoMode}))}catch{}
+}
+function loadDraft(){
+ try{
+  const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');
+  if(!draft||!schedule.some(item=>item.date===draft.date)||!Array.isArray(draft.picks)||draft.picks.length!==5)return;
+  selectedDate=draft.date;dateManuallyChosen=true;demoMode=draft.demoMode===true;
+  picks=draft.picks.map(arr=>Array.isArray(arr)?[...new Set(arr.filter(n=>Number.isInteger(n)&&n>=1&&n<=18))].sort((a,b)=>a-b):[]);
+  if(/^\d{1,7}$/.test(String(draft.unit))&&Number(draft.unit)>=100)unit.value=String(draft.unit);
+ }catch{}
+}
 const readCards=()=>{try{const payload=JSON.parse(localStorage.getItem(CARD_KEY)||'null');return Array.isArray(payload?.races)?payload.races:[]}catch{return []}};
 const getRaces=()=>{
+ if(demoMode)return demoRaces();
  const cards=readCards();
  return current().legs.map(l=>cards.find(c=>
   c&&c.date===selectedDate&&c.venue===l.venue&&Number(c.raceNumber)===l.raceNumber&&
@@ -94,10 +120,13 @@ function chooseUpcomingFromCards(){
 }
 function render(){
  chooseUpcomingFromCards();
+ demoSwitch.textContent=demoMode?'実際の出馬表に戻す':'デモ表示で操作する';
+ demoSwitch.setAttribute('aria-pressed',String(demoMode));
  const live=getRaces();
  picks=picks.map((numbers,i)=>numbers.filter(n=>live[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
- const expired=!upcoming&&selectedDate>=today();
+ storeDraft();
+ const expired=!demoMode&&!upcoming&&selectedDate>=today();
  dateSelect.disabled=false;
  jump.replaceChildren();
  current().legs.forEach((leg,i)=>{
@@ -132,6 +161,11 @@ function render(){
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
 dateSelect.onchange=()=>{dateManuallyChosen=true;selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
+demoSwitch.onclick=()=>{
+ demoMode=!demoMode;
+ // A switch between real data and synthetic data must never carry over selections.
+ picks=Array.from({length:5},()=>[]);render();
+};
 unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);render()};
 const demoTickets=[];
 
@@ -194,6 +228,7 @@ function showTicket(ticket){
 }
 buy.onclick=()=>{
  const before=check();if(!before.ok){render();return}
+ const chosenMode=demoMode;
  const chosenDate=selectedDate;
  const chosenPicks=picks.map(v=>v.slice());
  const legs=current().legs.map((leg,i)=>({...leg,numbers:chosenPicks[i].slice()}));
@@ -222,7 +257,7 @@ buy.onclick=()=>{
  preview.onclick=()=>{
   const after=check();
   if(!after.ok||after.stake!==before.stake||after.points!==before.points||
-   selectedDate!==chosenDate||JSON.stringify(picks)!==JSON.stringify(chosenPicks)){
+   selectedDate!==chosenDate||demoMode!==chosenMode||JSON.stringify(picks)!==JSON.stringify(chosenPicks)){
    close();render();return;
   }
   const ticket={id:demoTickets.length+1,date:chosenDate,stake:before.stake,unitStake:before.price,points:before.points,status:'preview',legs};
@@ -231,6 +266,7 @@ buy.onclick=()=>{
  close=modal('WIN5 購入内容の確認',contents,[back,preview]);
 };
 
+loadDraft();
 window.addEventListener('baken:cards-imported',render);
 window.addEventListener('storage',event=>{if(event.key===CARD_KEY)render()});
 window.addEventListener('focus',render);
