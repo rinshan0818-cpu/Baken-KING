@@ -38,6 +38,16 @@ const baseSelector='main.wrap > [data-tab]';
   const collectionFrame=page.frameLocator('#bkWin5Frame');
   await collectionFrame.locator('#wallet').waitFor({state:'visible'});
   assert.match(await collectionFrame.locator('#wallet').textContent(),/300,000/,'WIN5 wallet starts independently at 300,000');
+  await collectionFrame.locator('#drawTen').waitFor({state:'visible'});
+  await collectionFrame.locator('#drawTen').click();
+  await collectionFrame.locator('#revealOverlay:not([hidden])').waitFor({state:'visible'});
+  await collectionFrame.locator('#revealSkip').click();
+  await collectionFrame.locator('.bk-reveal-grid .bk-reveal-item').first().waitFor({state:'visible'});
+  assert.equal(await collectionFrame.locator('.bk-reveal-grid .bk-reveal-item').count(),10,'A ten-draw summary must show all ten badges without scrolling to results');
+  assert.equal(await collectionFrame.locator('#revealClose').textContent(),'ガチャへ戻る');
+  await collectionFrame.locator('#revealClose').click();
+  assert.equal(await collectionFrame.locator('#revealOverlay').isVisible(),false,'Closing summary must return to the fixed draw screen');
+
   // Compact embedded view keeps drawing controls first and the large collection separately.
   assert.equal(await collectionFrame.locator('.bk-gacha-hero img').count(),3,'Gacha overview must show three badge previews');
   assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),true,'Gacha overview must be visible');
@@ -51,6 +61,15 @@ const baseSelector='main.wrap > [data-tab]';
 
   assert.equal(await collectionFrame.locator('[data-collection-panel]').first().isVisible(),false,'Collection should not crowd the initial draw screen');
   await collectionFrame.locator('[data-collection-view="collection"]').click();
+  assert.equal(await collectionFrame.locator('#g1Status').isVisible(),false,'G1 introduction must be hidden');
+  assert.equal(await collectionFrame.locator('.tabs').isVisible(),false,'Legacy G1 filter buttons must be hidden');
+  assert.equal(await collectionFrame.locator('.bk-legacy-collection-backup').isVisible(),false,'Catalog must not contain backup controls');
+  assert.equal(await collectionFrame.locator('#bkG1Filter').isVisible(),true,'Catalog must offer a compact G1 dropdown');
+  assert.equal(await collectionFrame.locator('#pins .pin').first().locator('.badge').textContent(),'ホロ','G1 holo must sort ahead of normal');
+  const scrollBehavior=await collectionFrame.locator('.bk-collection-scroll').evaluate(el=>({overflow:getComputedStyle(el).overflowY,menuOutside:!el.contains(document.querySelector('.bk-collection-menu'))}));
+  assert.equal(scrollBehavior.overflow,'auto','Only the collection content should scroll');
+  assert.equal(scrollBehavior.menuOutside,true,'Gacha/collection menu must remain outside the scrollable catalog');
+
   await page.waitForFunction(()=>!document.body.classList.contains('bk-win5-draw-fixed'));
   assert.equal(await collectionFrame.locator('.bk-step-dropdowns').isVisible(),true,'Collection must expose step selectors');
   assert.equal(await collectionFrame.locator('#stepFilters').isVisible(),false,'Old step buttons must be hidden');
