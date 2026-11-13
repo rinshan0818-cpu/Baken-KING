@@ -41,11 +41,33 @@ const baseSelector='main.wrap > [data-tab]';
   // Compact embedded view keeps drawing controls first and the large collection separately.
   assert.equal(await collectionFrame.locator('.bk-gacha-hero img').count(),3,'Gacha overview must show three badge previews');
   assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),true,'Gacha overview must be visible');
+  await page.waitForFunction(()=>document.body.classList.contains('bk-win5-draw-fixed'));
+  const fixedLayout=await collectionFrame.locator('html').evaluate(el=>({
+   fixed:el.classList.contains('bk-draw-fixed'),
+   overflow:getComputedStyle(el).overflowY
+  }));
+  assert.equal(fixedLayout.fixed,true,'Gacha draw screen must be in fixed mode');
+  assert.equal(fixedLayout.overflow,'hidden','Embedded draw screen must not scroll');
+
   assert.equal(await collectionFrame.locator('[data-collection-panel]').first().isVisible(),false,'Collection should not crowd the initial draw screen');
   await collectionFrame.locator('[data-collection-view="collection"]').click();
+  await page.waitForFunction(()=>!document.body.classList.contains('bk-win5-draw-fixed'));
+  assert.equal(await collectionFrame.locator('.bk-step-dropdowns').isVisible(),true,'Collection must expose step selectors');
+  assert.equal(await collectionFrame.locator('#stepFilters').isVisible(),false,'Old step buttons must be hidden');
+  assert.equal(await collectionFrame.locator('#stepBadgeTitle').isVisible(),false,'Step heading must be hidden in compact catalog');
+  assert.equal(await collectionFrame.locator('[data-filter="owned"]').isVisible(),false,'G1 owned filter must be hidden');
+  assert.equal(await collectionFrame.locator('[data-filter="missing"]').isVisible(),false,'G1 missing filter must be hidden');
+  await collectionFrame.locator('#bkStepOwnership').selectOption('owned-first');
+  await collectionFrame.locator('#bkStepGrade').selectOption('G2');
+  assert.equal(await collectionFrame.locator('#bkStepOwnership').inputValue(),'owned-first');
+  assert.equal(await collectionFrame.locator('#bkStepGrade').inputValue(),'G2');
+  assert.match(await collectionFrame.locator('#bkCollectionOwned').textContent(),/\/ 98種類収集/);
+
   assert.equal(await collectionFrame.locator('[data-collection-panel]').first().isVisible(),true,'Collection view must be reachable');
   assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),false,'Draw controls must be hidden in collection view');
   await collectionFrame.locator('[data-collection-view="gacha"]').click();
+  await page.waitForFunction(()=>document.body.classList.contains('bk-win5-draw-fixed'));
+
   assert.equal(await collectionFrame.locator('#drawOne').isVisible(),true,'Drawing must work again after returning from collection');
   const win5MenuLayout=await page.locator('.bk-win5-subnav').evaluate(nav=>{
    const buttons=[...nav.querySelectorAll('button')].map(x=>x.getBoundingClientRect());
