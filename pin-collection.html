@@ -218,6 +218,43 @@ html.bk-embedded.bk-draw-fixed [data-gacha-panel]>#message{flex:0 0 auto;margin:
  html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{min-height:39px;padding:6px 2px}
  html.bk-embedded.bk-draw-fixed .bk-gacha-hero{min-height:68px;margin-bottom:5px!important}
 }
+
+/* 16:9 source poster: no artificial letterboxing or stretched frame. */
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]{
+  justify-content:space-between;
+}
+html.bk-embedded.bk-draw-fixed .bk-gacha-hero{
+  flex:1 1 auto;
+  min-height:110px;
+  max-height:none;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#06172e;
+  overflow:hidden;
+  border:1px solid #cda358;
+}
+html.bk-embedded.bk-draw-fixed .bk-gacha-hero .bk-hero-poster{
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:cover!important;
+  object-position:center center;
+  filter:none!important;
+  transform:none!important;
+}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.summary .metric{
+  min-height:62px;
+}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{
+  min-height:47px;
+}
+@media (max-height:650px){
+ html.bk-embedded.bk-draw-fixed .bk-gacha-hero{min-height:70px}
+ html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.summary .metric{min-height:47px}
+ html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{min-height:39px}
+}
 </style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
