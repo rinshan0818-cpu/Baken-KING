@@ -167,6 +167,19 @@ html.bk-embedded .bk-reveal-item.is-holo{border-color:#d6bbff;background:#7a65b4
 html.bk-embedded .bk-reveal-item.is-new:after{content:'NEW';position:absolute;right:1px;top:1px;font-size:7px;color:#ffe2a2;font-weight:900}
 html.bk-embedded .reveal-dialog:has(.bk-reveal-summary){padding:12px;max-height:calc(100dvh - 25px)}
 html.bk-embedded .reveal-dialog:has(.bk-reveal-summary) .reveal-actions button{min-height:43px}
+/* Responsive, no-scroll summary after a ten-pull; ordinary single-pull returns directly. */
+html.bk-embedded .reveal-overlay{padding:8px;overflow:hidden;align-items:center}
+html.bk-embedded .reveal-dialog{max-height:calc(100dvh - 16px);overflow:hidden;padding:11px}
+html.bk-embedded .reveal-dialog .reveal-stage.bk-reveal-summary{padding:7px}
+html.bk-embedded .reveal-dialog .reveal-top{min-height:32px}
+html.bk-embedded .reveal-dialog .reveal-top strong{font-size:15px}
+html.bk-embedded .reveal-dialog .reveal-count{margin:3px 0}
+html.bk-embedded .reveal-dialog .bk-reveal-item{aspect-ratio:auto;height:clamp(68px,14dvh,105px)}
+html.bk-embedded .reveal-dialog .bk-reveal-item img{height:72%;width:100%;max-width:100%;max-height:none;object-fit:contain}
+html.bk-embedded .reveal-dialog .bk-reveal-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+html.bk-embedded .reveal-dialog:has(.bk-reveal-summary) .reveal-actions{margin-top:6px}
+html.bk-embedded .reveal-dialog:has(.bk-reveal-summary) .reveal-actions button{min-height:41px}
+@media(max-height:490px){html.bk-embedded .reveal-dialog .bk-reveal-item{height:57px}}
 </style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
@@ -433,12 +446,12 @@ function showRevealedBadge(d,token,art){
  revealFinishTimer=setTimeout(()=>{
   revealFinishTimer=null;if($('revealOverlay').hidden||token!==revealLoadToken)return;
   revealBusy=false;$('revealNext').disabled=false;
-  $('revealNext').textContent=revealIndex===revealItems.length-1?'結果を確認':'次のバッジ';
+  $('revealNext').textContent=revealIndex===revealItems.length-1?(revealItems.length===1?'ガチャへ戻る':'10枚の一覧を見る'):'次のバッジ';
  },reduced?20:690);
 }
 async function revealNext(){
  if(!revealItems.length||revealBusy)return;
- if(!revealRetry&&revealIndex>=revealItems.length-1){closeReveal();return;}
+ if(!revealRetry&&revealIndex>=revealItems.length-1){if(revealItems.length===1)closeReveal();else showRevealSummary();return;}
  if(revealRetry){
   const retryURL=badgeAssetURL(revealItems[revealIndex]);if(retryURL)badgePreloads.delete(retryURL);
  }else revealIndex++;
@@ -465,17 +478,30 @@ async function revealNext(){
  }));
  revealTimer=setTimeout(()=>showRevealedBadge(d,token,art),reduced?90:730);
 }
-function revealSkip(){
+function showRevealSummary(){
  if(!revealItems.length)return;
  if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
  if(revealFinishTimer!==null){clearTimeout(revealFinishTimer);revealFinishTimer=null;}
  revealBusy=false;revealRetry=false;revealLoadToken++;revealIndex=revealItems.length-1;
- const stage=$('revealStage');stage.className='reveal-stage';stage.replaceChildren();
- const info=document.createElement('div');info.style.cssText='padding:18px;text-align:center;line-height:1.8;color:#f4dfaa;font-weight:700';
- info.textContent='全'+revealItems.length+'枚の結果を確認できます。下の一覧をご覧ください。';
- stage.append(info);$('revealCount').textContent=revealItems.length+' / '+revealItems.length+'枚';
- $('revealNext').disabled=false;$('revealNext').hidden=true;$('revealClose').hidden=false;$('revealClose').focus();
+ const stage=$('revealStage');stage.className='reveal-stage bk-reveal-summary';stage.replaceChildren();
+ const grid=document.createElement('div');grid.className='bk-reveal-grid';
+ for(const d of revealItems){
+  const tile=document.createElement('div');tile.className='bk-reveal-item'+(d.v==='holo'?' is-holo':'')+(d.first?' is-new':'');
+  const img=drawArt(d);img.loading='eager';
+  img.style.cssText='width:100%;height:70%;max-height:none;object-fit:contain;';
+  const label=document.createElement('span');label.className='bk-reveal-label';
+  label.textContent=d.v==='step'?d.r.race:d.r.name;
+  tile.append(img,label);grid.append(tile);
+ }
+ stage.append(grid);
+ $('revealHeading').textContent=revealItems.length===10?'10連ガチャの結果':'ガチャの結果';
+ $('revealCount').textContent='全'+revealItems.length+'枚 ／ NEW '+revealItems.filter(d=>d.first).length+'種類';
+ $('revealNext').hidden=true;
+ $('revealSkip').hidden=true;
+ $('revealClose').hidden=false;$('revealClose').textContent='ガチャへ戻る';
+ $('revealClose').focus();
 }
+function revealSkip(){showRevealSummary();}
 function closeReveal(){
  if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
  if(revealFinishTimer!==null){clearTimeout(revealFinishTimer);revealFinishTimer=null;}
@@ -483,7 +509,7 @@ function closeReveal(){
  $('revealOverlay').hidden=true;document.body.classList.remove('reveal-open');
  revealItems=[];revealIndex=-1;
  if(revealPreviousFocus?.isConnected)revealPreviousFocus.focus();
- $('result').scrollIntoView({behavior:'smooth',block:'nearest'});
+ if(!document.documentElement.classList.contains('bk-embedded'))$('result').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 $('revealNext').addEventListener('click',revealNext);
 $('revealSkip').addEventListener('click',revealSkip);
