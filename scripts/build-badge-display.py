@@ -6,7 +6,7 @@ medallion with an antialiased alpha boundary. Output dimensions are capped at
 512px for responsive mobile display. Uses deterministic WebP settings.
 """
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 import json
 import hashlib
 
@@ -37,6 +37,22 @@ def optimize(src, dest, circular=False):
         draw.ellipse((pad,pad,side-1-pad,side-1-pad), fill=255)
         im.putalpha(mask)
     im.thumbnail((512,512), Image.Resampling.LANCZOS)
+    if not circular:
+        # G1 medallions are irregular shields. Remove only near-black
+        # pixels connected to the outer corners, not dark inner details.
+        darkness = im.convert("RGB").convert("L").point(
+            lambda value: 255 if value < 65 else 0
+        )
+        for seed in ((0, 0), (darkness.width-1, 0),
+                     (0, darkness.height-1),
+                     (darkness.width-1, darkness.height-1)):
+            if darkness.getpixel(seed) == 255:
+                ImageDraw.floodfill(darkness, seed, 128)
+        alpha = darkness.point(lambda value: 0 if value == 128 else 255)
+        coverage = alpha.histogram()[255] / (alpha.width * alpha.height)
+        if not 0.30 < coverage < 0.75:
+            raise ValueError(f"Suspicious G1 mask: {src.name}: {coverage:.3f}")
+        im.putalpha(alpha.filter(ImageFilter.GaussianBlur(0.65)))
     dest.parent.mkdir(parents=True, exist_ok=True)
     im.save(dest, "WEBP", quality=84, method=6, exact=True)
     with Image.open(dest) as verify:
@@ -59,7 +75,7 @@ for x in g1:
 
 if len(items)!=98 or len({i["key"] for i in items})!=98 or len({i["file"] for i in items})!=98:
     raise ValueError("Duplicate output entries")
-manifest={"version":1,"count":98,"source":"approved-originals","files":items}
+manifest={"version":2,"count":98,"source":"approved-originals","g1Background":"border-connected dark background removed","files":items}
 (OUTPUT/"manifest.json").write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print("Built",len(items),"optimized images; total bytes:",sum(x["bytes"] for x in items),
       "largest:",max(x["bytes"] for x in items))
