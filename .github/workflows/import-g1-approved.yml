@@ -1,0 +1,37 @@
+name: Import approved G1 badge archive
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'collection/pins/import/g1-approved.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-g1-approved
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Validate and extract approved badges
+        run: python3 scripts/import-g1-approved.py
+      - name: Commit imported assets when present
+        run: |
+          git add -A collection/pins
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "assets: import 48 approved G1 badges from verified archive"
+          git push
