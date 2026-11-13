@@ -47,18 +47,25 @@
 .award-case{position:relative;width:218px;height:205px;perspective:650px;filter:drop-shadow(0 15px 22px #0009);isolation:isolate}
 .award-case__base{position:absolute;inset:55px 0 0;border:4px solid #caa05e;border-radius:22px 22px 28px 28px;background:radial-gradient(ellipse at 50% 37%,#243c58 4%,#111c31 60%,#081224 100%);box-shadow:inset 0 0 0 5px #081426,inset 0 0 0 7px #ad8c564e,0 8px 0 #71522b;display:grid;place-items:center}
 .award-case__base::before{content:"";width:104px;height:104px;border-radius:50%;border:2px solid #d5af724d;box-shadow:0 0 30px #d9b46e3a,inset 0 0 22px #c29d4c33;background:radial-gradient(circle,#f4d28c12,transparent 72%)}
-.award-case__lid{position:absolute;z-index:2;left:0;right:0;top:10px;height:129px;border-radius:23px 23px 16px 16px;border:4px solid #e0b876;background:linear-gradient(160deg,#263e5d,#08162a 65%);box-shadow:inset 0 0 0 5px #0a1527,inset 0 0 0 7px #bca06c8a,0 10px 15px #0006;display:grid;place-items:center;transform-origin:50% 10%;transition:transform .75s cubic-bezier(.2,.74,.2,1),opacity .75s ease}
+.award-case__lid{position:absolute;z-index:2;left:0;right:0;top:10px;height:129px;border-radius:23px 23px 16px 16px;border:4px solid #e0b876;background:linear-gradient(160deg,#263e5d,#08162a 65%);box-shadow:inset 0 0 0 5px #0a1527,inset 0 0 0 7px #bca06c8a,0 10px 15px #0006;display:grid;place-items:center;transform-origin:50% 36%;transform-style:preserve-3d;backface-visibility:visible}
 .award-case__lid span{text-align:center;color:#f1d59b;font:700 17px Georgia,serif;letter-spacing:.1em;text-shadow:0 1px 6px #000}
 .award-case__lid small{display:block;margin-top:8px;color:#e6c78f;font:400 9px Georgia,serif;letter-spacing:.16em}
-.reveal-stage.case-opening .award-case__lid{transform:rotateX(-112deg) translateY(-6px);opacity:.42}
-.reveal-stage.case-opening::after{content:"";position:absolute;inset:4%;z-index:1;background:radial-gradient(ellipse at 50% 50%,#fff5d0a8 0%,#efcd8466 18%,transparent 61%);animation:case-light .78s ease-out both;pointer-events:none}
+.reveal-stage.case-opening .award-case__lid{animation:case-lid-lift .96s cubic-bezier(.22,.68,.2,1) both}
+@keyframes case-lid-lift{
+  0%{transform:translate3d(0,0,0) rotateX(0deg)}
+  17%{transform:translate3d(0,-8px,5px) rotateX(3deg)}
+  42%{transform:translate3d(0,-17px,12px) rotateX(30deg)}
+  78%{transform:translate3d(0,-24px,18px) rotateX(76deg)}
+  100%{transform:translate3d(0,-25px,18px) rotateX(84deg)}
+}
+.reveal-stage.case-opening::after{content:"";position:absolute;inset:4%;z-index:1;background:radial-gradient(ellipse at 50% 50%,#fff5d0a8 0%,#efcd8466 18%,transparent 61%);animation:case-light .76s .16s ease-out both;pointer-events:none}
 .reveal-card{animation:medal-appear 1.05s cubic-bezier(.16,.72,.22,1) both}
 .reveal-card>.step-medal{animation:medal-shine 1.15s ease-out both}
 .reveal-stage.reveal-holo .reveal-card{animation-duration:1.3s}
 @keyframes case-light{from{opacity:0;transform:scale(.45)}45%{opacity:1}to{opacity:.2;transform:scale(1.3)}}
 @keyframes medal-appear{0%{opacity:0;transform:translateY(30px) scale(.77);filter:blur(9px) brightness(1.5)}48%{opacity:.72;filter:blur(3px) brightness(1.25)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) brightness(1)}}
 @keyframes medal-shine{0%{filter:brightness(1.9)}100%{filter:brightness(1)}}
-@media(prefers-reduced-motion:reduce){.award-case__lid{transition:none!important}.reveal-card,.reveal-card>.step-medal,.reveal-stage.case-opening::after{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.award-case__lid{animation:none!important}.reveal-card,.reveal-card>.step-medal,.reveal-stage.case-opening::after{animation:none!important}}
 </style></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
@@ -257,7 +264,7 @@ function revealNext(){
   if(!revealBusy||$('revealOverlay').hidden)return;
   $('revealStage').classList.add('case-opening');
  }));
- revealTimer=setTimeout(()=>showRevealedBadge(d),reduced?90:820);
+ revealTimer=setTimeout(()=>showRevealedBadge(d),reduced?90:1030);
 }
 function revealSkip(){
  if(!revealItems.length)return;
