@@ -1,6 +1,7 @@
 /* Settings surface v1.35: presentation only, no auth or data changes. */
 (()=>{
  'use strict';
+ function bkPinValid(v){if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(?:derby|arima|tenno-autumn|oka|japan-cup|february|takamatsunomiya|osaka|satsuki|tenno-spring|nhk-mile|victoria-mile|oaks|yasuda|takarazuka|sprinters|shuka|kikka|elizabeth|mile-cs|champions|hanshin-jf|asahi|hopeful)_(?:normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
  function init(){
   const main=document.querySelector('main.wrap');
   if(!main||main.querySelector('#bkSettingsSurface'))return;
@@ -62,7 +63,7 @@
   pinTitle.textContent='G1記念ピンバッジ';
   const pinText=document.createElement('p');
   pinText.className='muted';
-  pinText.textContent='5レース・通常／ホロの計10種類。WIN5準備財布でガチャを回して、図鑑に集められます。';
+  pinText.textContent='98種類のバッジをWIN5タブで集められます。バッジ専用バックアップは「データ管理」に移動しました。';
   const pinLink=document.createElement('a');
   pinLink.className='official';
   pinLink.href='./pin-collection.html';
@@ -140,6 +141,50 @@
    state.className='muted';
    state.textContent='バックアップの保存・検証・復元は、ここから操作できます。クラウドへの自動保存・復元は行いません。';
    backupPanel.append(heading,explanation,controls,verifyResult,state);
+   // Pin collection is independently stored but its backup belongs in Settings.
+   const pinMode=localStorage.getItem('baken-king-mode-v1')==='test'?'test':'production';
+   const pinKey='baken-king-g1-pins-mvp-v1-'+pinMode;
+   const pinBox=document.createElement('div');pinBox.className='bk-pin-backup';
+   pinBox.style.cssText='margin-top:14px;padding-top:13px;border-top:1px solid #dce5ef';
+   const pinHeading=document.createElement('h4');pinHeading.textContent='WIN5 バッジコレクション';
+   pinHeading.style.margin='0 0 6px';
+   const pinExplain=document.createElement('p');pinExplain.className='muted';
+   pinExplain.textContent='ガチャの準備財布・ポイント・所持バッジを専用ファイルで保存・復元します。通常の馬券バックアップとは別のファイルです。';
+   const pinActions=document.createElement('div');pinActions.className='row';
+   const pinExport=document.createElement('button');pinExport.id='bkPinBackupExport';pinExport.type='button';pinExport.className='alt';pinExport.textContent='バッジをバックアップ';
+   const pinImportLabel=document.createElement('label');pinImportLabel.className='alt';pinImportLabel.style.cssText='display:inline-block;background:#e6eef8;color:#123e74;padding:11px;border-radius:10px;cursor:pointer;font-weight:700';
+   pinImportLabel.textContent='バッジを復元';
+   const pinImport=document.createElement('input');pinImport.id='bkPinBackupImport';pinImport.type='file';pinImport.accept='application/json,.json';pinImport.hidden=true;pinImport.style.display='none';pinImportLabel.append(pinImport);
+   const pinStatus=document.createElement('p');pinStatus.id='bkPinBackupStatus';pinStatus.className='muted';pinStatus.setAttribute('role','status');
+   pinExport.addEventListener('click',()=>{
+    try{
+     const data=JSON.parse(localStorage.getItem(pinKey)||'null');
+     if(!data)throw Error('保存されたコレクションデータがありません');
+     if(!bkPinValid(data))throw Error('データの形式が正しくありません');
+     const blob=new Blob([JSON.stringify({type:'BAKEN_KING_PIN_COLLECTION',mode:pinMode,data},null,2)],{type:'application/json'});
+     const url=URL.createObjectURL(blob);const link=document.createElement('a');
+     link.href=url;link.download='baken-king-pin-collection-'+pinMode+'-'+new Date().toISOString().slice(0,10)+'.json';
+     document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+     pinStatus.textContent='バッジのバックアップを保存しました。';
+    }catch(err){pinStatus.textContent='保存できませんでした：'+err.message;}
+   });
+   pinImport.addEventListener('change',async()=>{
+    try{
+     const file=pinImport.files[0];if(!file)return;
+     if(file.size>4_000_000)throw Error('ファイルが大きすぎます');
+     const obj=JSON.parse(await file.text());
+     if(obj.type!=='BAKEN_KING_PIN_COLLECTION'||obj.mode!==pinMode||!bkPinValid(obj.data))throw Error('形式または本番／テストモードが違います');
+     if(!confirm('バッジ・準備財布・ポイントをバックアップの内容で上書きしますか？'))return;
+     localStorage.setItem(pinKey,JSON.stringify({...obj.data,points:obj.data.points??0}));
+     const frame=document.getElementById('bkWin5Frame');
+     if(frame?.getAttribute('src'))frame.contentWindow.location.reload();
+     pinStatus.textContent='バッジコレクションを復元しました。';
+    }catch(err){pinStatus.textContent='復元できませんでした：'+err.message;}
+    finally{pinImport.value='';}
+   });
+   pinActions.append(pinExport,pinImportLabel);
+   pinBox.append(pinHeading,pinExplain,pinActions,pinStatus);backupPanel.append(pinBox);
+
    groups.data.prepend(backupPanel);
   }
   // History export belongs with saved data, not the season reset controls.
