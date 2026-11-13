@@ -12,31 +12,38 @@ const schedule=[
 ['12-19','阪神10','中山10','中京11','阪神11','中山11'],['12-20','中山10','阪神10','中京11','中山11','阪神11'],
 ['12-26','中山9','阪神10','中山10','阪神11','中山11'],['12-27','中山9','阪神10','中山10','阪神11','中山11']
 ].map(row=>({date:'2026-'+row[0],legs:row.slice(1).map(x=>({venue:x.replace(/[0-9]/g,''),raceNumber:Number(x.match(/[0-9]+/)[0])}))}));
+// The five race identities are sourced from JRA's published 2026 WIN5 list (not inferred from race numbers).
+// Add new officially verified dates before the December 27 list expires.
+const OFFICIAL_SCHEDULE_URL='https://www.jra.go.jp/kouza/win5/info/racelist.html';
 const today=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
 const fmt=n=>Number(n).toLocaleString('ja-JP')+'円';
 const node=(tag,txt)=>{const n=document.createElement(tag);if(txt!==undefined)n.textContent=txt;return n};
 const styles=node('style');
 styles.textContent=`.w5-select{width:auto;max-width:65%;padding:8px}.w5-race{background:#fff;border:1px solid #d5e1ee;border-radius:14px;padding:13px;margin:10px 0;box-shadow:0 3px 12px #112d5008}.w5-race h3{margin:0 0 5px;font-size:15px;color:#102f5c;line-height:1.35}.w5-horses{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.w5-horses button{background:#f1f5fb;color:#193451;border:1.5px solid #c9d8eb;padding:0;display:flex;justify-content:center;align-items:center;min-width:0;min-height:47px;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;border-radius:10px;touch-action:manipulation}.w5-horses button[aria-pressed=true]{background:#174e9a;border:2px solid #174e9a;color:#fff;box-shadow:0 2px 7px #113f8130}.w5-horses button:disabled{opacity:.45}.w5-bar{background:#eef4fd;border:1px solid #c7d9f0;border-radius:14px;padding:13px;margin-top:12px;position:sticky;bottom:calc(74px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 -3px 18px #092b5820}.w5-bar button{width:100%;margin-top:8px}.w5-hist{padding:12px;margin-top:14px;background:#f5f7fa;border-radius:12px}.w5-record{border-top:1px solid #d7e2f0;padding:9px 0;font-size:12px;line-height:1.7}.w5-modal{position:fixed;inset:0;background:#10233dbc;z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px}.w5-dialog{background:#fff;color:#172c4a;width:min(100%,440px);max-height:85dvh;overflow:auto;border-radius:17px;padding:18px;line-height:1.7}.w5-dialog button{margin:5px}.w5-note{font-size:12px;line-height:1.65;color:#596f89}.w5-digital{background:linear-gradient(145deg,#071d3c,#123f79 67%,#245da0);color:white;border-radius:19px;padding:18px 16px;box-shadow:0 10px 27px #061d3d38;overflow:hidden;position:relative}.w5-digital:after{content:"";position:absolute;top:-75px;right:-55px;width:180px;height:180px;border:1px solid #ffffff25;border-radius:50%;pointer-events:none}.w5-digital-head{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #ffffff42;padding-bottom:13px}.w5-digital-brand{font-size:27px;font-weight:900;letter-spacing:1px}.w5-digital-sub{font-size:10px;color:#c7d9f2;letter-spacing:.08em}.w5-digital-state{font-size:10px;background:#ffffff27;border:1px solid #ffffff40;border-radius:20px;padding:5px 9px;white-space:nowrap}.w5-digital-leg{display:grid;grid-template-columns:48px 1fr;gap:9px;border-bottom:1px solid #ffffff24;padding:10px 0;align-items:center}.w5-digital-index{font-size:11px;color:#c0d6f2;font-weight:850}.w5-digital-race{font-size:12px;color:#e2edfa}.w5-digital-picks{font-size:18px;font-weight:850;letter-spacing:.08em;overflow-wrap:anywhere}.w5-digital-foot{display:flex;justify-content:space-between;align-items:end;gap:10px;padding-top:17px}.w5-digital-foot small{display:block;color:#bbd5f5;font-size:10px;margin-bottom:3px}.w5-digital-foot strong{font-size:25px}.w5-digital-code{margin-top:14px;font-size:10px;letter-spacing:.12em;color:#aac9e9;border-top:1px solid #ffffff28;padding-top:9px}.w5-confirm-row{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #e4ebf3}.w5-action-row{display:flex;gap:8px;margin-top:15px}.w5-action-row button{flex:1;min-width:0}.w5-overview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:8px 0 14px}.w5-overview div{text-align:center;background:#edf3fb;border-radius:9px;padding:9px 2px}.w5-overview small{display:block;font-size:10px;color:#58718f}.w5-overview strong{font-size:17px;color:#123d73}.w5-topline{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px}`;
+styles.textContent+=`.w5-source-link{display:inline-block;font-size:11px;color:#2259a1;text-decoration:underline;margin:0 0 8px 2px}.w5-jump{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;position:sticky;top:0;z-index:3;background:#f5f7fb;padding:6px 2px 8px}.w5-jump-button{font-size:15px!important;font-weight:800;padding:8px 2px;background:#eaf0f8!important;color:#33577d!important;border:1px solid #cadaeb!important}.w5-jump-filled{background:#174e9a!important;color:#fff!important;border-color:#174e9a!important}.w5-expired{padding:13px;background:#fff0d9;border:1px solid #ebd2a3;border-radius:11px}.w5-race{scroll-margin-top:70px}.w5-race:focus-within{border-color:#a1bce4}.w5-race h3{letter-spacing:-.02em}`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
-let selectedDate=(schedule.find(x=>x.date>=today())||schedule[schedule.length-1]).date;
+const upcoming=schedule.find(x=>x.date>=today());
+let selectedDate=(upcoming||schedule[schedule.length-1]).date;
+let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','馬番は通常の予想タブと同じ出馬表に連動します。馬番をタップして選択・解除できます。購入・残高・精算はUIプレビューのままです。');note.className='w5-note';
+const note=node('p','JRA公表のWIN5対象5レースと、通常の予想タブの出馬表を組み合わせて表示します。馬番をタップして選択・解除できます。購入処理は未接続です。');note.className='w5-note';
+const sourceLink=node('a','JRA公式のWIN5対象レースを確認');sourceLink.href=OFFICIAL_SCHEDULE_URL;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.className='w5-source-link';
 const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
 const total=node('p'),message=node('p');message.className='w5-note';
 const buy=node('button','購入内容を確認'),clear=node('button','選択をクリア');clear.className='outline';
 bar.append(unitLabel,total,message,buy,clear);
-const history=node('div');history.className='w5-hist';body.append(head,note,races,bar,history);host.replaceChildren(styles,body);
+const history=node('div');history.className='w5-hist';const jump=node('div');jump.className='w5-jump';body.append(head,note,sourceLink,jump,races,bar,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
 // Read exactly the same validated race-card cache used by the regular prediction screen.
 const CARD_KEY='baken-king-personal-cards-v1';
+const readCards=()=>{try{const payload=JSON.parse(localStorage.getItem(CARD_KEY)||'null');return Array.isArray(payload?.races)?payload.races:[]}catch{return []}};
 const getRaces=()=>{
- let cards=[];
- try{const payload=JSON.parse(localStorage.getItem(CARD_KEY)||'null');if(Array.isArray(payload?.races))cards=payload.races}catch{}
+ const cards=readCards();
  return current().legs.map(l=>cards.find(c=>
   c&&c.date===selectedDate&&c.venue===l.venue&&Number(c.raceNumber)===l.raceNumber&&
   Array.isArray(c.horses)&&c.horses.length>0
@@ -52,12 +59,33 @@ function check(){
  Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000;
  return {cards,count,points,price,stake,cutoff,ok};
 }
+function chooseUpcomingFromCards(){
+ if(dateManuallyChosen||!upcoming)return;
+ const availableDates=new Set(readCards().map(c=>c?.date));
+ const preferred=schedule.find(x=>x.date>=today()&&availableDates.has(x.date));
+ if(preferred&&preferred.date!==selectedDate){
+  selectedDate=preferred.date;picks=Array.from({length:5},()=>[]);
+ }
+}
 function render(){
+ chooseUpcomingFromCards();
  const live=getRaces();
  picks=picks.map((numbers,i)=>numbers.filter(n=>live[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
+ const expired=!upcoming;
+ dateSelect.disabled=expired;
+ jump.replaceChildren();
  current().legs.forEach((leg,i)=>{
- const c=x.cards[i],section=node('section');section.className='w5-race';
+  const b=node('button',''+(i+1));
+  b.type='button';b.className='w5-jump-button'+(x.count[i]?' w5-jump-filled':'');
+  b.setAttribute('aria-label','WIN'+(i+1)+' '+leg.venue+leg.raceNumber+'Rへ移動');
+  b.onclick=()=>document.getElementById('w5-leg-'+i)?.scrollIntoView({behavior:'smooth',block:'start'});
+  jump.append(b);
+ });
+ if(expired){const alert=node('p','現在公開済みの日程は2026年12月27日までです。次回の公式対象レース更新を待っています。');alert.className='w5-note w5-expired';races.append(alert)}
+
+ current().legs.forEach((leg,i)=>{
+ const c=x.cards[i],section=node('section');section.className='w5-race';section.id='w5-leg-'+i;
  section.append(node('h3','WIN'+(i+1)+'　'+leg.venue+leg.raceNumber+'R'));
  const t=timeOf(c),sub=node('p',c?((t?t+' 発走 ／ ':'')+c.horses.length+'頭 ／ 選択 '+(x.count[i]?picks[i].filter(n=>c.horses.some(h=>available(h)&&Number(h.number)===n)).join('・'):'なし')):'出馬表の配信待ち');sub.className='w5-note';section.append(sub);
  if(!c?.horses?.length){const waiting=node('p','通常の予想タブにこのレースの馬番が配信されると、ここに自動表示されます。');waiting.className='w5-note';section.append(waiting);}
@@ -69,8 +97,8 @@ function render(){
  b.onclick=()=>{picks[i]=picks[i].includes(n)?picks[i].filter(x=>x!==n):[...picks[i],n].sort((a,b)=>a-b);render()};grid.append(b)});
  section.append(grid)}races.append(section)});
  total.textContent=x.count.every(n=>n>0)?x.points+'点 × '+fmt(x.price)+' ＝ '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5レース ／ 全レース選択で合計表示';
- buy.disabled=!x.ok;
- message.textContent=!x.cards.every(Boolean)?'対象5レースの出馬表を待っています':x.count.some(n=>n===0)?'5レースすべてで1頭以上選択してください':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'プレビュー上限100万円を超えています':'UIプレビュー：残高の変更はありません';
+ buy.disabled=expired||!x.ok;
+ message.textContent=expired?'公開済みの日程が終了しました':!x.cards.every(Boolean)?'対象5レースの出馬表を待っています':x.count.some(n=>n===0)?'5レースすべてで1頭以上選択してください':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'プレビュー上限100万円を超えています':'UIプレビュー：残高の変更はありません';
  history.replaceChildren(node('strong','WIN5 購入履歴'));
  const purchased=demoTickets;
  purchased.slice(-20).reverse().forEach(t=>{
@@ -78,7 +106,7 @@ function render(){
  t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>{const cover=node('div');cover.className='w5-modal';const panel=node('div');panel.className='w5-dialog';panel.append(node('h3','WIN5 デジタル投票券'),digitalTicket(t));const close=node('button','閉じる');close.style.width='100%';close.onclick=()=>cover.remove();panel.append(close);cover.append(panel);document.body.append(cover)};box.append(show);history.append(box)});
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
-dateSelect.onchange=()=>{selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
+dateSelect.onchange=()=>{dateManuallyChosen=true;selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
 unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);render()};
 const demoTickets=[];
 
