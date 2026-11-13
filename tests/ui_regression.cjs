@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 
 const origin='http://127.0.0.1:8765/';
-const approvedTabs=['home','predict','tickets','payout','data'];
+const approvedTabs=['home','predict','tickets','payout','data','win5'];
 const baseSelector='main.wrap > [data-tab]';
 
 (async()=>{
@@ -25,10 +25,20 @@ const baseSelector='main.wrap > [data-tab]';
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('bk-test-mode')),false,
     'A fresh production session must not start in test mode');
 
-  // Freeze the design contract: five tabs, predicted ◎, sideways ticket icon.
+  // Freeze the design contract: six tabs including WIN5, predicted ◎, sideways ticket icon.
   assert.deepEqual(await page.locator('.bottom-nav [data-nav]').evaluateAll(nodes=>nodes.map(n=>n.dataset.nav)),approvedTabs);
   assert.equal(await page.locator('[data-nav="predict"] svg circle').count(),2,'Prediction icon must remain ◎');
   assert.equal(await page.locator('[data-nav="tickets"] svg rect').count(),1,'Ticket icon must stay a horizontal ticket');
+  // WIN5 collection is integrated in its own tab, without modifying the main wallet.
+  await page.locator('.bottom-nav [data-nav="win5"]').click();
+  await page.waitForSelector('[data-tab="win5"]:not([hidden]) #bkWin5Frame');
+  const collectionFrame=page.frameLocator('#bkWin5Frame');
+  await collectionFrame.locator('#wallet').waitFor({state:'visible'});
+  assert.match(await collectionFrame.locator('#wallet').textContent(),/300,000/,'WIN5 wallet starts independently at 300,000');
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')||'null')?.balance??100000),100000,'WIN5 must not alter the main wallet');
+  assert.equal(await page.locator('[data-tab="home"]').first().isVisible(),false,'WIN5 must hide the home panel');
+  await page.locator('.bottom-nav [data-nav="home"]').click();
+
   assert.equal(await page.locator('#bkHomeNextRace').count(),1,'Permanent next-race slot missing');
   assert.equal(await page.locator('#homeToPredict, #homeToPayout, #homeRecent').count(),0,'Removed home controls reappeared');
   assert.equal(await page.locator('#autumnFixtureCard .bk-race-eyebrow').isVisible(),false,'Duplicate race date row returned');
