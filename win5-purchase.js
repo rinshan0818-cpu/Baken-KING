@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const host=document.querySelector('[data-win5-panel="purchase"]');
-if(!host||typeof s==='undefined'||typeof save!=='function')return;
+if(!host)return;
 const schedule=[
 ['11-14','東京10','京都10','福島11','東京11','京都11'],['11-15','東京10','京都10','福島11','東京11','京都11'],
 ['11-21','京都9','福島10','京都10','福島11','京都11'],['11-22','京都9','東京10','京都10','東京11','京都11'],
@@ -24,7 +24,7 @@ let selectedDate=(schedule.find(x=>x.date>=today())||schedule[schedule.length-1]
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','JRAが公表した対象5レースを表示。対象レースが変更される場合があります。公式情報と照合して購入してください。');note.className='w5-note';
+const note=node('p','UIデザイン確認用です。馬名・対象レースはサンプルで、残高・出馬表・精算とは未接続です。');note.className='w5-note';
 const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
 const total=node('p'),message=node('p');message.className='w5-note';
@@ -32,8 +32,8 @@ const buy=node('button','購入内容を確認'),clear=node('button','選択を�
 bar.append(unitLabel,total,message,buy,clear);
 const history=node('div');history.className='w5-hist';body.append(head,note,races,bar,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
-const getCards=()=>{try{return JSON.parse(localStorage.getItem('baken-king-personal-cards-v1')||'null')?.races||[]}catch{return []}};
-const getRaces=()=>current().legs.map(l=>getCards().find(c=>c.date===selectedDate&&c.venue===l.venue&&Number(c.raceNumber)===l.raceNumber)||null);
+const getCards=()=>[];
+const demoNames=['アオゾラ','フューチャー','サンライズ','ブレイブ','スターライト','ミライ','グランプリ','シルバー','エメラルド','レインボー','オーロラ','キング'];const getRaces=()=>current().legs.map((l,i)=>({date:selectedDate,venue:l.venue,raceNumber:l.raceNumber,raceName:'サンプル対象レース '+(i+1),startTime:['14:40','14:50','15:00','15:10','15:20'][i],horses:demoNames.map((name,j)=>({number:j+1,name}))}));
 const timeOf=c=>{const v=String(c?.startTime||c?.scheduledStartAt||'');return v.match(/(?:^|T)([0-2][0-9]:[0-5][0-9])/)?.[1]||''};
 const available=h=>Number.isInteger(Number(h?.number))&&Number(h.number)>=1&&Number(h.number)<=18&&Boolean(h.name)&&h.scratched!==true&&h.cancelled!==true&&h.excluded!==true&&h.status!=='取消'&&h.status!=='除外';
 function check(){
@@ -41,8 +41,8 @@ function check(){
  const points=count.reduce((a,b)=>a*b,1),price=Number(unit.value),stake=points*price;
  const start=timeOf(cards[0]);const cutoff=start?Date.parse(selectedDate+'T'+start+':00+09:00')-300000:NaN;
  const ok=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i])&&
- Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=s.balance&&
- Number.isFinite(cutoff)&&Date.now()<cutoff&&selectedDate>=today()&&!s.seasonOver;
+ Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000&&
+ Number.isFinite(cutoff)&&true&&true;
  return {cards,count,points,price,stake,cutoff,ok};
 }
 function render(){
@@ -61,37 +61,45 @@ function render(){
  section.append(grid)}races.append(section)});
  total.textContent=x.points+'点 × '+fmt(x.price)+' ＝ '+fmt(x.stake);
  buy.disabled=!x.ok;
- message.textContent=!x.cards.every(Boolean)?'対象レースの出馬表配信待ち':!timeOf(x.cards[0])?'第1レースの発走時刻未取得':x.count.some(n=>n===0)?'5レースすべてで1頭以上選択してください':x.points>5000?'5,000点以内にしてください':x.stake>s.balance?'残高不足':Date.now()>=x.cutoff?'販売締切（第1レース5分前）':'現在残高 '+fmt(s.balance)+' ／ 購入後 '+fmt(s.balance-x.stake);
+ message.textContent=!x.cards.every(Boolean)?'対象レースの出馬表配信待ち':!timeOf(x.cards[0])?'第1レースの発走時刻未取得':x.count.some(n=>n===0)?'5レースすべてで1頭以上選択してください':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'サンプル上限100万円を超えています':Date.now()>=x.cutoff?'販売締切（第1レース5分前）':'UIプレビュー：残高の変更はありません';
  history.replaceChildren(node('strong','WIN5 購入履歴'));
- const purchased=Array.isArray(s.win5Tickets)?s.win5Tickets:[];
+ const purchased=demoTickets;
  purchased.slice(-20).reverse().forEach(t=>{
- const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　'+(t.status==='pending'?'結果待ち':'精算済み')));
+ const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　'+('UIプレビュー')));
  t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));history.append(box)});
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
 dateSelect.onchange=()=>{selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
 unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);render()};
+const demoTickets=[];
 buy.onclick=()=>{
  const before=check();if(!before.ok){render();return}
- const overlay=node('div');overlay.className='w5-modal';const dialog=node('div');dialog.className='w5-dialog';
- dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.append(node('h3','WIN5購入内容の確認'));
+ const overlay=node('div');overlay.className='w5-modal';
+ const dialog=node('div');dialog.className='w5-dialog';
+ dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+ dialog.append(node('h3','WIN5購入画面の確認'));
  dialog.append(node('p',selectedDate+'　'+before.points+'点　'+fmt(before.stake)));
  current().legs.forEach((l,i)=>dialog.append(node('p',(i+1)+'　'+l.venue+l.raceNumber+'R：'+picks[i].join('・'))));
- const msg=node('p','仮想資金から引き落とします。結果照合と払戻は次の開発段階です。');msg.className='w5-note';dialog.append(msg);
- const back=node('button','戻る'),confirm=node('button','この内容で購入');back.className='outline';back.onclick=()=>overlay.remove();
+ dialog.append(node('p','これはUIプレビューです。残高・購入履歴・精算データは変更されません。'));
+ const back=node('button','修正に戻る'),confirm=node('button','投票券をプレビュー');
+ back.className='outline';back.onclick=()=>overlay.remove();
  confirm.onclick=()=>{
- const after=check();if(!after.ok||after.stake!==before.stake||after.points!==before.points){overlay.remove();render();return}
- const ticket={id:crypto.randomUUID(),date:selectedDate,season:s.season,purchasedAt:new Date().toISOString(),type:'WIN5',stake:after.stake,unitStake:after.price,points:after.points,paid:0,status:'pending',legs:current().legs.map((l,i)=>({...l,numbers:picks[i].slice(),raceName:after.cards[i].raceName||''}))};
- if(!Array.isArray(s.win5Tickets))s.win5Tickets=[];
- s.win5Tickets.push(ticket);s.balance-=after.stake;s.totalStake+=after.stake;
- try{save()}catch{ s.win5Tickets.pop();s.balance+=after.stake;s.totalStake-=after.stake;overlay.remove();message.textContent='保存に失敗しました';return}
- picks=Array.from({length:5},()=>[]);overlay.remove();render();toast('WIN5を購入しました');
+ const ticket={id:demoTickets.length+1,date:selectedDate,stake:before.stake,unitStake:before.price,points:before.points,status:'preview',legs:current().legs.map((l,i)=>({...l,numbers:picks[i].slice()}))};
+ demoTickets.unshift(ticket);overlay.remove();
+ const ticketOverlay=node('div');ticketOverlay.className='w5-modal';const paper=node('div');paper.className='w5-dialog';
+ paper.append(node('h3','WIN5 投票券・デザインプレビュー'));
+ paper.append(node('p',ticket.date+'　WIN5'));
+ ticket.legs.forEach((leg,i)=>{const row=node('p','WIN'+(i+1)+'　'+leg.venue+leg.raceNumber+'R　'+leg.numbers.join('・'));row.style.borderBottom='1px dashed #a9beaf';row.style.padding='11px';paper.append(row)});
+ paper.append(node('h3',ticket.points+'点　'+fmt(ticket.stake)));
+ paper.append(node('p','UIサンプル：実際の購入は行われていません。'));
+ const done=node('button','閉じる');done.onclick=()=>ticketOverlay.remove();paper.append(done);ticketOverlay.append(paper);document.body.append(ticketOverlay);
+ render();
  };
  dialog.append(back,confirm);overlay.append(dialog);document.body.append(overlay);
  overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};back.focus();
 };
-window.addEventListener('baken:wagers-updated',render);
+
 window.addEventListener('focus',render);
-window.addEventListener('storage',e=>{if(e.key==='baken-king-personal-cards-v1')render()});
+
 render();
 })();
