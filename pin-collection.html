@@ -196,6 +196,28 @@ html.bk-embedded .reveal-dialog .bk-reveal-item img{height:100%;width:42%;object
 html.bk-embedded .reveal-dialog .bk-reveal-item .bk-reveal-label{width:56%;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:clamp(9px,2.8vw,12px);text-align:left;line-height:1.25}
 html.bk-embedded .reveal-dialog:has(.bk-reveal-summary){width:min(100%,470px)}
 @media(max-height:660px){html.bk-embedded .reveal-dialog .bk-reveal-item{height:clamp(48px,9dvh,85px)}}
+
+/* Approved BAKEN-KING case poster: fill the available draw space without scrolling. */
+.bk-hero-poster{display:none}
+html.bk-embedded.bk-draw-fixed .bk-collection-scroll{display:flex;flex-direction:column;min-height:0}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;margin-top:2px!important;padding:9px 10px!important}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>h2{flex:0 0 auto;margin-bottom:6px}
+html.bk-embedded .bk-gacha-hero{border-radius:13px;overflow:hidden}
+html.bk-embedded .bk-gacha-hero .bk-hero-legacy{display:none!important}
+html.bk-embedded .bk-gacha-hero .bk-hero-poster{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;filter:none!important;transform:none!important}
+html.bk-embedded.bk-draw-fixed .bk-gacha-hero{flex:1 1 auto;height:auto!important;min-height:90px;max-height:none;aspect-ratio:auto;margin:0 0 8px!important;padding:0!important;background:#071b38;border:1px solid #cda358}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.summary{flex:0 0 auto;gap:8px}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.summary .metric{min-height:66px;padding:11px}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions{flex:0 0 auto;gap:8px;margin-top:8px}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{min-height:50px;padding:10px 4px}
+html.bk-embedded.bk-draw-fixed [data-gacha-panel]>#message{flex:0 0 auto;margin:7px 0 0;min-height:18px;line-height:1.35}
+@media(max-height:540px){
+ html.bk-embedded.bk-draw-fixed [data-gacha-panel]{padding:6px 8px!important}
+ html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.summary .metric{min-height:48px;padding:7px}
+ html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions{margin-top:5px}
+ html.bk-embedded.bk-draw-fixed [data-gacha-panel]>.actions button{min-height:39px;padding:6px 2px}
+ html.bk-embedded.bk-draw-fixed .bk-gacha-hero{min-height:68px;margin-bottom:5px!important}
+}
 </style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
@@ -216,10 +238,11 @@ html.bk-embedded .reveal-dialog:has(.bk-reveal-summary){width:min(100%,470px)}
  </select></label>
 </div>
 <section class="panel" data-gacha-panel><h2>ガチャ</h2>
-<div class="bk-gacha-hero" aria-label="バッジガチャのサンプル">
- <img src="./assets/badges/display/step-01.webp?v=2" alt="ステップレースのバッジ" loading="eager">
- <img src="./assets/badges/display/derby-normal.webp?v=2" alt="GⅠ通常バッジ" loading="eager">
- <img src="./assets/badges/display/arima-holo.webp?v=2" alt="GⅠホロバッジ" loading="eager">
+<div class="bk-gacha-hero" aria-label="プレミアムメダルコレクション">
+ <img class="bk-hero-poster" src="./assets/badges/collection-hero.webp?v=1" alt="BAKEN-KINGの金縁付き紺色メダルケースと競馬記念バッジ" width="480" height="270" loading="eager" decoding="async">
+ <img class="bk-hero-legacy" src="./assets/badges/display/step-01.webp?v=2" alt="ステップレースのバッジ" loading="lazy">
+ <img class="bk-hero-legacy" src="./assets/badges/display/derby-normal.webp?v=2" alt="GⅠ通常バッジ" loading="lazy">
+ <img class="bk-hero-legacy" src="./assets/badges/display/arima-holo.webp?v=2" alt="GⅠホロバッジ" loading="lazy">
 </div><div class="summary"><div class="metric"><small>所持バリエーション</small><strong id="owned">0 / 98</strong></div><div class="metric"><small>WIN5準備財布</small><strong id="wallet">¥300,000</strong></div><div class="metric"><small>交換ポイント</small><strong id="points">0 pt</strong></div></div><div class="progress"><div id="progressFill" style="width:0%"></div></div><p class="sub" id="progressLabel">未収集：98種類</p><p class="note">これはWIN5機能ができるまでの独立した準備財布です。初回30万円から開始し、通常馬券の残高・精算・購入履歴には一切影響しません。現在、WIN5の的中金はまだ自動入金されません。</p><div class="actions"><button id="drawOne">1回ガチャ ¥5,000</button><button id="drawTen">10連ガチャ ¥45,000</button></div><div class="actions" style="grid-template-columns:1fr"><button type="button" class="secondary" id="drawPoints">1回ガチャ 1,000 pt</button></div><p class="sub">同じバッジを引くとポイントを自動獲得します。ステップレース：30 pt／GⅠ通常版：100 pt／GⅠホロ版：500 pt。1,000 ptで1回引けます。獲得ポイントは重複したバッジを消費せず、所持数も減りません。ポイントはこの端末のコレクションデータに保存されます。</p><p class="sub">ステップレース75%／GⅠ通常21%／GⅠホロ4%。各枠内の対象レースは均等抽選。GⅠは承認済み24レースが対象です。ポイントガチャも同じ確率で、10連の確定枠はありません。</p><p id="message" class="status" role="status" aria-live="polite"></p><div id="result" class="result" hidden></div><p class="sub" id="drawHint">抽選後に開封画面が表示されます。演出はスキップできます。</p></section>
 <section class="panel" data-collection-panel><div class="bk-collection-heading"><h2>GⅠバッジ図鑑</h2><span id="bkCollectionOwned">0 / 98種類収集</span></div><p class="sub" id="g1Status">24レース・通常版とホロ版の48種類を読み込み中。承認済み画像はGitHub登録後に表示されます。</p><div class="tabs" role="group" aria-label="ピンバッジの表示切替"><button data-filter="all" aria-pressed="true">すべて</button><button data-filter="normal" aria-pressed="false">通常版</button><button data-filter="holo" aria-pressed="false">ホロ版</button><button data-filter="owned" aria-pressed="false" class="bk-legacy-filter">所持済み</button><button data-filter="missing" aria-pressed="false" class="bk-legacy-filter">未所持</button></div><div class="bk-collection-select" hidden><label>表示するバッジ <select id="bkG1Filter"><option value="all">すべて（ホロ→通常）</option><option value="holo">ホロのみ</option><option value="normal">通常のみ</option></select></label></div><div id="pins" class="pins"></div><div id="detail" class="detail hidden"></div></section>
 <section class="panel" data-collection-panel id="stepBadgePanel" aria-labelledby="stepBadgeTitle"><h2 id="stepBadgeTitle">ステップレースバッジ</h2><p class="sub bk-step-description">GⅡ＝赤・GⅢ＝緑・L＝ブロンズの全50種。承認済みのオリジナル画像を収録した図鑑です。ガチャで獲得したものはカラー、未所持は暗く表示します。重複時はポイントを獲得できます。</p>
