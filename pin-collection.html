@@ -380,7 +380,7 @@ function render(){
   const legacyRace=RACES.find(r=>r.id===x.r.id);
   if(x.filename&&g1AssetsReady){
    const img=document.createElement('img');img.src=badgeAssetURL({key:x.key,v:x.v,r:x.r});img.alt=x.name+'の'+(x.v==='holo'?'ホロ':'通常')+'バッジ';img.loading='lazy';img.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';
-   if(!state.owned[x.key])img.classList.add('bk-unowned-art');
+   if(!state.owned[x.key]){img.classList.add('bk-unowned-art');bkSolidSilhouette(img);}
    b.append(img);
   }else if(legacyRace){b.innerHTML=pinArtwork(legacyRace,x.v);}
   else{const ph=document.createElement('div');ph.className='g1-placeholder';ph.textContent='画像登録待ち';b.append(ph);}
@@ -390,13 +390,58 @@ function render(){
   b.append(title,badge,count);b.addEventListener('click',()=>showDetail(x.r,x.v));$('pins').append(b);
  }
 }
+
+const bkSilhouetteCache=new Map();
+function bkSolidSilhouette(img){
+ const source=img.getAttribute('src');if(!source)return;
+ img.setAttribute('data-silhouette-source',source);
+ if(!bkSilhouetteCache.has(source)){
+  const job=new Promise(resolve=>{
+   const original=new Image();
+   original.onload=()=>{
+    try{
+     const ratio=Math.min(1,400/Math.max(original.naturalWidth,original.naturalHeight));
+     const w=Math.max(1,Math.round(original.naturalWidth*ratio)),h=Math.max(1,Math.round(original.naturalHeight*ratio));
+     const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+     const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(original,0,0,w,h);
+     const pixels=ctx.getImageData(0,0,w,h),data=pixels.data,n=w*h;
+     const solid=new Uint8Array(n);
+     for(let i=0;i<n;i++)if(data[i*4+3]>45)solid[i]=1;
+     const sealed=solid.slice();
+     for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+      const i=y*w+x;if(solid[i])continue;
+      if((solid[i-1]&&solid[i+1])||(solid[i-w]&&solid[i+w]))sealed[i]=1;
+     }
+     const exterior=new Uint8Array(n),queue=new Int32Array(n);let head=0,tail=0;
+     function enqueue(i){if(!sealed[i]&&!exterior[i]){exterior[i]=1;queue[tail++]=i;}}
+     for(let x=0;x<w;x++){enqueue(x);enqueue((h-1)*w+x);}
+     for(let y=0;y<h;y++){enqueue(y*w);enqueue(y*w+w-1);}
+     while(head<tail){
+      const i=queue[head++],x=i%w,y=(i-x)/w;
+      if(x>0)enqueue(i-1);if(x<w-1)enqueue(i+1);
+      if(y>0)enqueue(i-w);if(y<h-1)enqueue(i+w);
+     }
+     for(let i=0;i<n;i++){
+      const j=i*4;data[j]=30;data[j+1]=32;data[j+2]=36;data[j+3]=exterior[i]?0:255;
+     }
+     ctx.putImageData(pixels,0,0);resolve(canvas.toDataURL('image/png'));
+    }catch(e){resolve(null);}
+   };
+   original.onerror=()=>resolve(null);original.src=source;
+  });
+  bkSilhouetteCache.set(source,job);
+ }
+ bkSilhouetteCache.get(source).then(url=>{
+  if(url&&img.isConnected&&img.getAttribute('data-silhouette-source')===source)img.src=url;
+ });
+}
 function showDetail(r,v){
  const key=itemKey(r,v),n=state.owned[key]||0;
  const item=g1Items.find(x=>x.key===key);
  $('detail').classList.remove('hidden');
  $('detail').replaceChildren();
  if(item?.filename&&g1AssetsReady){
-  const image=document.createElement('img');image.src=badgeAssetURL({key:item.key,v:item.v,r:item.r});image.alt=item.name+'のバッジ';image.style.cssText='display:block;width:100%;max-width:250px;margin:auto;';if(!n)image.classList.add('bk-unowned-art');$('detail').append(image);
+  const image=document.createElement('img');image.src=badgeAssetURL({key:item.key,v:item.v,r:item.r});image.alt=item.name+'のバッジ';image.style.cssText='display:block;width:100%;max-width:250px;margin:auto;';if(!n){image.classList.add('bk-unowned-art');bkSolidSilhouette(image);}$('detail').append(image);
  }else if(RACES.some(x=>x.id===r.id)){const artwork=document.createElement('div');artwork.innerHTML=pinArtwork(r,v);$('detail').append(artwork.firstElementChild);}
  else{const placeholder=document.createElement('div');placeholder.className='g1-placeholder';placeholder.textContent='承認済み画像の登録待ち';$('detail').append(placeholder);}
  const h=document.createElement('h3'),p1=document.createElement('p'),p2=document.createElement('p');p1.className='sub';p2.className='sub';$('detail').append(h,p1,p2);
