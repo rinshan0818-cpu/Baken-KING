@@ -66,6 +66,24 @@
 @keyframes medal-appear{0%{opacity:0;transform:translateY(30px) scale(.77);filter:blur(9px) brightness(1.5)}48%{opacity:.72;filter:blur(3px) brightness(1.25)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) brightness(1)}}
 @keyframes medal-shine{0%{filter:brightness(1.9)}100%{filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){.award-case__lid{animation:none!important}.reveal-card,.reveal-card>.step-medal,.reveal-stage.case-opening::after{animation:none!important}}
+
+/* iPhone-friendly handoff: the case and medal share a composited stage. */
+.reveal-stage.case-opening::before{animation:none;opacity:.45}
+.award-case,.award-case__lid{will-change:transform,opacity}
+.reveal-stage.case-revealed .award-case{opacity:0;transform:translate3d(0,-12px,0) scale(.95);transition:opacity .48s ease-in,transform .55s ease-out;pointer-events:none}
+.reveal-stage.case-revealed .reveal-card{grid-area:1 / 1;position:relative;z-index:3;width:100%;animation:medal-smooth .7s cubic-bezier(.16,.72,.22,1) both;will-change:transform,opacity}
+.reveal-stage.case-revealed .award-case{grid-area:1 / 1}
+.reveal-stage.case-revealed::after{opacity:.7}
+@keyframes medal-smooth{
+  0%{opacity:0;transform:translate3d(0,20px,0) scale(.89)}
+  100%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+/* Avoid per-frame blur/filter work while sliding on mobile Safari. */
+.reveal-stage.case-revealed .reveal-card>.step-medal{animation:none}
+@media(prefers-reduced-motion:reduce){
+ .reveal-stage.case-revealed .reveal-card{animation:none!important;will-change:auto}
+ .reveal-stage.case-revealed .award-case{transition:none!important;opacity:0}
+}
 </style></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
@@ -92,7 +110,7 @@ const POINT_COST=1000;
 const DUPLICATE_POINTS={step:30,normal:100,holo:500};
 const $=id=>document.getElementById(id);
 let filter='all',lastDraw=[],g1Items=[];
-let revealItems=[],revealIndex=-1,revealPreviousFocus=null,revealTimer=null,revealBusy=false;
+let revealItems=[],revealIndex=-1,revealPreviousFocus=null,revealTimer=null,revealFinishTimer=null,revealBusy=false;
 let g1AssetsReady=false;
 function empty(){return {version:1,wallet:INITIAL,points:0,owned:{},history:[]};}
 function valid(v){if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(derby|arima|tenno-autumn|oka|japan-cup)_(normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
@@ -228,6 +246,7 @@ function prepareAwardCase(){
 }
 function beginReveal(drawn){
  if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
+ if(revealFinishTimer!==null){clearTimeout(revealFinishTimer);revealFinishTimer=null;}
  revealBusy=false;revealItems=drawn;revealIndex=-1;revealPreviousFocus=document.activeElement;
  const overlay=$('revealOverlay');overlay.hidden=false;document.body.classList.add('reveal-open');
  $('revealHeading').textContent=drawn.length===10?'10連ガチャ開封':'ガチャ開封';
@@ -237,18 +256,23 @@ function beginReveal(drawn){
  $('revealClose').hidden=true;$('revealSkip').hidden=false;$('revealNext').focus();
 }
 function showRevealedBadge(d){
- revealBusy=false;revealTimer=null;
- if($('revealOverlay').hidden)return;
- const stage=$('revealStage');stage.replaceChildren();
- stage.className='reveal-stage '+(d.v==='holo'?'reveal-holo':d.v==='step'?'reveal-step':'reveal-g1-normal');
+ revealTimer=null;
+ if($('revealOverlay').hidden||!revealBusy)return;
+ const stage=$('revealStage');
+ // Retain the case while the award rises above it: no abrupt DOM replacement.
+ stage.classList.add('case-revealed',d.v==='holo'?'reveal-holo':d.v==='step'?'reveal-step':'reveal-g1-normal');
  const card=document.createElement('div');card.className='reveal-card';
  const name=document.createElement('div');name.className='name';name.textContent=d.v==='step'?d.r.race:d.r.name;
  const status=document.createElement('div');status.className='count'+(d.first?' reveal-new':'');
  status.textContent=d.first?'NEW!':'重複 +'+d.pointsEarned+' pt';
  card.append(drawArt(d),name,status);stage.append(card);
  $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚';
- $('revealNext').disabled=false;
- $('revealNext').textContent=revealIndex===revealItems.length-1?'結果を確認':'次のバッジ';
+ const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ revealFinishTimer=setTimeout(()=>{
+  revealFinishTimer=null;if($('revealOverlay').hidden)return;
+  revealBusy=false;$('revealNext').disabled=false;
+  $('revealNext').textContent=revealIndex===revealItems.length-1?'結果を確認':'次のバッジ';
+ },reduced?20:690);
 }
 function revealNext(){
  if(!revealItems.length||revealBusy)return;
@@ -264,11 +288,12 @@ function revealNext(){
   if(!revealBusy||$('revealOverlay').hidden)return;
   $('revealStage').classList.add('case-opening');
  }));
- revealTimer=setTimeout(()=>showRevealedBadge(d),reduced?90:1030);
+ revealTimer=setTimeout(()=>showRevealedBadge(d),reduced?90:850);
 }
 function revealSkip(){
  if(!revealItems.length)return;
  if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
+ if(revealFinishTimer!==null){clearTimeout(revealFinishTimer);revealFinishTimer=null;}
  revealBusy=false;revealIndex=revealItems.length-1;
  const stage=$('revealStage');stage.className='reveal-stage';stage.replaceChildren();
  const info=document.createElement('div');info.style.cssText='padding:18px;text-align:center;line-height:1.8;color:#f4dfaa;font-weight:700';
@@ -278,6 +303,7 @@ function revealSkip(){
 }
 function closeReveal(){
  if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null;}
+ if(revealFinishTimer!==null){clearTimeout(revealFinishTimer);revealFinishTimer=null;}
  revealBusy=false;
  $('revealOverlay').hidden=true;document.body.classList.remove('reveal-open');
  revealItems=[];revealIndex=-1;
