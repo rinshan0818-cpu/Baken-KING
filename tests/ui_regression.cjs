@@ -99,6 +99,20 @@ const baseSelector='main.wrap > [data-tab]';
   await collectionFrame.locator('#bkUnifiedFilter').selectOption('all');
   assert.equal(await collectionFrame.locator('#pins .pin').count(),48);
   assert.equal(await collectionFrame.locator('#stepBadgePanel').isVisible(),true);
+  // Missing badges must use solid alpha-filled silhouette assets, never
+  // grayscale originals with white gaps inside their decoration.
+  await collectionFrame.locator('#pins .pin.locked img.bk-solid-silhouette').first().waitFor({state:'attached',timeout:15000});
+  const solidG1=await collectionFrame.locator('#pins .pin.locked img.bk-solid-silhouette').first().evaluate(img=>({
+   isGenerated:img.getAttribute('src').startsWith('data:image/png;base64,'),
+   filter:getComputedStyle(img).filter,
+   loaded:img.complete&&img.naturalWidth>0
+  }));
+  assert.equal(solidG1.isGenerated,true,'Missing G1 badge should have an alpha-filled PNG silhouette');
+  assert.equal(solidG1.loaded,true,'Silhouette must decode');
+  await collectionFrame.locator('#stepGrid .step-tile.locked img.bk-solid-silhouette').first().waitFor({state:'attached',timeout:15000});
+  const solidStep=await collectionFrame.locator('#stepGrid .step-tile.locked img.bk-solid-silhouette').first().evaluate(img=>img.getAttribute('src').startsWith('data:image/png;base64,'));
+  assert.equal(solidStep,true,'Missing step badge should also use the filled silhouette');
+
   assert.equal((await collectionFrame.locator('#bkUnifiedOwned').textContent()).includes('98種類収集'),true);
   assert.equal(await collectionFrame.locator('[data-collection-panel]').first().isVisible(),true,'Collection view must be reachable');
   assert.equal(await collectionFrame.locator('[data-gacha-panel]').isVisible(),false,'Draw controls must be hidden in collection view');
