@@ -139,7 +139,7 @@ async function loadStepCatalog(){
   if(data.count!==50||!Array.isArray(data.entries)||data.entries.length!==50)throw Error('種類数が不正です');
   const numbers=new Set();
   for(const entry of data.entries){
-   if(!Number.isInteger(entry.number)||entry.number<1||entry.number>50||numbers.has(entry.number)||!['G2','G3','L'].includes(entry.grade)||entry.rarity!==3||typeof entry.race!=='string'||typeof entry.filename!=='string'||!/^\\d{2}_[^/\\\\]+\\.png$/.test(entry.filename))throw Error('図鑑データが不正です');
+   if(!Number.isInteger(entry.number)||entry.number<1||entry.number>50||numbers.has(entry.number)||!['G2','G3','L'].includes(entry.grade)||entry.rarity!==3||typeof entry.race!=='string'||typeof entry.filename!=='string'||!entry.filename.startsWith(String(entry.number).padStart(2,'0')+'_')||!entry.filename.endsWith('.png')||entry.filename.includes('/')||entry.filename.includes(String.fromCharCode(92)))throw Error('図鑑データが不正です');
    numbers.add(entry.number);
   }
   stepEntries=data.entries.sort((a,b)=>a.number-b.number);displayStepBadges();
