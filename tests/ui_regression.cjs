@@ -31,12 +31,18 @@ const baseSelector='main.wrap > [data-tab]';
   assert.equal(await page.locator('[data-nav="tickets"] svg rect').count(),1,'Ticket icon must stay a horizontal ticket');
   // WIN5 collection is integrated in its own tab, without modifying the main wallet.
   await page.locator('.bottom-nav [data-nav="win5"]').click();
-  await page.waitForSelector('[data-tab="win5"]:not([hidden]) #bkWin5Frame');
+  await page.waitForSelector('[data-tab="win5"]:not([hidden]) [data-win5-panel="purchase"]:not([hidden])');
+  assert.equal(await page.locator('[data-win5-panel="gacha"]').isVisible(),false,'Gacha must be hidden on the purchase page');
+  await page.locator('[data-win5-section="gacha"]').click();
+  await page.waitForSelector('[data-win5-panel="gacha"]:not([hidden]) #bkWin5Frame');
   const collectionFrame=page.frameLocator('#bkWin5Frame');
   await collectionFrame.locator('#wallet').waitFor({state:'visible'});
   assert.match(await collectionFrame.locator('#wallet').textContent(),/300,000/,'WIN5 wallet starts independently at 300,000');
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('keiba-demo-v1')||'null')?.balance??100000),100000,'WIN5 must not alter the main wallet');
   assert.equal(await page.locator('[data-tab="home"]').first().isVisible(),false,'WIN5 must hide the home panel');
+  await page.locator('[data-win5-section="purchase"]').click();
+  assert.equal(await page.locator('[data-win5-panel="gacha"]').isVisible(),false,'Purchase page must hide the gacha');
+  assert.equal(await page.locator('[data-win5-panel="purchase"]').isVisible(),true,'Purchase page must be visible');
   await page.locator('.bottom-nav [data-nav="home"]').click();
 
   assert.equal(await page.locator('#bkHomeNextRace').count(),1,'Permanent next-race slot missing');
