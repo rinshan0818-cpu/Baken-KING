@@ -24,7 +24,7 @@ let selectedDate=(schedule.find(x=>x.date>=today())||schedule[schedule.length-1]
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','UIプレビュー：馬番をタップして選択・解除できます。対象レースや出走頭数はサンプルです。残高・出馬表・精算とは未接続です。');note.className='w5-note';
+const note=node('p','馬番は通常の予想タブと同じ出馬表に連動します。馬番をタップして選択・解除できます。購入・残高・精算はUIプレビューのままです。');note.className='w5-note';
 const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
 const total=node('p'),message=node('p');message.className='w5-note';
@@ -32,7 +32,16 @@ const buy=node('button','購入内容を確認'),clear=node('button','選択を�
 bar.append(unitLabel,total,message,buy,clear);
 const history=node('div');history.className='w5-hist';body.append(head,note,races,bar,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
-const demoCounts=[16,14,12,18,15];const getRaces=()=>current().legs.map((l,i)=>({date:selectedDate,venue:l.venue,raceNumber:l.raceNumber,raceName:'',startTime:['14:40','14:50','15:00','15:10','15:20'][i],horses:Array.from({length:demoCounts[i]},(_,j)=>({number:j+1,name:'サンプル馬'}))}));
+// Read exactly the same validated race-card cache used by the regular prediction screen.
+const CARD_KEY='baken-king-personal-cards-v1';
+const getRaces=()=>{
+ let cards=[];
+ try{const payload=JSON.parse(localStorage.getItem(CARD_KEY)||'null');if(Array.isArray(payload?.races))cards=payload.races}catch{}
+ return current().legs.map(l=>cards.find(c=>
+  c&&c.date===selectedDate&&c.venue===l.venue&&Number(c.raceNumber)===l.raceNumber&&
+  Array.isArray(c.horses)&&c.horses.length>0
+ )||null);
+};
 const timeOf=c=>{const v=String(c?.startTime||c?.scheduledStartAt||'');return v.match(/(?:^|T)([0-2][0-9]:[0-5][0-9])/)?.[1]||''};
 const available=h=>Number.isInteger(Number(h?.number))&&Number(h.number)>=1&&Number(h.number)<=18&&Boolean(h.name)&&h.scratched!==true&&h.cancelled!==true&&h.excluded!==true&&h.status!=='取消'&&h.status!=='除外';
 function check(){
@@ -40,17 +49,18 @@ function check(){
  const points=count.reduce((a,b)=>a*b,1),price=Number(unit.value),stake=points*price;
  const start=timeOf(cards[0]);const cutoff=start?Date.parse(selectedDate+'T'+start+':00+09:00')-300000:NaN;
  const ok=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i])&&
- Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000&&
- true;
+ Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000;
  return {cards,count,points,price,stake,cutoff,ok};
 }
 function render(){
+ const live=getRaces();
+ picks=picks.map((numbers,i)=>numbers.filter(n=>live[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
  current().legs.forEach((leg,i)=>{
  const c=x.cards[i],section=node('section');section.className='w5-race';
- section.append(node('h3','WIN'+(i+1)+'　'+leg.venue+leg.raceNumber+'R　'+(c?.raceName||'')));
- const t=timeOf(c),sub=node('p',(t?t+' 発走':'発走時刻未取得')+' ／ '+(c?.horses?.length||0)+'頭 ／ 選択 '+(picks[i].length?picks[i].join('・'):'なし'));sub.className='w5-note';section.append(sub);
- if(!c?.horses?.length)section.append(node('p','出馬表の配信待ち'));
+ section.append(node('h3','WIN'+(i+1)+'　'+leg.venue+leg.raceNumber+'R'));
+ const t=timeOf(c),sub=node('p',c?((t?t+' 発走 ／ ':'')+c.horses.length+'頭 ／ 選択 '+(x.count[i]?picks[i].filter(n=>c.horses.some(h=>available(h)&&Number(h.number)===n)).join('・'):'なし')):'出馬表の配信待ち');sub.className='w5-note';section.append(sub);
+ if(!c?.horses?.length){const waiting=node('p','通常の予想タブにこのレースの馬番が配信されると、ここに自動表示されます。');waiting.className='w5-note';section.append(waiting);}
  else{
  const grid=node('div');grid.className='w5-horses';
  c.horses.slice().sort((a,b)=>Number(a.number)-Number(b.number)).forEach(h=>{
@@ -60,7 +70,7 @@ function render(){
  section.append(grid)}races.append(section)});
  total.textContent=x.count.every(n=>n>0)?x.points+'点 × '+fmt(x.price)+' ＝ '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5レース ／ 全レース選択で合計表示';
  buy.disabled=!x.ok;
- message.textContent=!x.cards.every(Boolean)?'対象レースの出馬表配信待ち':!timeOf(x.cards[0])?'第1レースの発走時刻未取得':x.count.some(n=>n===0)?'5レースすべてで1頭以上選択してください':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'サンプル上限100万円を超えています':'UIプレビュー：残高の変更はありません';
+ message.textContent=!x.cards.every(Boolean)?'対象5レースの出馬表を待っています':x.count.some(n=>n===0)?'5レースすべてで1頭以上選択してください':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'プレビュー上限100万円を超えています':'UIプレビュー：残高の変更はありません';
  history.replaceChildren(node('strong','WIN5 購入履歴'));
  const purchased=demoTickets;
  purchased.slice(-20).reverse().forEach(t=>{
@@ -123,7 +133,10 @@ buy.onclick=()=>{
  overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};back.focus();
 };
 
+window.addEventListener('baken:cards-imported',render);
+window.addEventListener('storage',event=>{if(event.key===CARD_KEY)render()});
 window.addEventListener('focus',render);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
 
 render();
 })();
