@@ -296,24 +296,12 @@ function beginReveal(drawn){
  $('revealNext').disabled=false;$('revealNext').hidden=false;$('revealNext').textContent='ケースを開く';
  $('revealClose').hidden=true;$('revealSkip').hidden=false;$('revealNext').focus();
 }
-async function showRevealedBadge(d,token){
+function showRevealedBadge(d,token,art){
  revealTimer=null;
  if($('revealOverlay').hidden||!revealBusy||token!==revealLoadToken)return;
  const stage=$('revealStage');
- const art=await waitForBadge(d);
- if($('revealOverlay').hidden||!revealBusy||token!==revealLoadToken)return;
- if(!art){
-  revealBusy=false;revealRetry=true;
-  stage.classList.add('case-revealed');
-  const message=document.createElement('p');message.className='image-load-error';
-  message.textContent='バッジ画像を読み込めませんでした。通信状況を確認して再読み込みしてください。';
-  stage.append(message);
-  $('revealNext').disabled=false;$('revealNext').textContent='画像を再読み込み';
-  $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚 — 画像読み込みエラー';
-  return;
- }
+ // The image was fully loaded and decoded before the case started opening.
  revealRetry=false;
- // Keep the opening case in the DOM and crossfade the already decoded image.
  stage.classList.add('case-revealed',d.v==='holo'?'reveal-holo':d.v==='step'?'reveal-step':'reveal-g1-normal');
  const card=document.createElement('div');card.className='reveal-card';
  const name=document.createElement('div');name.className='name';name.textContent=d.v==='step'?d.r.race:d.r.name;
@@ -329,7 +317,7 @@ async function showRevealedBadge(d,token){
   $('revealNext').textContent=revealIndex===revealItems.length-1?'結果を確認':'次のバッジ';
  },reduced?20:690);
 }
-function revealNext(){
+async function revealNext(){
  if(!revealItems.length||revealBusy)return;
  if(!revealRetry&&revealIndex>=revealItems.length-1){closeReveal();return;}
  if(revealRetry){
@@ -338,16 +326,25 @@ function revealNext(){
  revealRetry=false;
  const d=revealItems[revealIndex],token=++revealLoadToken;
  revealBusy=true;$('revealNext').disabled=true;
- preloadBadge(d);
  prepareAwardCase();
+ $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚 — 画像を準備中';
+ $('revealNext').textContent='画像を準備中…';
+ // Keep the lid closed until the image is ready; never pause mid-opening.
+ const art=await waitForBadge(d);
+ if(token!==revealLoadToken||$('revealOverlay').hidden||!revealBusy)return;
+ if(!art){
+  revealBusy=false;revealRetry=true;
+  $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚 — 読み込みエラー';
+  $('revealNext').disabled=false;$('revealNext').textContent='画像を再読み込み';
+  return;
+ }
  $('revealCount').textContent=(revealIndex+1)+' / '+revealItems.length+'枚 — 開封中';
  const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- // Two animation frames let Safari paint the closed case before the lid opens.
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  if(!revealBusy||$('revealOverlay').hidden)return;
+  if(token!==revealLoadToken||!revealBusy||$('revealOverlay').hidden)return;
   $('revealStage').classList.add('case-opening');
  }));
- revealTimer=setTimeout(()=>showRevealedBadge(d,token),reduced?90:850);
+ revealTimer=setTimeout(()=>showRevealedBadge(d,token,art),reduced?90:960);
 }
 function revealSkip(){
  if(!revealItems.length)return;
