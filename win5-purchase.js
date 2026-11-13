@@ -123,7 +123,7 @@ function render(){
  demoSwitch.textContent=demoMode?'実際の出馬表に戻す':'デモ表示で操作する';
  demoSwitch.setAttribute('aria-pressed',String(demoMode));
  const live=getRaces();
- picks=picks.map((numbers,i)=>numbers.filter(n=>live[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)));
+ picks=picks.map((numbers,i)=>!live[i]?numbers:numbers.filter(n=>live[i].horses.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
  storeDraft();
  const expired=!demoMode&&!upcoming&&selectedDate>=today();
