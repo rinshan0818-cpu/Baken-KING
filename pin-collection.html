@@ -84,7 +84,13 @@
  .reveal-stage.case-revealed .reveal-card{animation:none!important;will-change:auto}
  .reveal-stage.case-revealed .award-case{transition:none!important;opacity:0}
 }
-.image-load-error{position:relative;z-index:3;max-width:260px;margin:25px auto;color:#f8e0a7;font-size:13px;line-height:1.7;text-align:center}.reveal-stage.case-revealed .image-load-error{grid-area:1/1}.reveal-stage.case-revealed .award-case{grid-area:1/1}</style></head><body>
+.image-load-error{position:relative;z-index:3;max-width:260px;margin:25px auto;color:#f8e0a7;font-size:13px;line-height:1.7;text-align:center}.reveal-stage.case-revealed .image-load-error{grid-area:1/1}.reveal-stage.case-revealed .award-case{grid-area:1/1}/* Embedded view inside the main app's WIN5 tab. Preserve standalone page layout. */
+html.bk-embedded,html.bk-embedded body{background:#f2f5fa}
+html.bk-embedded body{padding-bottom:24px}
+html.bk-embedded header{display:none}
+html.bk-embedded main{padding:1px 9px 24px;max-width:780px}
+html.bk-embedded main>.panel:first-child{margin-top:9px}
+</style><script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('bk-embedded');</script></head><body>
 <header><div class="inner"><a href="./index.html">‹ Baken-KINGに戻る</a><h1>ピンバッジコレクション</h1><p>GⅠの通常・ホログラムとステップレースのバッジを集めよう。</p></div></header>
 <main>
 <section class="panel"><h2>コレクション</h2><div class="summary"><div class="metric"><small>所持バリエーション</small><strong id="owned">0 / 98</strong></div><div class="metric"><small>WIN5準備財布</small><strong id="wallet">¥300,000</strong></div><div class="metric"><small>交換ポイント</small><strong id="points">0 pt</strong></div></div><div class="progress"><div id="progressFill" style="width:0%"></div></div><p class="sub" id="progressLabel">未収集：98種類</p><p class="note">これはWIN5機能ができるまでの独立した準備財布です。初回30万円から開始し、通常馬券の残高・精算・購入履歴には一切影響しません。現在、WIN5の的中金はまだ自動入金されません。</p><div class="actions"><button id="drawOne">1回ガチャ ¥5,000</button><button id="drawTen">10連ガチャ ¥45,000</button></div><div class="actions" style="grid-template-columns:1fr"><button type="button" class="secondary" id="drawPoints">1回ガチャ 1,000 pt</button></div><p class="sub">同じバッジを引くとポイントを自動獲得します。ステップレース：30 pt／GⅠ通常版：100 pt／GⅠホロ版：500 pt。1,000 ptで1回引けます。獲得ポイントは重複したバッジを消費せず、所持数も減りません。ポイントはこの端末のコレクションデータに保存されます。</p><p class="sub">ステップレース75%／GⅠ通常21%／GⅠホロ4%。各枠内の対象レースは均等抽選。GⅠは承認済み24レースが対象です。ポイントガチャも同じ確率で、10連の確定枠はありません。</p><p id="message" class="status" role="status" aria-live="polite"></p><div id="result" class="result" hidden></div><p class="sub" id="drawHint">抽選後に開封画面が表示されます。演出はスキップできます。</p></section>
