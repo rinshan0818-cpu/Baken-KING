@@ -2384,6 +2384,15 @@ main.wrap > section.bk-home[data-tab="home"]:not([hidden]){box-sizing:border-box
 @supports not (height:100dvh){#bkWin5Frame{height:calc(100vh - 216px)}}
 .bottom-nav button[data-nav="win5"] .bk-nav-icon svg{width:25px;height:25px}
 @media(max-width:390px){.bk-win5-screen{padding:9px 5px 5px}.bottom-nav button{font-size:10px!important}}
+/* Compact WIN5 layout: override the global 3/2-column section-nav rules. */
+section[data-tab="win5"] .bk-win5-subnav{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;position:static!important;padding:0!important;margin:5px 3px 10px!important;border:0!important;background:transparent!important}
+section[data-tab="win5"] .bk-win5-subnav>button,section[data-tab="win5"] .bk-win5-subnav>button:nth-child(n){grid-column:auto!important;width:100%;min-height:40px!important;padding:9px 6px!important;font-size:14px!important;background:#edf2fb!important;color:#123e74!important;border-radius:10px!important}
+section[data-tab="win5"] .bk-win5-subnav>button[aria-pressed="true"]{background:#0b2d5b!important;color:#fff!important}
+.bk-win5-screen{padding:11px 10px 6px!important;margin-top:10px!important}
+.bk-win5-heading{font-size:18px;margin:0 5px 4px!important}
+.bk-win5-description{font-size:11px;line-height:1.45;margin:0 5px 6px}
+#bkWin5Frame{height:calc(100dvh - 296px);min-height:360px;max-height:840px;background:#fff}
+@supports not (height:100dvh){#bkWin5Frame{height:calc(100vh - 296px)}}
 /* Subnavigation matches the data tab, with independent WIN5 purchase and gacha panes. */
 .bk-win5-subnav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:9px 3px 13px}
 .bk-win5-subnav button{min-height:44px;border-radius:11px;background:#eef3ef;color:#48614f;font-size:14px;font-weight:750;padding:9px}
