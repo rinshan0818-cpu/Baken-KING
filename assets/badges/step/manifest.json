@@ -1,0 +1,459 @@
+{
+  "version": "2026-11-13",
+  "status": "approved-50-on-github",
+  "count": 50,
+  "rarity": 3,
+  "assetBase": "assets/badges/step",
+  "entries": [
+    {
+      "id": "step-01",
+      "number": 1,
+      "race": "チューリップ賞",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "01_チューリップ賞_競馬メダル.png",
+      "githubBlobSha": "5832d9fb8f4fe009c3ca704878dcaec3e361f240"
+    },
+    {
+      "id": "step-02",
+      "number": 2,
+      "race": "フィリーズレビュー",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "02_華麗な競馬記念章_フィリーズレビュー.png",
+      "githubBlobSha": "0b87386ea1282017fde35d01f9f78060d0fe9846"
+    },
+    {
+      "id": "step-03",
+      "number": 3,
+      "race": "アネモネS",
+      "grade": "L",
+      "rarity": 3,
+      "filename": "03_華麗なアネモネs競馬バッジ.png",
+      "githubBlobSha": "181b660cd236c3e3269e6fe3cf5b4e5a5a796da8"
+    },
+    {
+      "id": "step-04",
+      "number": 4,
+      "race": "弥生賞",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "04_弥生賞トライアル記念章.png",
+      "githubBlobSha": "cac653ef075bd582240e4c1543ce585c89ab13e0"
+    },
+    {
+      "id": "step-05",
+      "number": 5,
+      "race": "スプリングS",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "05_華麗なスプリングs競馬章紋.png",
+      "githubBlobSha": "fe284dd36220ce69d947a04abb01159c0178bce0"
+    },
+    {
+      "id": "step-06",
+      "number": 6,
+      "race": "若葉S",
+      "grade": "L",
+      "rarity": 3,
+      "filename": "06_伝統競馬バッジ_若葉s.png",
+      "githubBlobSha": "c735b2d96fa074c1f554b0f5e7f695004585b51f"
+    },
+    {
+      "id": "step-07",
+      "number": 7,
+      "race": "ニュージーランドT",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "07_ニュージーランドt_栄光の競馬章.png",
+      "githubBlobSha": "e590ed8dc7c19b7ec0fa4101fd04b34f48d2f62b"
+    },
+    {
+      "id": "step-08",
+      "number": 8,
+      "race": "チャーチルダウンズC",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "08_giiiエメラルド競馬メダルバッジ.png",
+      "githubBlobSha": "614c85ef410f4b7295760a255c5aa22e11a67255"
+    },
+    {
+      "id": "step-09",
+      "number": 9,
+      "race": "フローラS",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "09_競馬エンブレム_フローラs.png",
+      "githubBlobSha": "b38a5263e19ae9f511ad67de472b5f335e9e3869"
+    },
+    {
+      "id": "step-10",
+      "number": 10,
+      "race": "スイートピーS",
+      "grade": "L",
+      "rarity": 3,
+      "filename": "10_クラシック競馬メダリオン_スイートピーs.png",
+      "githubBlobSha": "aee98f81c29b45d335f2e01456ec1cd8bcf74791"
+    },
+    {
+      "id": "step-11",
+      "number": 11,
+      "race": "青葉賞",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "11_青葉賞_ロードトゥ日本ダービー徽章.png",
+      "githubBlobSha": "31fe684ed73ef8c8d03a9a86335d2fb907f1585f"
+    },
+    {
+      "id": "step-12",
+      "number": 12,
+      "race": "プリンシパルS",
+      "grade": "L",
+      "rarity": 3,
+      "filename": "12_競走馬モチーフの金章_プリンシパルs.png",
+      "githubBlobSha": "1d370c0b14cb2fc273dbc0349890338fbc14cf25"
+    },
+    {
+      "id": "step-13",
+      "number": 13,
+      "race": "紫苑S",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "13_トライアル競馬章_紫苑s.png",
+      "githubBlobSha": "780901a2c55d88ab8fe551ae6bc3ad7ada4a3b15"
+    },
+    {
+      "id": "step-14",
+      "number": 14,
+      "race": "ローズS",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "14_ローズs_金章バッジ.png",
+      "githubBlobSha": "8b79eac8ecc4f6fa023ec2f7e8c8d846c10f2cd8"
+    },
+    {
+      "id": "step-15",
+      "number": 15,
+      "race": "セントライト記念",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "15_セントライト記念_レーシングバッジ.png",
+      "githubBlobSha": "63ae1762f712060d0db27b7901567b974fe767a3"
+    },
+    {
+      "id": "step-16",
+      "number": 16,
+      "race": "神戸新聞杯",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "16_神戸新聞杯_菊花賞への道標.png",
+      "githubBlobSha": "a0f955e3ae1cf193baee6941346c5ad0c24bad6d"
+    },
+    {
+      "id": "step-17",
+      "number": 17,
+      "race": "プロキオンS",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "17_金色月桂冠のプロキオンs競馬章.png",
+      "githubBlobSha": "904da727584f828b5a3f6ad054bf2880381ad86b"
+    },
+    {
+      "id": "step-18",
+      "number": 18,
+      "race": "根岸S",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "18_競走馬シルエットの根岸sエンブレム.png",
+      "githubBlobSha": "29c8d70e875bd643709d9fae715e3da18b131305"
+    },
+    {
+      "id": "step-19",
+      "number": 19,
+      "race": "阪急杯",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "19_阪急杯_ゴールド競馬メダル.png",
+      "githubBlobSha": "1c697410133cffcd1353a88c6413e644b0525f30"
+    },
+    {
+      "id": "step-20",
+      "number": 20,
+      "race": "オーシャンS",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "20_オーシャンs_ロードトゥ高松宮記念バッジ.png",
+      "githubBlobSha": "4f5000a511fad6039df3d5bfbc48f3a6c0d6c76e"
+    },
+    {
+      "id": "step-21",
+      "number": 21,
+      "race": "中山記念",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "21_中山記念_G2.png",
+      "githubBlobSha": "4415e363dbb7fd3c3e699353ef1300b99d2f8084"
+    },
+    {
+      "id": "step-22",
+      "number": 22,
+      "race": "金鯱賞",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "22_金鯱賞_G2.png",
+      "githubBlobSha": "e963d2633fb6881cacd8ba9bceab50d622925e05"
+    },
+    {
+      "id": "step-23",
+      "number": 23,
+      "race": "阪神大賞典",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "23_阪神大賞典_G2.png",
+      "githubBlobSha": "581b199a0e9bed15e70e8f900d930a1e61530cbb"
+    },
+    {
+      "id": "step-24",
+      "number": 24,
+      "race": "日経賞",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "24_日経賞_G2.png",
+      "githubBlobSha": "bab86276f9a6259b883f1fa7a67796d761010c6d"
+    },
+    {
+      "id": "step-25",
+      "number": 25,
+      "race": "阪神牝馬S",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "25_阪神牝馬S_G2.png",
+      "githubBlobSha": "835301580ff8f22ef26e1cb27babf8355b864f9d"
+    },
+    {
+      "id": "step-26",
+      "number": 26,
+      "race": "福島牝馬S",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "26_福島牝馬S_G3.png",
+      "githubBlobSha": "acd3500a73651753cba0d4675bd2d7d1d1ba9135"
+    },
+    {
+      "id": "step-27",
+      "number": 27,
+      "race": "マイラーズC",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "27_マイラーズC_G2.png",
+      "githubBlobSha": "a6b59ac544e4bd873cbf4c5b53aefcd95ddb40f7"
+    },
+    {
+      "id": "step-28",
+      "number": 28,
+      "race": "京王杯SC",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "28_京王杯SC_G2.png",
+      "githubBlobSha": "c2136db587277f558b103a13030873636ab37b71"
+    },
+    {
+      "id": "step-29",
+      "number": 29,
+      "race": "キーンランドC",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "29_キーンランドC_G3.png",
+      "githubBlobSha": "4caee779c7344cb3aa7f6fb6e162856702165868"
+    },
+    {
+      "id": "step-30",
+      "number": 30,
+      "race": "セントウルS",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "30_セントウルS_G2.png",
+      "githubBlobSha": "c895d2b221e193e3084bfb27fd5ce36185906822"
+    },
+    {
+      "id": "step-31",
+      "number": 31,
+      "race": "オールカマー",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "31_金色縁取りのオールカマー記念メダル.png",
+      "githubBlobSha": "028caced1ac71c3b84515c6ce5e826ab08dd2ee8"
+    },
+    {
+      "id": "step-32",
+      "number": 32,
+      "race": "毎日王冠",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "32_毎日王冠_ゴールド記章.png",
+      "githubBlobSha": "fcaf2ad98b3f38af846eabb80a44a080f36ab214"
+    },
+    {
+      "id": "step-33",
+      "number": 33,
+      "race": "京都大賞典",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "33_京都大賞典_ゴールドエンブレム.png",
+      "githubBlobSha": "26736ca6ef885f0c8ef8cf65fee055193326b3ab"
+    },
+    {
+      "id": "step-34",
+      "number": 34,
+      "race": "アイルランドT",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "34_アイルランドt_競馬エンブレム.png",
+      "githubBlobSha": "01bfb493971724d99db4c6158e2afe098247a68a"
+    },
+    {
+      "id": "step-35",
+      "number": 35,
+      "race": "スワンS",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "35_スワンs_栄光の競走章.png",
+      "githubBlobSha": "d9ea11e9e73316266d78984bba3eb93cffb3fa50"
+    },
+    {
+      "id": "step-36",
+      "number": 36,
+      "race": "富士S",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "36_富士s_金賞メダルバッジ.png",
+      "githubBlobSha": "f4e1c2156c0c8f818470bd87f9a478616762231f"
+    },
+    {
+      "id": "step-37",
+      "number": 37,
+      "race": "みやこS",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "37_精巧な金縁エメラルド競馬メダル_みやこs.png",
+      "githubBlobSha": "d1cdbbeeb6cc66a6be85ea932f65438c2ef19874"
+    },
+    {
+      "id": "step-38",
+      "number": 38,
+      "race": "武蔵野S",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "38_武蔵野s_金賞競馬メダル.png",
+      "githubBlobSha": "33365b699e0ff51358acd57d12781ab8411a24ad"
+    },
+    {
+      "id": "step-39",
+      "number": 39,
+      "race": "東京スポーツ杯2歳S",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "39_金色の輝き_東京スポーツ杯メダルバッジ.png",
+      "githubBlobSha": "60f2099a5a09e9cac5f34f7c021416ae9206ca3d"
+    },
+    {
+      "id": "step-40",
+      "number": 40,
+      "race": "京王杯2歳S",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "40_京王杯2歳s_ゴールドメダル.png",
+      "githubBlobSha": "7112d4fe07f63f9baa947899b551df4ea7183b57"
+    },
+    {
+      "id": "step-41",
+      "number": 41,
+      "race": "サウジアラビアRC",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "41_栄光のサウジアラビアrcメダル.png",
+      "githubBlobSha": "bc0e3b7aab6a0911ab1283d700b313d7dcc38a67"
+    },
+    {
+      "id": "step-42",
+      "number": 42,
+      "race": "アルテミスS",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "42_アルテミスs_ゴールド競馬メダル.png",
+      "githubBlobSha": "126f44fcfa680e9f91f31db902691818f25b773a"
+    },
+    {
+      "id": "step-43",
+      "number": 43,
+      "race": "京都2歳S",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "43_京都2歳s_ゴールドメダリオン.png",
+      "githubBlobSha": "41de0b63e2de4a1e0550f37dda0cc590518c7526"
+    },
+    {
+      "id": "step-44",
+      "number": 44,
+      "race": "共同通信杯",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "44_giii共同通信杯ゴールドバッジ.png",
+      "githubBlobSha": "ba14d170e23a7039b0d69ee3343347dbf07617a0"
+    },
+    {
+      "id": "step-45",
+      "number": 45,
+      "race": "京成杯",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "45_京成杯_giii_ゴールドエンブレム.png",
+      "githubBlobSha": "fd0d6fde30503ab1e313fff0b15324376c5ef0de"
+    },
+    {
+      "id": "step-46",
+      "number": 46,
+      "race": "きさらぎ賞",
+      "grade": "G3",
+      "rarity": 3,
+      "filename": "46_きさらぎ賞_giii_ゴールドバッジ.png",
+      "githubBlobSha": "6a3996c40325416de6cc6bbee46c1b0e79de4b67"
+    },
+    {
+      "id": "step-47",
+      "number": 47,
+      "race": "京都新聞杯",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "47_華麗な京都新聞杯メダルバッジ.png",
+      "githubBlobSha": "5d3396ac1be32e2ce583a14af2a24f99b3b8ed86"
+    },
+    {
+      "id": "step-48",
+      "number": 48,
+      "race": "札幌記念",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "48_輝く金章の札幌記念バッジ.png",
+      "githubBlobSha": "11a2dacf6d50cf81916eb9215273b8b5194d1b06"
+    },
+    {
+      "id": "step-49",
+      "number": 49,
+      "race": "アルゼンチン共和国杯",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "49_アルゼンチン共和国杯の華麗な競馬章.png",
+      "githubBlobSha": "c5fbf7af90ee1895e2df225b20d62105b76a3470"
+    },
+    {
+      "id": "step-50",
+      "number": 50,
+      "race": "京都記念",
+      "grade": "G2",
+      "rarity": 3,
+      "filename": "50_京都記念_gii_エンブレム.png",
+      "githubBlobSha": "a8c9b99c7718e5bca3cf3512c54dd5cd4588ad75"
+    }
+  ]
+}
