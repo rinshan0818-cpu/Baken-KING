@@ -2521,6 +2521,10 @@ window.BakenWin5Wallet={
   const cardKey='baken-king-personal-cards-v1';
   if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
   if(s.seasonOver)return {ok:false,error:'シーズン終了中は購入できません'};
+  const requestId=typeof request.requestId==='string'?request.requestId:'';
+  if(!/^[a-zA-Z0-9-]{10,100}$/.test(requestId))return {ok:false,error:'購入リクエストが不正です'};
+  const existing=(Array.isArray(s.win5Tickets)?s.win5Tickets:[]).find(t=>t.requestId===requestId);
+  if(existing)return {ok:true,ticket:existing,duplicate:true};
   const date=request.date,unit=Number(request.unitStake),legs=request.legs;
   if(typeof date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Array.isArray(legs)||legs.length!==5)return {ok:false,error:'対象5レースが不正です'};
   const localToday=new Date(Date.now()+9*3600000).toISOString().slice(0,10);
@@ -2550,7 +2554,7 @@ window.BakenWin5Wallet={
   if(!Number.isSafeInteger(stake)||points>5000||stake>1000000)return {ok:false,error:'点数・購入額が上限を超えています'};
   if(stake>s.balance)return {ok:false,error:'残高が不足しています'};
   if(!Number.isSafeInteger(s.totalStake+stake))return {ok:false,error:'累計購入額が上限を超えています'};
-  const ticket={id:'win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),date,season:s.season,unitStake:unit,points,stake,paid:0,status:'pending',purchasedAt:new Date().toISOString(),legs:normalized};
+  const ticket={id:'win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),requestId,date,season:s.season,unitStake:unit,points,stake,paid:0,status:'pending',purchasedAt:new Date().toISOString(),legs:normalized};
   const prior={balance:s.balance,totalStake:s.totalStake,win5Tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():null};
   try{
    s.win5Tickets=[...(prior.win5Tickets||[]),ticket];
@@ -3775,7 +3779,13 @@ function bkValidBackupState(v){
  Array.isArray(v.seasons)&&v.seasons.length<=10000&&
  ['balance','totalStake','totalPaid','grants'].every(k=>Number.isSafeInteger(v[k])&&v[k]>=0)&&
  ['season','bankrupt','manualRestarts'].every(k=>Number.isSafeInteger(v[k])&&v[k]>=0)&&
- v.season>=1&&v.bets.every(b=>b&&typeof b==='object'&&!Array.isArray(b)&&
+ v.season>=1&&(!('win5Tickets' in v)||(Array.isArray(v.win5Tickets)&&v.win5Tickets.length<=100000&&v.win5Tickets.every(t=>
+ t&&typeof t==='object'&&!Array.isArray(t)&&typeof t.date==='string'&&Number.isSafeInteger(t.season)&&t.season>=1&&
+ Number.isSafeInteger(t.stake)&&t.stake>=100&&Number.isSafeInteger(t.points)&&t.points>=1&&
+ Number.isSafeInteger(t.unitStake)&&t.unitStake>=100&&Array.isArray(t.legs)&&t.legs.length===5&&
+ t.legs.every(l=>l&&typeof l.venue==='string'&&Number.isInteger(l.raceNumber)&&Array.isArray(l.numbers)&&l.numbers.length>0&&l.numbers.length<=18&&l.numbers.every(n=>Number.isInteger(n)&&n>=1&&n<=18))&&
+ ['pending','settled','refunded'].includes(t.status)&&Number.isSafeInteger(t.paid)&&t.paid>=0
+ )))&&v.bets.every(b=>b&&typeof b==='object'&&!Array.isArray(b)&&
  Number.isSafeInteger(b.stake)&&b.stake>=0&&
  (b.status==='pending'||b.status==='settled'||b.status==='paid'||b.status==='lost'||b.status==='refunded'||b.status==='final')&&
  (b.paid==null||(Number.isSafeInteger(b.paid)&&b.paid>=0)));
