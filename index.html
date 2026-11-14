@@ -4647,8 +4647,10 @@ bkTicketRaceTitle=function(b){
  async function registerVerifiedResults(payload,automatic=false){
   {
    if(!automatic&&payload?.format==='BAKEN_KING_SPECIAL_RESULT')return registerSpecialManualResult(payload);
-   if(automatic&&(!payload||!Array.isArray(payload.races)||!payload.races.length))return 0;
-   if(payload.schemaVersion!==1||!Array.isArray(payload.races)||!payload.races.length)throw Error('結果JSONの形式が違います');
+   if(automatic&&(!payload||!Array.isArray(payload.races)))return 0;
+   if(payload.schemaVersion!==1||!Array.isArray(payload.races))throw Error('結果JSONの形式が違います');
+   // WIN5 dividends can be published after all five individual race results.
+   // Process them even when the ordinary results list is empty.
    // WIN5 consumes only confirmed official race results; a missing WIN5 payout never becomes an estimated credit.
    window.BakenWin5Wallet?.ingestVerifiedResults?.(payload);
    window.BakenWin5Wallet?.ingestVerifiedWin5Payouts?.(payload);
