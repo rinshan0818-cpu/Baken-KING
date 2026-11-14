@@ -4692,8 +4692,11 @@ bkTicketRaceTitle=function(b){
    // WIN5 dividends can be published after all five individual race results.
    // Process them even when the ordinary results list is empty.
    // WIN5 consumes only confirmed official race results; a missing WIN5 payout never becomes an estimated credit.
-   window.BakenWin5Wallet?.ingestVerifiedResults?.(payload);
-   window.BakenWin5Wallet?.ingestVerifiedWin5Payouts?.(payload);
+   // Importer tests execute this function without a browser window; keep legacy result imports standalone.
+   if(typeof window!=='undefined'){
+    window.BakenWin5Wallet?.ingestVerifiedResults?.(payload);
+    window.BakenWin5Wallet?.ingestVerifiedWin5Payouts?.(payload);
+   }
    const orderedTypes=new Set(['馬単','三連単']);
    const validTypes=['単勝','複勝','馬連','馬単','ワイド','三連複','三連単'];
    const candidates=[];
