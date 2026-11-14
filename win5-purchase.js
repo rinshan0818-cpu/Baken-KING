@@ -186,16 +186,17 @@ function render(){
  const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　'+ticketStateLabel(t)));
  if(t.win5Evaluation?.complete===true){
   const outcome=t.win5Evaluation;
-  const resultLine=node('p',outcome.void?'WIN5開催無効・全額返還':outcome.hitCount>0?'的中組合せ '+outcome.hitCount+'点 ／ WIN5公式払戻金の確認待ち':'不的中 ／ 返還 '+fmt(outcome.refundYen));
+  const resultLine=node('p',outcome.void?'WIN5開催無効・全額返還':outcome.hitCount>0?'的中組合せ '+outcome.hitCount+'点 ／ '+(t.win5PayoutReady?'払戻 '+fmt(t.win5OfficialPayout.totalYen):'WIN5公式払戻金の確認待ち'):'不的中 ／ 返還 '+fmt(outcome.refundYen));
   resultLine.className='w5-note';box.append(resultLine);
  }
 
  t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);
- if(t.status==='pending'&&t.win5Evaluation?.complete===true&&t.win5Evaluation.hitCount===0){
-  const settle=node('button',t.win5Evaluation.refundYen>0?'返還を精算する':'不的中を精算する');
+ if(t.status==='pending'&&t.win5Evaluation?.complete===true&&(t.win5Evaluation.hitCount===0||t.win5PayoutReady===true)){
+  const settle=node('button',t.win5Evaluation.hitCount>0?'WIN5的中を精算する':t.win5Evaluation.refundYen>0?'返還を精算する':'不的中を精算する');
   settle.className='w5-settle-btn';settle.type='button';
   settle.onclick=()=>{
-   if(!window.confirm('WIN5の結果を確認し、'+fmt(t.win5Evaluation.refundYen)+'を精算して履歴を確定しますか？'))return;
+   const amount=t.win5PayoutReady?t.win5OfficialPayout?.totalYen:t.win5Evaluation.refundYen;
+   if(!window.confirm('WIN5の確定結果と払戻 '+fmt(amount)+'を確認して精算しますか？'))return;
    const outcome=wallet()?.settle?.(t.id);
    if(!outcome?.ok){window.alert(outcome?.error||'精算できませんでした');return}
    render();
@@ -215,7 +216,7 @@ unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);rende
 const demoTickets=[];
 const wallet=()=>window.BakenWin5Wallet;
 const walletSnapshot=()=>wallet()?.snapshot?.()||null;
-const ticketStateLabel=t=>t.status==='preview'?'UIプレビュー':t.status==='settled'?'精算済み':t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?'WIN5払戻金待ち':'精算待ち'):'結果待ち';
+const ticketStateLabel=t=>t.status==='preview'?'UIプレビュー':t.status==='settled'?'精算済み':t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?(t.win5PayoutReady?'的中・精算待ち':'WIN5払戻金待ち'):'精算待ち'):'結果待ち';
 
 
 function digitalTicket(ticket){
@@ -269,7 +270,7 @@ function modal(title,body,actions){
 function showTicket(ticket){
  const body=node('div','w5-history-preview');
  body.append(digitalTicket(ticket));
- const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':ticket.status==='settled'?'精算済みの購入記録です。':ticket.win5Evaluation?.hitCount>0?'5レースの結果を確認しました。WIN5公式払戻金が未取得のため精算待機中です。':'購入記録は保存されています。確定結果を取得後、履歴から精算できます。');hint.className='w5-ticket-hint';body.append(hint);
+ const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':ticket.status==='settled'?'精算済みの購入記録です。':ticket.win5PayoutReady?'WIN5公式払戻 '+fmt(ticket.win5OfficialPayout?.totalYen)+'を確認済み。購入履歴から精算できます。':ticket.win5Evaluation?.hitCount>0?'5レースの結果を確認しました。WIN5公式払戻金が未取得のため精算待機中です。':'購入記録は保存されています。確定結果を取得後、履歴から精算できます。');hint.className='w5-ticket-hint';body.append(hint);
  const closeButton=node('button','閉じる');let close;
  closeButton.onclick=()=>close();
  close=modal('WIN5 デジタル投票券',body,[closeButton]);
