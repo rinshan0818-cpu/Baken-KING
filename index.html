@@ -2516,6 +2516,24 @@ function save(){
 // WIN5 wallet bridge: only invoked on the isolated development branch's real-card purchase path.
 // Records are embedded in the primary state and therefore in the existing full backup.
 window.BakenWin5Wallet={
+ ingestVerifiedWin5Payouts:payload=>{
+  const engine=window.BakenWin5PayoutEngine;
+  if(!engine||payload?.schemaVersion!==1||!Array.isArray(payload.win5)||!Array.isArray(s.win5Tickets))return 0;
+  let updated=0;
+  for(const ticket of s.win5Tickets){
+   if(ticket?.status!=='pending'||ticket.win5Evaluation?.complete!==true||
+      ticket.win5Evaluation.hitCount<=0||ticket.win5PayoutReady===true)continue;
+   const matching=payload.win5.filter(p=>p?.date===ticket.date);
+   if(matching.length!==1)continue;
+   const checked=engine.checkedRecord(matching[0],ticket);
+   if(!checked.ok)continue;
+   ticket.win5OfficialPayout=checked;
+   ticket.win5PayoutReady=true;
+   updated++;
+  }
+  if(updated)save();
+  return updated;
+ },
  ingestVerifiedResults:payload=>{
   const engine=window.BakenWin5ResultEngine;
   if(!engine||!Array.isArray(payload?.races)||!Array.isArray(s.win5Tickets))return 0;
@@ -2538,9 +2556,12 @@ window.BakenWin5Wallet={
   if(ticket.status==='settled')return {ok:true,ticket,duplicate:true};
   const result=ticket.win5Evaluation;
   if(ticket.status!=='pending'||result?.complete!==true)return {ok:false,error:'5レースすべての確定結果を待っています'};
-  if(result.hitCount>0)return {ok:false,error:'的中しています。WIN5公式払戻金を確認するまで精算できません'};
-  const paid=result.refundYen;
-  if(!Number.isSafeInteger(paid)||paid<0||paid>ticket.stake||!Number.isSafeInteger(s.balance+paid)||!Number.isSafeInteger(s.totalPaid+paid))
+  if(result.hitCount>0&&!ticket.win5PayoutReady)return {ok:false,error:'的中しています。WIN5公式払戻金を確認するまで精算できません'};
+  const paid=result.hitCount>0?ticket.win5OfficialPayout?.totalYen:result.refundYen;
+  if(result.hitCount>0&&(!ticket.win5OfficialPayout||ticket.win5OfficialPayout.hitCount!==result.hitCount||
+     ticket.win5OfficialPayout.refundYen!==result.refundYen||ticket.win5OfficialPayout.source!=='JRA_WIN5'))
+    return {ok:false,error:'WIN5の払戻データが一致しません'};
+  if(!Number.isSafeInteger(paid)||paid<0||(result.hitCount===0&&paid>ticket.stake)||!Number.isSafeInteger(s.balance+paid)||!Number.isSafeInteger(s.totalPaid+paid))
    return {ok:false,error:'返還額を確認できません'};
   const prev={balance:s.balance,totalPaid:s.totalPaid,status:ticket.status,paid:ticket.paid};
   try{
@@ -4630,6 +4651,7 @@ bkTicketRaceTitle=function(b){
    if(payload.schemaVersion!==1||!Array.isArray(payload.races)||!payload.races.length)throw Error('結果JSONの形式が違います');
    // WIN5 consumes only confirmed official race results; a missing WIN5 payout never becomes an estimated credit.
    window.BakenWin5Wallet?.ingestVerifiedResults?.(payload);
+   window.BakenWin5Wallet?.ingestVerifiedWin5Payouts?.(payload);
    const orderedTypes=new Set(['馬単','三連単']);
    const validTypes=['単勝','複勝','馬連','馬単','ワイド','三連複','三連単'];
    const candidates=[];
@@ -4895,4 +4917,4 @@ try{const saved=localStorage.getItem(cardStorageKey);if(saved)importCardData(JSO
 loadAuthorizedCards();
 date.addEventListener('change',()=>{if(cards.length)syncImportedOptions();show();window.dispatchEvent(new Event('baken:cards-imported'))});venue.addEventListener('change',()=>{if(cards.length)syncImportedOptions();show();window.dispatchEvent(new Event('baken:cards-imported'))});race.addEventListener('change',()=>{show();window.dispatchEvent(new Event('baken:cards-imported'))});
 })();
-</script><script src="./monitor-target-export.js?v=4" defer></script><script src="./monitor-lifecycle.js?v=2" defer></script><script src="./monitor-auto-sync.js?v=4" defer></script><script src="./race-card-auto-sync.js?v=5" defer></script><script src="./result-auto-sync.js?v=4" defer></script><script src="./push-notifications.js?v=7" defer></script><script src="./settings-surface.js?v=6" defer></script><script src="./race-diagnostics.js?v=1" defer></script><script src="./friend-cloud-sync.js?v=4" defer></script><script src="./app-next-cloud.js?v=4" defer></script><script src="./app-next-monitor.js?v=6" defer></script><script src="./win5-results-engine.js?v=1"></script><script src="./win5-purchase.js?v=1"></script></body></html>
+</script><script src="./monitor-target-export.js?v=4" defer></script><script src="./monitor-lifecycle.js?v=2" defer></script><script src="./monitor-auto-sync.js?v=4" defer></script><script src="./race-card-auto-sync.js?v=5" defer></script><script src="./result-auto-sync.js?v=4" defer></script><script src="./push-notifications.js?v=7" defer></script><script src="./settings-surface.js?v=6" defer></script><script src="./race-diagnostics.js?v=1" defer></script><script src="./friend-cloud-sync.js?v=4" defer></script><script src="./app-next-cloud.js?v=4" defer></script><script src="./app-next-monitor.js?v=6" defer></script><script src="./win5-results-engine.js?v=1"></script><script src="./win5-payouts-engine.js?v=1"></script><script src="./win5-purchase.js?v=1"></script></body></html>
