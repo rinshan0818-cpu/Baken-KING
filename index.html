@@ -2515,9 +2515,16 @@ function save(){
 }
 // WIN5 wallet bridge: only invoked on the isolated development branch's real-card purchase path.
 // Records are embedded in the primary state and therefore in the existing full backup.
-const BK_WIN5_LIVE_PURCHASES=false; // Production-safe rollout; do not enable before verified payout automation.
+// Temporary production gate: only the verified 2026-11-15 WIN5 can debit game balance.
+// This does NOT activate a real JRA purchase or bypass the unverified WIN5 payout hold.
+const BK_WIN5_LIVE_DATE='2026-11-15';
+const BK_WIN5_LIVE_LEGS=[
+ ['東京',10],['京都',10],['福島',11],['東京',11],['京都',11]
+];
+const bkWin5Today=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+const bkWin5BuyingEnabled=()=>bkWin5Today()===BK_WIN5_LIVE_DATE;
 window.BakenWin5Wallet={
- enabled:()=>BK_WIN5_LIVE_PURCHASES,
+ enabled:()=>bkWin5BuyingEnabled(),
  monitorSnapshot:()=>s.win5Watch&&typeof s.win5Watch==='object'?JSON.parse(JSON.stringify(s.win5Watch)):null,
  watch:request=>{
   if(!request||!/^20\d{2}-\d{2}-\d{2}$/.test(request.date)||!Array.isArray(request.legs)||request.legs.length!==5)return {ok:false,error:'監視日・対象レースを確認できません'};
@@ -2614,7 +2621,11 @@ window.BakenWin5Wallet={
  },
  snapshot:()=>({balance:s.balance,season:s.season,seasonOver:s.seasonOver,mode:IS_TEST_MODE?'test':'production',tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():[]}),
  purchase:request=>{
-  if(!BK_WIN5_LIVE_PURCHASES)return {ok:false,error:'WIN5の本購入は自動精算の確認が完了するまで停止しています'};
+  if(!bkWin5BuyingEnabled())return {ok:false,error:'WIN5の本購入は11月15日限定です'};
+  if(request?.date!==BK_WIN5_LIVE_DATE)return {ok:false,error:'11月15日のWIN5のみ購入できます'};
+  if(!Array.isArray(request.legs)||request.legs.length!==BK_WIN5_LIVE_LEGS.length||
+     request.legs.some((leg,i)=>leg?.venue!==BK_WIN5_LIVE_LEGS[i][0]||leg?.raceNumber!==BK_WIN5_LIVE_LEGS[i][1]))
+    return {ok:false,error:'JRA公式のWIN5対象5レースと一致しません'};
   const cardKey='baken-king-personal-cards-v1';
   if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
   if(s.seasonOver)return {ok:false,error:'シーズン終了中は購入できません'};
@@ -2639,16 +2650,22 @@ window.BakenWin5Wallet={
    if(nums.length!==leg.numbers.length||nums.some(n=>!Number.isInteger(n)||n<1||n>18))return {ok:false,error:'馬番が不正です'};
    const card=cards.find(c=>c.date===date&&c.venue===leg.venue&&c.raceNumber===leg.raceNumber);
    if(!card||!Array.isArray(card.horses)||!card.horses.length)return {ok:false,error:'出馬表がまだありません'};
-   const allGood=nums.every(n=>card.horses.some(h=>Number(h.number)===n&&h.scratched!==true&&h.cancelled!==true&&h.excluded!==true&&h.status!=='取消'&&h.status!=='除外'));
+   const allGood=nums.every(n=>card.horses.some(h=>Number(h.number)===n&&Boolean(String(h.name||'').trim())&&h.scratched!==true&&h.cancelled!==true&&h.excluded!==true&&h.status!=='取消'&&h.status!=='除外'));
    if(!allGood)return {ok:false,error:'選べない馬番が含まれています'};
    normalized.push({venue:leg.venue,raceNumber:leg.raceNumber,numbers:nums});
   }
   const first=cards.find(c=>c.date===date&&c.venue===normalized[0].venue&&c.raceNumber===normalized[0].raceNumber);
   const firstAt=Date.parse(String(first?.scheduledStartAt||''));
   if(!Number.isFinite(firstAt))return {ok:false,error:'発売締切時刻を確認できません'};
+  // Never use a future-dated or incorrectly ordered race card to extend the deadline.
+  const allRaceTimes=normalized.map(l=>cards.find(c=>c.date===date&&c.venue===l.venue&&c.raceNumber===l.raceNumber)?.scheduledStartAt)
+   .map(v=>Date.parse(String(v||'')));
+  if(allRaceTimes.some(t=>!Number.isFinite(t))||allRaceTimes.some((t,i)=>i>0&&t<=allRaceTimes[i-1]))
+   return {ok:false,error:'対象5レースの発走時刻を確認できません'};
   if(Date.now()>=firstAt-300000)return {ok:false,error:'WIN5の購入締切を過ぎています'};
   const points=normalized.reduce((n,leg)=>n*leg.numbers.length,1),stake=points*unit;
   if(!Number.isSafeInteger(stake)||points>5000||stake>1000000)return {ok:false,error:'点数・購入額が上限を超えています'};
+  if(!Number.isSafeInteger(s.balance)||s.balance<0)return {ok:false,error:'ゲーム内残高が不正です'};
   if(stake>s.balance)return {ok:false,error:'残高が不足しています'};
   if(!Number.isSafeInteger(s.totalStake+stake))return {ok:false,error:'累計購入額が上限を超えています'};
   const ticket={id:'win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),requestId,date,season:s.season,unitStake:unit,points,stake,paid:0,status:'pending',purchasedAt:new Date().toISOString(),legs:normalized};
