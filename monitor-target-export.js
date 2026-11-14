@@ -10,7 +10,7 @@
   function read(key){
     try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}
   }
-  function extractTargets(bets,cards){
+  function extractTargets(bets,cards,win5Tickets=[]){
     if(!Array.isArray(bets)||!Array.isArray(cards))return [];
     const starts=new Map();
     for(const c of cards){
@@ -34,6 +34,16 @@
       if(!Number.isFinite(start))continue;
       result.set(key,{date:b.raceDate,venue:b.raceVenue,raceNumber:number});
     }
+    // WIN5 adds only race identifiers, never selections, stakes or balances.
+    if(Array.isArray(win5Tickets))for(const ticket of win5Tickets){
+      if(!ticket||ticket.status!=='pending'||ticket.win5Evaluation?.complete===true||!datePattern.test(ticket.date)||!Array.isArray(ticket.legs)||ticket.legs.length!==5)continue;
+      for(const leg of ticket.legs){
+        if(!leg||!VENUES.has(leg.venue)||!Number.isInteger(leg.raceNumber)||leg.raceNumber<1||leg.raceNumber>12)continue;
+        const key=ticket.date+'|'+leg.venue+'|'+leg.raceNumber;
+        if(!Number.isFinite(starts.get(key)))continue;
+        result.set(key,{date:ticket.date,venue:leg.venue,raceNumber:leg.raceNumber});
+      }
+    }
     return [...result.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.venue.localeCompare(b.venue,'ja')||a.raceNumber-b.raceNumber);
   }
   window.BakenMonitoringTargets={extractTargets};
@@ -54,7 +64,7 @@
       const state=read(BETS_KEY);
       const stored=read(CARDS_KEY);
       const cards=Array.isArray(stored)?stored:stored?.races;
-      const targets=extractTargets(state?.bets,cards);
+      const targets=extractTargets(state?.bets,cards,state?.win5Tickets);
       if(!targets.length){msg.textContent='対象レースなし。発走時刻付きの出馬表と購入済み・未精算馬券を確認してください。';return}
       const payload={schemaVersion:1,kind:'baken-monitor-targets',targets};
       const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
