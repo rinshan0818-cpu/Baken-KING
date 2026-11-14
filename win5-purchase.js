@@ -76,7 +76,7 @@ let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','JRA公表のWIN5対象5レースと、通常の予想タブの出馬表を組み合わせて表示します。馬番をタップして選択・解除できます。購入処理は未接続です。');note.className='w5-note';
+const note=node('p','WIN5対象5レースを公式一覧と通常の出馬表に合わせて表示します。現在、本購入は検証のため停止中。デモ表示では残高を使わず操作できます。');note.className='w5-note';
 const sourceLink=node('a','JRA公式のWIN5対象レースを確認');sourceLink.href=OFFICIAL_SCHEDULE_URL;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.className='w5-source-link';
 const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
@@ -132,7 +132,7 @@ function check(){
  const snapshot=walletSnapshot();
  const validCard=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i]);
  const purchaseWindow=demoMode||(selectedDate>=today()&&Number.isFinite(cutoff)&&Date.now()<cutoff);
- const enough=demoMode||Boolean(snapshot&&!snapshot.seasonOver&&stake<=snapshot.balance);
+ const enough=demoMode||Boolean(isLivePurchaseEnabled()&&snapshot&&!snapshot.seasonOver&&stake<=snapshot.balance);
  const ok=validCard&&Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000&&purchaseWindow&&enough;
  return {cards,count,points,price,stake,cutoff,ok};
 }
@@ -179,7 +179,7 @@ function render(){
  total.textContent=x.count.every(n=>n>0)?x.points+'点・合計 '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5 レース';
  buy.disabled=expired||!x.ok;
  const snapshot=walletSnapshot();
- message.textContent=expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
+ message.textContent=!demoMode&&!isLivePurchaseEnabled()?'本購入は現在停止中：デモ表示で操作できます':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
  const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  purchased.slice(-20).reverse().forEach(t=>{
@@ -216,6 +216,7 @@ unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);rende
 const demoTickets=[];
 const wallet=()=>window.BakenWin5Wallet;
 const walletSnapshot=()=>wallet()?.snapshot?.()||null;
+const isLivePurchaseEnabled=()=>wallet()?.enabled?.()===true;
 const ticketStateLabel=t=>t.status==='preview'?'UIプレビュー':t.status==='settled'?'精算済み':t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?(t.win5PayoutReady?'的中・精算待ち':'WIN5払戻金待ち'):'精算待ち'):'結果待ち';
 
 
