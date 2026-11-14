@@ -2493,7 +2493,7 @@ const initial=()=>({season:1,balance:100000,grants:100000,totalStake:0,totalPaid
 const horses=['サンプルスター','グリーンホープ','ミライウインド','トウキョードリーム','アオゾラランナー','ゴールドリーフ','ラッキーセブン','ブルームーン'];const specs={'単勝':1,'複勝':1,'枠連':2,'馬連':2,'ワイド':2,'馬単':2,'三連複':3,'三連単':3};const ordered=new Set(['馬単','三連単']);const payouts={'単勝':{'7':450},'複勝':{'7':180,'2':240,'3':160},'枠連':{'2-7':900},'馬連':{'2-7':2450},'ワイド':{'2-7':740,'3-7':510,'2-3':660},'馬単':{'7-2':5100},'三連複':{'2-3-7':3200},'三連単':{'7-2-3':15320}};
 const $=id=>document.getElementById(id),fmt=n=>Math.round(n).toLocaleString('ja-JP')+'円';function bkAdvanceSeasonIfGameOver(){
  // Only after every current-season ticket has been settled. Never reset an open wager.
- if(s.balance>=100||s.bets.some(b=>b.season===s.season&&b.status==='pending'))return false;
+ if(s.balance>=100||s.bets.some(b=>b.season===s.season&&b.status==='pending')||(Array.isArray(s.win5Tickets)&&s.win5Tickets.some(t=>t.season===s.season&&t.status==='pending')))return false;
  if(!s.seasonOver)s.bankrupt=(Number(s.bankrupt)||0)+1;
  if(!Array.isArray(s.seasons))s.seasons=[];
  s.seasons.push({id:s.season,reason:'ゲームオーバー',balance:s.balance});
@@ -2512,7 +2512,59 @@ function save(){
  render();
  window.dispatchEvent(new Event('baken:wagers-updated'));
  if(advanced)toast('ゲームオーバー。過去の記録を保存し、次のシーズンへ進みました（10万円支給）');
-}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2800)}let selected=[];function keyFor(type,nums){return ordered.has(type)||specs[type]===1?nums.join('-'):nums.slice().sort((a,b)=>a-b).join('-')}
+}
+// WIN5 wallet bridge: only invoked on the isolated development branch's real-card purchase path.
+// Records are embedded in the primary state and therefore in the existing full backup.
+window.BakenWin5Wallet={
+ snapshot:()=>({balance:s.balance,season:s.season,seasonOver:s.seasonOver,mode:IS_TEST_MODE?'test':'production',tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():[]}),
+ purchase:request=>{
+  const cardKey='baken-king-personal-cards-v1';
+  if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
+  if(s.seasonOver)return {ok:false,error:'シーズン終了中は購入できません'};
+  const date=request.date,unit=Number(request.unitStake),legs=request.legs;
+  if(typeof date!=='string'||!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||!Array.isArray(legs)||legs.length!==5)return {ok:false,error:'対象5レースが不正です'};
+  const localToday=new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+  if(date<localToday)return {ok:false,error:'過去開催日は購入できません'};
+  if(!Number.isSafeInteger(unit)||unit<100||unit%100!==0)return {ok:false,error:'100円単位で入力してください'};
+  let cards;try{const stored=JSON.parse(localStorage.getItem(cardKey)||'null');cards=stored?.races}catch{}
+  if(!Array.isArray(cards))return {ok:false,error:'出馬表を取得できません'};
+  const normalized=[],used=new Set();
+  for(const leg of legs){
+   if(!leg||typeof leg.venue!=='string'||!Number.isInteger(leg.raceNumber)||!Array.isArray(leg.numbers)||leg.numbers.length<1||leg.numbers.length>18)return {ok:false,error:'買い目に不備があります'};
+   const id=leg.venue+'|'+leg.raceNumber;
+   if(used.has(id))return {ok:false,error:'対象レースが重複しています'};
+   used.add(id);
+   const nums=[...new Set(leg.numbers)].sort((a,b)=>a-b);
+   if(nums.length!==leg.numbers.length||nums.some(n=>!Number.isInteger(n)||n<1||n>18))return {ok:false,error:'馬番が不正です'};
+   const card=cards.find(c=>c.date===date&&c.venue===leg.venue&&c.raceNumber===leg.raceNumber);
+   if(!card||!Array.isArray(card.horses)||!card.horses.length)return {ok:false,error:'出馬表がまだありません'};
+   const allGood=nums.every(n=>card.horses.some(h=>Number(h.number)===n&&h.scratched!==true&&h.cancelled!==true&&h.excluded!==true&&h.status!=='取消'&&h.status!=='除外'));
+   if(!allGood)return {ok:false,error:'選べない馬番が含まれています'};
+   normalized.push({venue:leg.venue,raceNumber:leg.raceNumber,numbers:nums});
+  }
+  const first=cards.find(c=>c.date===date&&c.venue===normalized[0].venue&&c.raceNumber===normalized[0].raceNumber);
+  const firstAt=Date.parse(String(first?.scheduledStartAt||''));
+  if(!Number.isFinite(firstAt))return {ok:false,error:'発売締切時刻を確認できません'};
+  if(Date.now()>=firstAt-300000)return {ok:false,error:'WIN5の購入締切を過ぎています'};
+  const points=normalized.reduce((n,leg)=>n*leg.numbers.length,1),stake=points*unit;
+  if(!Number.isSafeInteger(stake)||points>5000||stake>1000000)return {ok:false,error:'点数・購入額が上限を超えています'};
+  if(stake>s.balance)return {ok:false,error:'残高が不足しています'};
+  if(!Number.isSafeInteger(s.totalStake+stake))return {ok:false,error:'累計購入額が上限を超えています'};
+  const ticket={id:'win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),date,season:s.season,unitStake:unit,points,stake,paid:0,status:'pending',purchasedAt:new Date().toISOString(),legs:normalized};
+  const prior={balance:s.balance,totalStake:s.totalStake,win5Tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():null};
+  try{
+   s.win5Tickets=[...(prior.win5Tickets||[]),ticket];
+   s.balance-=stake;s.totalStake+=stake;
+   save();
+   return {ok:true,ticket};
+  }catch(e){
+   s.balance=prior.balance;s.totalStake=prior.totalStake;
+   if(prior.win5Tickets===null)delete s.win5Tickets;else s.win5Tickets=prior.win5Tickets;
+   return {ok:false,error:'購入記録の保存に失敗しました'};
+  }
+ }
+};
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2800)}let selected=[];function keyFor(type,nums){return ordered.has(type)||specs[type]===1?nums.join('-'):nums.slice().sort((a,b)=>a-b).join('-')}
 
 /* Multi-combination ticket builder. A ticket contains picks[] and one unit stake. */
 let betMode='normal',formationLegs=[[],[],[]],activeFormationLeg=0;
