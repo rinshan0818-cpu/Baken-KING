@@ -2515,7 +2515,9 @@ function save(){
 }
 // WIN5 wallet bridge: only invoked on the isolated development branch's real-card purchase path.
 // Records are embedded in the primary state and therefore in the existing full backup.
+const BK_WIN5_LIVE_PURCHASES=false; // Production-safe rollout; do not enable before verified payout automation.
 window.BakenWin5Wallet={
+ enabled:()=>BK_WIN5_LIVE_PURCHASES,
  ingestVerifiedWin5Payouts:payload=>{
   const engine=window.BakenWin5PayoutEngine;
   if(!engine||payload?.schemaVersion!==1||!Array.isArray(payload.win5)||!Array.isArray(s.win5Tickets))return 0;
@@ -2575,6 +2577,7 @@ window.BakenWin5Wallet={
  },
  snapshot:()=>({balance:s.balance,season:s.season,seasonOver:s.seasonOver,mode:IS_TEST_MODE?'test':'production',tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():[]}),
  purchase:request=>{
+  if(!BK_WIN5_LIVE_PURCHASES)return {ok:false,error:'WIN5の本購入は自動精算の確認が完了するまで停止しています'};
   const cardKey='baken-king-personal-cards-v1';
   if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
   if(s.seasonOver)return {ok:false,error:'シーズン終了中は購入できません'};
