@@ -42,7 +42,7 @@
    const cards=Array.isArray(saved)?saved:saved?.races;
    const select=window.BakenMonitoringTargets?.extractTargets;
    if(typeof select!=='function')throw Error('対象抽出機能が未読込です');
-   return select(state?.bets,cards);
+   return select(state?.bets,cards,state?.win5Tickets,state?.win5Watch);
  }
  function label(t){return t.date+' '+t.venue+t.raceNumber+'R'}
  function show(items){

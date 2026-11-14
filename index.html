@@ -2493,7 +2493,7 @@ const initial=()=>({season:1,balance:100000,grants:100000,totalStake:0,totalPaid
 const horses=['サンプルスター','グリーンホープ','ミライウインド','トウキョードリーム','アオゾラランナー','ゴールドリーフ','ラッキーセブン','ブルームーン'];const specs={'単勝':1,'複勝':1,'枠連':2,'馬連':2,'ワイド':2,'馬単':2,'三連複':3,'三連単':3};const ordered=new Set(['馬単','三連単']);const payouts={'単勝':{'7':450},'複勝':{'7':180,'2':240,'3':160},'枠連':{'2-7':900},'馬連':{'2-7':2450},'ワイド':{'2-7':740,'3-7':510,'2-3':660},'馬単':{'7-2':5100},'三連複':{'2-3-7':3200},'三連単':{'7-2-3':15320}};
 const $=id=>document.getElementById(id),fmt=n=>Math.round(n).toLocaleString('ja-JP')+'円';function bkAdvanceSeasonIfGameOver(){
  // Only after every current-season ticket has been settled. Never reset an open wager.
- if(s.balance>=100||s.bets.some(b=>b.season===s.season&&b.status==='pending'))return false;
+ if(s.balance>=100||s.bets.some(b=>b.season===s.season&&b.status==='pending')||(Array.isArray(s.win5Tickets)&&s.win5Tickets.some(t=>t.season===s.season&&t.status==='pending')))return false;
  if(!s.seasonOver)s.bankrupt=(Number(s.bankrupt)||0)+1;
  if(!Array.isArray(s.seasons))s.seasons=[];
  s.seasons.push({id:s.season,reason:'ゲームオーバー',balance:s.balance});
@@ -2512,7 +2512,160 @@ function save(){
  render();
  window.dispatchEvent(new Event('baken:wagers-updated'));
  if(advanced)toast('ゲームオーバー。過去の記録を保存し、次のシーズンへ進みました（10万円支給）');
-}function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2800)}let selected=[];function keyFor(type,nums){return ordered.has(type)||specs[type]===1?nums.join('-'):nums.slice().sort((a,b)=>a-b).join('-')}
+}
+// WIN5 wallet bridge: only invoked on the isolated development branch's real-card purchase path.
+// Records are embedded in the primary state and therefore in the existing full backup.
+const BK_WIN5_LIVE_PURCHASES=false; // Production-safe rollout; do not enable before verified payout automation.
+window.BakenWin5Wallet={
+ enabled:()=>BK_WIN5_LIVE_PURCHASES,
+ monitorSnapshot:()=>s.win5Watch&&typeof s.win5Watch==='object'?JSON.parse(JSON.stringify(s.win5Watch)):null,
+ watch:request=>{
+  if(!request||!/^20\d{2}-\d{2}-\d{2}$/.test(request.date)||!Array.isArray(request.legs)||request.legs.length!==5)return {ok:false,error:'監視日・対象レースを確認できません'};
+  const today=new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+  if(request.date<today)return {ok:false,error:'過去の開催日は監視開始できません'};
+  const cards=(()=>{try{return JSON.parse(localStorage.getItem('baken-king-personal-cards-v1')||'null')?.races}catch{return null}})();
+  if(!Array.isArray(cards))return {ok:false,error:'通常の出馬表が取得されていません'};
+  const ids=new Set(),legs=[];
+  for(const leg of request.legs){
+   if(!leg||typeof leg.venue!=='string'||!Number.isInteger(leg.raceNumber))return {ok:false,error:'対象レースの指定が不正です'};
+   const id=request.date+'|'+leg.venue+'|'+leg.raceNumber;
+   if(ids.has(id))return {ok:false,error:'対象レースが重複しています'};
+   ids.add(id);
+   if(!cards.some(c=>c?.date===request.date&&c.venue===leg.venue&&c.raceNumber===leg.raceNumber&&
+     Number.isFinite(Date.parse(String(c.scheduledStartAt||'')))))return {ok:false,error:'5レースの発走時刻付き出馬表を待っています'};
+   legs.push({venue:leg.venue,raceNumber:leg.raceNumber});
+  }
+  if(s.win5Watch?.date===request.date&&s.win5Watch?.status==='watching')return {ok:true,duplicate:true};
+  s.win5Watch={date:request.date,legs,status:'watching',confirmed:[],startedAt:new Date().toISOString()};
+  save();return {ok:true};
+ },
+
+ ingestVerifiedWin5Payouts:payload=>{
+  const engine=window.BakenWin5PayoutEngine;
+  if(!engine||payload?.schemaVersion!==1||!Array.isArray(payload.win5)||!Array.isArray(s.win5Tickets))return 0;
+  let updated=0;
+  for(const ticket of s.win5Tickets){
+   if(ticket?.status!=='pending'||ticket.win5Evaluation?.complete!==true||
+      ticket.win5Evaluation.hitCount<=0||ticket.win5PayoutReady===true)continue;
+   const matching=payload.win5.filter(p=>p?.date===ticket.date);
+   if(matching.length!==1)continue;
+   const checked=engine.checkedRecord(matching[0],ticket);
+   if(!checked.ok)continue;
+   ticket.win5OfficialPayout=checked;
+   ticket.win5PayoutReady=true;
+   updated++;
+  }
+  if(updated)save();
+  return updated;
+ },
+ ingestVerifiedResults:payload=>{
+  if(!Array.isArray(payload?.races))return 0;
+  if(s.win5Watch?.status==='watching'){
+   const watch=s.win5Watch;
+   const confirmed=watch.legs.map(l=>{
+    const rows=payload.races.filter(r=>r?.date===watch.date&&r.venue===l.venue&&r.raceNumber===l.raceNumber);
+    if(rows.length!==1||rows[0].status!=='final'||!Array.isArray(rows[0].completeTypes)||
+       !rows[0].completeTypes.includes('単勝')||!Array.isArray(rows[0].payouts))return null;
+    const winners=rows[0].payouts.filter(p=>p?.type==='単勝'&&p.yenPer100>0&&p.numbers?.length===1&&
+     Number.isInteger(p.numbers[0])).map(p=>p.numbers[0]);
+    return winners.length?{venue:l.venue,raceNumber:l.raceNumber,winners}:null;
+   });
+   if(JSON.stringify(confirmed)!==JSON.stringify(watch.confirmed)){
+    watch.confirmed=confirmed;watch.status=confirmed.every(Boolean)?'complete':'watching';save();
+   }
+  }
+  const engine=window.BakenWin5ResultEngine;
+  if(!engine||!Array.isArray(s.win5Tickets))return 0;
+  let updated=0;
+  for(const ticket of s.win5Tickets){
+   if(ticket?.status!=='pending'||ticket.win5Evaluation?.complete===true)continue;
+   const resolution=engine.assess(ticket,payload);
+   if(!resolution.complete)continue;
+   ticket.win5Evaluation=resolution;
+   ticket.officialReady=true;
+   updated++;
+  }
+  if(updated)save();
+  return updated;
+ },
+ settle:ticketId=>{
+  if(typeof ticketId!=='string')return {ok:false,error:'投票券が不正です'};
+  const ticket=(Array.isArray(s.win5Tickets)?s.win5Tickets:[]).find(t=>t.id===ticketId);
+  if(!ticket)return {ok:false,error:'投票券が見つかりません'};
+  if(ticket.status==='settled')return {ok:true,ticket,duplicate:true};
+  const result=ticket.win5Evaluation;
+  if(ticket.status!=='pending'||result?.complete!==true)return {ok:false,error:'5レースすべての確定結果を待っています'};
+  if(result.hitCount>0&&!ticket.win5PayoutReady)return {ok:false,error:'的中しています。WIN5公式払戻金を確認するまで精算できません'};
+  const paid=result.hitCount>0?ticket.win5OfficialPayout?.totalYen:result.refundYen;
+  if(result.hitCount>0&&(!ticket.win5OfficialPayout||ticket.win5OfficialPayout.hitCount!==result.hitCount||
+     ticket.win5OfficialPayout.refundYen!==result.refundYen||ticket.win5OfficialPayout.source!=='JRA_WIN5'))
+    return {ok:false,error:'WIN5の払戻データが一致しません'};
+  if(!Number.isSafeInteger(paid)||paid<0||(result.hitCount===0&&paid>ticket.stake)||!Number.isSafeInteger(s.balance+paid)||!Number.isSafeInteger(s.totalPaid+paid))
+   return {ok:false,error:'返還額を確認できません'};
+  const prev={balance:s.balance,totalPaid:s.totalPaid,status:ticket.status,paid:ticket.paid};
+  try{
+   ticket.status='settled';ticket.paid=paid;
+   s.balance+=paid;s.totalPaid+=paid;
+   save();return {ok:true,ticket};
+  }catch(e){
+   ticket.status=prev.status;ticket.paid=prev.paid;s.balance=prev.balance;s.totalPaid=prev.totalPaid;
+   return {ok:false,error:'精算記録の保存に失敗しました'};
+  }
+ },
+ snapshot:()=>({balance:s.balance,season:s.season,seasonOver:s.seasonOver,mode:IS_TEST_MODE?'test':'production',tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():[]}),
+ purchase:request=>{
+  if(!BK_WIN5_LIVE_PURCHASES)return {ok:false,error:'WIN5の本購入は自動精算の確認が完了するまで停止しています'};
+  const cardKey='baken-king-personal-cards-v1';
+  if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
+  if(s.seasonOver)return {ok:false,error:'シーズン終了中は購入できません'};
+  const requestId=typeof request.requestId==='string'?request.requestId:'';
+  if(!/^[a-zA-Z0-9-]{10,100}$/.test(requestId))return {ok:false,error:'購入リクエストが不正です'};
+  const existing=(Array.isArray(s.win5Tickets)?s.win5Tickets:[]).find(t=>t.requestId===requestId);
+  if(existing)return {ok:true,ticket:existing,duplicate:true};
+  const date=request.date,unit=Number(request.unitStake),legs=request.legs;
+  if(typeof date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Array.isArray(legs)||legs.length!==5)return {ok:false,error:'対象5レースが不正です'};
+  const localToday=new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+  if(date<localToday)return {ok:false,error:'過去開催日は購入できません'};
+  if(!Number.isSafeInteger(unit)||unit<100||unit%100!==0)return {ok:false,error:'100円単位で入力してください'};
+  let cards;try{const stored=JSON.parse(localStorage.getItem(cardKey)||'null');cards=stored?.races}catch{}
+  if(!Array.isArray(cards))return {ok:false,error:'出馬表を取得できません'};
+  const normalized=[],used=new Set();
+  for(const leg of legs){
+   if(!leg||typeof leg.venue!=='string'||!Number.isInteger(leg.raceNumber)||!Array.isArray(leg.numbers)||leg.numbers.length<1||leg.numbers.length>18)return {ok:false,error:'買い目に不備があります'};
+   const id=leg.venue+'|'+leg.raceNumber;
+   if(used.has(id))return {ok:false,error:'対象レースが重複しています'};
+   used.add(id);
+   const nums=[...new Set(leg.numbers)].sort((a,b)=>a-b);
+   if(nums.length!==leg.numbers.length||nums.some(n=>!Number.isInteger(n)||n<1||n>18))return {ok:false,error:'馬番が不正です'};
+   const card=cards.find(c=>c.date===date&&c.venue===leg.venue&&c.raceNumber===leg.raceNumber);
+   if(!card||!Array.isArray(card.horses)||!card.horses.length)return {ok:false,error:'出馬表がまだありません'};
+   const allGood=nums.every(n=>card.horses.some(h=>Number(h.number)===n&&h.scratched!==true&&h.cancelled!==true&&h.excluded!==true&&h.status!=='取消'&&h.status!=='除外'));
+   if(!allGood)return {ok:false,error:'選べない馬番が含まれています'};
+   normalized.push({venue:leg.venue,raceNumber:leg.raceNumber,numbers:nums});
+  }
+  const first=cards.find(c=>c.date===date&&c.venue===normalized[0].venue&&c.raceNumber===normalized[0].raceNumber);
+  const firstAt=Date.parse(String(first?.scheduledStartAt||''));
+  if(!Number.isFinite(firstAt))return {ok:false,error:'発売締切時刻を確認できません'};
+  if(Date.now()>=firstAt-300000)return {ok:false,error:'WIN5の購入締切を過ぎています'};
+  const points=normalized.reduce((n,leg)=>n*leg.numbers.length,1),stake=points*unit;
+  if(!Number.isSafeInteger(stake)||points>5000||stake>1000000)return {ok:false,error:'点数・購入額が上限を超えています'};
+  if(stake>s.balance)return {ok:false,error:'残高が不足しています'};
+  if(!Number.isSafeInteger(s.totalStake+stake))return {ok:false,error:'累計購入額が上限を超えています'};
+  const ticket={id:'win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),requestId,date,season:s.season,unitStake:unit,points,stake,paid:0,status:'pending',purchasedAt:new Date().toISOString(),legs:normalized};
+  const prior={balance:s.balance,totalStake:s.totalStake,win5Tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():null};
+  try{
+   s.win5Tickets=[...(prior.win5Tickets||[]),ticket];
+   s.balance-=stake;s.totalStake+=stake;
+   save();
+   return {ok:true,ticket};
+  }catch(e){
+   s.balance=prior.balance;s.totalStake=prior.totalStake;
+   if(prior.win5Tickets===null)delete s.win5Tickets;else s.win5Tickets=prior.win5Tickets;
+   return {ok:false,error:'購入記録の保存に失敗しました'};
+  }
+ }
+};
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2800)}let selected=[];function keyFor(type,nums){return ordered.has(type)||specs[type]===1?nums.join('-'):nums.slice().sort((a,b)=>a-b).join('-')}
 
 /* Multi-combination ticket builder. A ticket contains picks[] and one unit stake. */
 let betMode='normal',formationLegs=[[],[],[]],activeFormationLeg=0;
@@ -3723,7 +3876,13 @@ function bkValidBackupState(v){
  Array.isArray(v.seasons)&&v.seasons.length<=10000&&
  ['balance','totalStake','totalPaid','grants'].every(k=>Number.isSafeInteger(v[k])&&v[k]>=0)&&
  ['season','bankrupt','manualRestarts'].every(k=>Number.isSafeInteger(v[k])&&v[k]>=0)&&
- v.season>=1&&v.bets.every(b=>b&&typeof b==='object'&&!Array.isArray(b)&&
+ v.season>=1&&(!('win5Tickets' in v)||(Array.isArray(v.win5Tickets)&&v.win5Tickets.length<=100000&&v.win5Tickets.every(t=>
+ t&&typeof t==='object'&&!Array.isArray(t)&&typeof t.date==='string'&&Number.isSafeInteger(t.season)&&t.season>=1&&
+ Number.isSafeInteger(t.stake)&&t.stake>=100&&Number.isSafeInteger(t.points)&&t.points>=1&&
+ Number.isSafeInteger(t.unitStake)&&t.unitStake>=100&&Array.isArray(t.legs)&&t.legs.length===5&&
+ t.legs.every(l=>l&&typeof l.venue==='string'&&Number.isInteger(l.raceNumber)&&Array.isArray(l.numbers)&&l.numbers.length>0&&l.numbers.length<=18&&l.numbers.every(n=>Number.isInteger(n)&&n>=1&&n<=18))&&
+ ['pending','settled','refunded'].includes(t.status)&&Number.isSafeInteger(t.paid)&&t.paid>=0
+ )))&&v.bets.every(b=>b&&typeof b==='object'&&!Array.isArray(b)&&
  Number.isSafeInteger(b.stake)&&b.stake>=0&&
  (b.status==='pending'||b.status==='settled'||b.status==='paid'||b.status==='lost'||b.status==='refunded'||b.status==='final')&&
  (b.paid==null||(Number.isSafeInteger(b.paid)&&b.paid>=0)));
@@ -4528,8 +4687,16 @@ bkTicketRaceTitle=function(b){
  async function registerVerifiedResults(payload,automatic=false){
   {
    if(!automatic&&payload?.format==='BAKEN_KING_SPECIAL_RESULT')return registerSpecialManualResult(payload);
-   if(automatic&&(!payload||!Array.isArray(payload.races)||!payload.races.length))return 0;
-   if(payload.schemaVersion!==1||!Array.isArray(payload.races)||!payload.races.length)throw Error('結果JSONの形式が違います');
+   if(automatic&&(!payload||!Array.isArray(payload.races)))return 0;
+   if(payload.schemaVersion!==1||!Array.isArray(payload.races))throw Error('結果JSONの形式が違います');
+   // WIN5 dividends can be published after all five individual race results.
+   // Process them even when the ordinary results list is empty.
+   // WIN5 consumes only confirmed official race results; a missing WIN5 payout never becomes an estimated credit.
+   // Importer tests execute this function without a browser window; keep legacy result imports standalone.
+   if(typeof window!=='undefined'){
+    window.BakenWin5Wallet?.ingestVerifiedResults?.(payload);
+    window.BakenWin5Wallet?.ingestVerifiedWin5Payouts?.(payload);
+   }
    const orderedTypes=new Set(['馬単','三連単']);
    const validTypes=['単勝','複勝','馬連','馬単','ワイド','三連複','三連単'];
    const candidates=[];
@@ -4795,4 +4962,4 @@ try{const saved=localStorage.getItem(cardStorageKey);if(saved)importCardData(JSO
 loadAuthorizedCards();
 date.addEventListener('change',()=>{if(cards.length)syncImportedOptions();show();window.dispatchEvent(new Event('baken:cards-imported'))});venue.addEventListener('change',()=>{if(cards.length)syncImportedOptions();show();window.dispatchEvent(new Event('baken:cards-imported'))});race.addEventListener('change',()=>{show();window.dispatchEvent(new Event('baken:cards-imported'))});
 })();
-</script><script src="./monitor-target-export.js?v=4" defer></script><script src="./monitor-lifecycle.js?v=2" defer></script><script src="./monitor-auto-sync.js?v=4" defer></script><script src="./race-card-auto-sync.js?v=5" defer></script><script src="./result-auto-sync.js?v=4" defer></script><script src="./push-notifications.js?v=7" defer></script><script src="./settings-surface.js?v=6" defer></script><script src="./race-diagnostics.js?v=1" defer></script><script src="./friend-cloud-sync.js?v=4" defer></script><script src="./app-next-cloud.js?v=4" defer></script><script src="./app-next-monitor.js?v=6" defer></script></body></html>
+</script><script src="./monitor-target-export.js?v=4" defer></script><script src="./monitor-lifecycle.js?v=2" defer></script><script src="./monitor-auto-sync.js?v=4" defer></script><script src="./race-card-auto-sync.js?v=5" defer></script><script src="./result-auto-sync.js?v=4" defer></script><script src="./push-notifications.js?v=7" defer></script><script src="./settings-surface.js?v=6" defer></script><script src="./race-diagnostics.js?v=1" defer></script><script src="./friend-cloud-sync.js?v=4" defer></script><script src="./app-next-cloud.js?v=4" defer></script><script src="./app-next-monitor.js?v=6" defer></script><script src="./win5-results-engine.js?v=1"></script><script src="./win5-payouts-engine.js?v=1"></script><script src="./win5-purchase.js?v=1"></script></body></html>
