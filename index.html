@@ -2559,8 +2559,7 @@ window.BakenWin5Wallet={
   return updated;
  },
  ingestVerifiedResults:payload=>{
-  const engine=window.BakenWin5ResultEngine;
-  if(!engine||!Array.isArray(payload?.races))return 0;
+  if(!Array.isArray(payload?.races))return 0;
   if(s.win5Watch?.status==='watching'){
    const watch=s.win5Watch;
    const confirmed=watch.legs.map(l=>{
@@ -2575,7 +2574,8 @@ window.BakenWin5Wallet={
     watch.confirmed=confirmed;watch.status=confirmed.every(Boolean)?'complete':'watching';save();
    }
   }
-  if(!Array.isArray(s.win5Tickets))return 0;
+  const engine=window.BakenWin5ResultEngine;
+  if(!engine||!Array.isArray(s.win5Tickets))return 0;
   let updated=0;
   for(const ticket of s.win5Tickets){
    if(ticket?.status!=='pending'||ticket.win5Evaluation?.complete===true)continue;
