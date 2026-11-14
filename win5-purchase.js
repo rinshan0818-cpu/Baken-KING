@@ -136,7 +136,8 @@ const available=h=>Number.isInteger(Number(h?.number))&&Number(h.number)>=1&&Num
 function check(){
  const cards=getRaces(),count=picks.map((list,i)=>list.filter(n=>cards[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)).length);
  const points=count.reduce((a,b)=>a*b,1),price=Number(unit.value),stake=points*price;
- const start=timeOf(cards[0]);const cutoff=start?Date.parse(selectedDate+'T'+start+':00+09:00')-300000:NaN;
+ const start=timeOf(cards[0]);const rawCutoff=start?Date.parse(selectedDate+'T'+start+':00+09:00')-300000:NaN;
+ const cutoff=selectedDate==='2026-11-15'?Math.min(rawCutoff,Date.parse('2026-11-15T14:35:00+09:00')):rawCutoff;
  const snapshot=walletSnapshot();
  const validCard=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i]);
  const purchaseWindow=demoMode||(selectedDate>=today()&&Number.isFinite(cutoff)&&Date.now()<cutoff);
