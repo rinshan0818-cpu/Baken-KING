@@ -2522,7 +2522,7 @@ window.BakenWin5Wallet={
   if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
   if(s.seasonOver)return {ok:false,error:'シーズン終了中は購入できません'};
   const date=request.date,unit=Number(request.unitStake),legs=request.legs;
-  if(typeof date!=='string'||!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||!Array.isArray(legs)||legs.length!==5)return {ok:false,error:'対象5レースが不正です'};
+  if(typeof date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Array.isArray(legs)||legs.length!==5)return {ok:false,error:'対象5レースが不正です'};
   const localToday=new Date(Date.now()+9*3600000).toISOString().slice(0,10);
   if(date<localToday)return {ok:false,error:'過去開催日は購入できません'};
   if(!Number.isSafeInteger(unit)||unit<100||unit%100!==0)return {ok:false,error:'100円単位で入力してください'};
