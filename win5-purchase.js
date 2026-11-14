@@ -66,6 +66,7 @@ styles.textContent+=`
 @media(max-width:355px){.w5-purchase-actions{grid-template-columns:90px minmax(0,1fr)}.w5-purchase-total p:first-child{font-size:15px}.w5-horses{gap:4px}}
 `;
 styles.textContent+=`.w5-record .w5-settle-btn{background:#155a47!important;color:white!important;border:1px solid #155a47!important}.w5-record p{margin:7px 0}.w5-record .w5-note{font-size:11px;color:#4e667e}.w5-record button{min-height:43px}`;
+styles.textContent+=`.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
@@ -78,6 +79,13 @@ head.style.display='flex';head.style.justifyContent='space-between';head.style.a
 head.append(node('strong','WIN5を購入'),dateSelect);
 const note=node('p','WIN5対象5レースを公式一覧と通常の出馬表に合わせて表示します。現在、本購入は検証のため停止中。デモ表示では残高を使わず操作できます。');note.className='w5-note';
 const sourceLink=node('a','JRA公式のWIN5対象レースを確認');sourceLink.href=OFFICIAL_SCHEDULE_URL;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.className='w5-source-link';
+const trial=node('section');trial.className='w5-watch-panel';
+const trialTitle=node('strong','WIN5公式結果・自動監視テスト');
+const trialNote=node('p','この5レースを通常の認証済み結果監視に登録します。購入・残高変更はありません。ログインと発走時刻付き出馬表が必要です。');
+trialNote.className='w5-note';
+const trialButton=node('button','この日の5レースを監視登録');trialButton.type='button';trialButton.className='outline';
+const trialStatus=node('p');trialStatus.className='w5-note';trialStatus.setAttribute('role','status');
+trial.append(trialTitle,trialNote,trialButton,trialStatus);
 const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
 const total=node('p'),message=node('p');message.className='w5-note';
@@ -91,7 +99,7 @@ const history=node('details');history.className='w5-hist';history.open=false;
 const jump=node('div');jump.className='w5-jump';
 const demoSwitch=node('button','デモ表示に切替');demoSwitch.type='button';demoSwitch.className='outline w5-demo-switch';
 demoSwitch.setAttribute('aria-pressed','false');
-body.append(head,note,sourceLink,demoSwitch,jump,races,bar,history);host.replaceChildren(styles,body);
+body.append(head,note,sourceLink,demoSwitch,trial,jump,races,bar,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
 // Read exactly the same validated race-card cache used by the regular prediction screen.
 const CARD_KEY='baken-king-personal-cards-v1';
@@ -151,6 +159,13 @@ function render(){
  const live=getRaces();
  picks=picks.map((numbers,i)=>!live[i]?numbers:numbers.filter(n=>live[i].horses.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
+ const watched=watchSnapshot();
+ trialButton.disabled=demoMode||selectedDate<today()||watched?.date===selectedDate&&watched?.status==='watching';
+ trialButton.textContent=watched?.date===selectedDate&&watched?.status==='watching'?'監視登録済み（端末）':'この日の5レースを監視登録';
+ trialStatus.textContent=watched?.date===selectedDate?
+  watched.status==='complete'?'5レースの確定結果を受信済み：'+watched.confirmed.map((v,i)=>'WIN'+(i+1)+' '+v.winners.join('・')).join(' / '):
+  '監視希望を端末に保存済み。結果受信 '+(watched.confirmed||[]).filter(Boolean).length+'/5レース。サーバー登録状況は「設定」で確認できます。':
+  '登録すると発走前から監視対象に入り、確定結果を確認します。';
  storeDraft();
  const expired=!demoMode&&!upcoming&&selectedDate>=today();
  dateSelect.disabled=false;
@@ -207,6 +222,11 @@ function render(){
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
 dateSelect.onchange=()=>{dateManuallyChosen=true;selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
+trialButton.onclick=()=>{
+ const result=wallet()?.watch?.({date:selectedDate,legs:current().legs.map(l=>({venue:l.venue,raceNumber:l.raceNumber}))});
+ if(!result?.ok){window.alert(result?.error||'監視の登録に失敗しました');return}
+ render();
+};
 demoSwitch.onclick=()=>{
  demoMode=!demoMode;
  // A switch between real data and synthetic data must never carry over selections.
@@ -216,6 +236,7 @@ unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);rende
 const demoTickets=[];
 const wallet=()=>window.BakenWin5Wallet;
 const walletSnapshot=()=>wallet()?.snapshot?.()||null;
+const watchSnapshot=()=>wallet()?.monitorSnapshot?.()||null;
 const isLivePurchaseEnabled=()=>wallet()?.enabled?.()===true;
 const ticketStateLabel=t=>t.status==='preview'?'UIプレビュー':t.status==='settled'?'精算済み':t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?(t.win5PayoutReady?'的中・精算待ち':'WIN5払戻金待ち'):'精算待ち'):'結果待ち';
 
