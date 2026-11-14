@@ -11,6 +11,10 @@
     try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}
   }
   function extractTargets(bets,cards,win5Tickets=[],win5Watch=null){
+    // Legacy selector callers pass an explicit timestamp as argument three.
+    // Actual monitoring passes WIN5 ticket arrays to pre-register future races.
+    const testTime=Number.isFinite(win5Tickets)?win5Tickets:null;
+    if(testTime!==null)win5Tickets=[];
     if(!Array.isArray(bets)||!Array.isArray(cards))return [];
     const starts=new Map();
     for(const c of cards){
@@ -31,7 +35,7 @@
       if(number<1||number>12)continue;
       const key=b.raceDate+'|'+b.raceVenue+'|'+number;
       const start=starts.get(key);
-      if(!Number.isFinite(start))continue;
+      if(!Number.isFinite(start)||(testTime!==null&&start>testTime))continue;
       result.set(key,{date:b.raceDate,venue:b.raceVenue,raceNumber:number});
     }
     // WIN5 adds only race identifiers, never selections, stakes or balances.
