@@ -257,6 +257,7 @@ function showTicket(ticket){
 buy.onclick=()=>{
  const before=check();if(!before.ok){render();return}
  const chosenMode=demoMode;
+ const requestId='win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
  const chosenDate=selectedDate;
  const chosenPicks=picks.map(v=>v.slice());
  const legs=current().legs.map((leg,i)=>({...leg,numbers:chosenPicks[i].slice()}));
@@ -289,11 +290,12 @@ buy.onclick=()=>{
    close();render();return;
   }
   let ticket;
+  preview.disabled=true;
   if(chosenMode){
    ticket={id:demoTickets.length+1,date:chosenDate,stake:before.stake,unitStake:before.price,points:before.points,status:'preview',legs};
    demoTickets.push(ticket);
   }else{
-   const result=wallet()?.purchase?.({date:chosenDate,unitStake:before.price,legs});
+   const result=wallet()?.purchase?.({requestId,date:chosenDate,unitStake:before.price,legs});
    if(!result?.ok){close();render();alert(result?.error||'購入処理が利用できません');return}
    ticket=result.ticket;
   }
