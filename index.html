@@ -2662,7 +2662,7 @@ window.BakenWin5Wallet={
    .map(v=>Date.parse(String(v||'')));
   if(allRaceTimes.some(t=>!Number.isFinite(t))||allRaceTimes.some((t,i)=>i>0&&t<=allRaceTimes[i-1]))
    return {ok:false,error:'対象5レースの発走時刻を確認できません'};
-  if(Date.now()>=firstAt-300000)return {ok:false,error:'WIN5の購入締切を過ぎています'};
+  if(Date.now()>=Math.min(firstAt-300000,Date.parse(BK_WIN5_LIVE_DATE+'T14:35:00+09:00')))return {ok:false,error:'WIN5の購入締切（14:35）を過ぎています'};
   const points=normalized.reduce((n,leg)=>n*leg.numbers.length,1),stake=points*unit;
   if(!Number.isSafeInteger(stake)||points>5000||stake>1000000)return {ok:false,error:'点数・購入額が上限を超えています'};
   if(!Number.isSafeInteger(s.balance)||s.balance<0)return {ok:false,error:'ゲーム内残高が不正です'};
