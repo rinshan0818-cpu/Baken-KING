@@ -3302,7 +3302,7 @@ function bkMeta(b,key){
   const indicators=[condition.surface,card?.surface,b.raceMeta?.surface,b.surface,
                     condition.grade,card?.grade,b.raceMeta?.grade,b.grade,
                     condition.obstacleCourse,card?.obstacleCourse,
-                    b.raceName,b.raceTitle,card?.raceName];
+                    b.raceName,b.raceTitle,card?.raceName,card?.title,condition.raceKind,card?.raceKind,b.raceMeta?.raceKind];
   if(indicators.some(v=>String(v||'').trim()==='障害'||/^(?:J[・･-]?G(?:[ⅠⅡⅢ123]|I{1,3}))$/i.test(String(v||'').trim())||/障害\s*[234]歳|障害(?:未勝利|オープン)|ジャンプステークス/.test(String(v||''))))return '障害';
   if(['芝','ダート'].includes(condition.surface)||['芝','ダート'].includes(card?.surface))return '平地';
   if(existing==='障害'||existing==='平地')return existing;
@@ -4396,6 +4396,7 @@ bkTicketRaceTitle=function(b){
   '2026-11-01|東京|11':{grade:'GⅠ'},
   '2026-11-07|東京|11':{grade:'GⅡ'},
   '2026-11-07|京都|8':{grade:'J・GⅢ',surface:'障害',obstacleCourse:'芝',distanceMeters:3170},
+  '2026-11-14|東京|8':{surface:'障害',obstacleCourse:'芝',distanceMeters:3110},
   // JRA 2026 official grading; used only for these exact date/venue/race IDs.
   '2026-11-08|東京|11':{grade:'GⅡ'},
   '2026-11-08|京都|11':{grade:'GⅢ'},
@@ -4408,6 +4409,18 @@ bkTicketRaceTitle=function(b){
   '2026-11-07|京都|12':{classCondition:'1勝クラス'},
   '2026-11-07|福島|11':{classCondition:'3勝クラス'}
  };
+ function bkIsObstacleCard(entry,verified){
+  const rule=entry?.raceConditions||{};
+  const values=[rule.surface,entry?.surface,verified?.surface,rule.raceKind,entry?.raceKind,
+   rule.grade,entry?.grade,verified?.grade,rule.obstacleCourse,entry?.obstacleCourse,
+   entry?.title,entry?.raceName];
+  // JRA's turf course designation alone does not distinguish flat from jumps.
+  return values.some(value=>{
+   const v=String(value||'').trim();
+   return v==='障害'||/^(?:J[・･-]?G(?:[ⅠⅡⅢ123]|I{1,3}))$/i.test(v)||
+    /障害\s*[234]歳|障害(?:未勝利|オープン)|ジャンプステークス/.test(v);
+  });
+ }
  function setRace(entry){
   if(!entry?.numbersConfirmed||!Array.isArray(entry.horses)||!entry.horses.length)return;
   currentRace=entry;
@@ -4418,12 +4431,12 @@ bkTicketRaceTitle=function(b){
   bkDraftRestore();
   const fixtureKey=[entry.date,entry.venue,entry.raceNumber].join('|');
   const verified=bkVerifiedFixtureDetails[fixtureKey]||{};
+  const obstacle=bkIsObstacleCard(entry,verified);
   const hero=document.querySelector('#autumnFixtureCard .bk-race-hero');
   if(hero){
    const title=hero.querySelector('h2');if(title)title.textContent=entry.title||'出馬表';
    const eyebrow=hero.querySelector('.bk-race-eyebrow');if(eyebrow){eyebrow.textContent='';eyebrow.hidden=true}
-   const meta=hero.querySelector('.bk-race-meta');if(meta){const course=entry.raceConditions?.obstacleCourse||verified.obstacleCourse;const track=entry.surface||entry.raceConditions?.surface||verified.surface||'';const distance=entry.distance||entry.raceConditions?.distanceMeters||verified.distanceMeters;meta.textContent=[(entry.startTime||'時刻未登録')+'発走',distance?(track+' '+distance+'m'+(track==='障害'&&course?'（'+course+'）':'')):(track||'コース未取得'),entry.horses.length+'頭'].join(' · ')}
-   const obstacle=(entry.surface||entry.raceConditions?.surface||verified.surface)==='障害';
+   const meta=hero.querySelector('.bk-race-meta');if(meta){const course=entry.raceConditions?.obstacleCourse||verified.obstacleCourse;const track=obstacle?'障害':(entry.surface||entry.raceConditions?.surface||verified.surface||'');const distance=entry.distance||entry.raceConditions?.distanceMeters||verified.distanceMeters;meta.textContent=[(entry.startTime||'時刻未登録')+'発走',distance?(track+' '+distance+'m'+(track==='障害'&&course?'（'+course+'）':'')):(track||'コース未取得'),entry.horses.length+'頭'].join(' · ')}
    let obstacleTag=hero.querySelector('.bk-obstacle-tag');
    if(!obstacleTag){obstacleTag=document.createElement('span');obstacleTag.className='bk-obstacle-tag';hero.insertBefore(obstacleTag,hero.querySelector('h2'))}
    obstacleTag.textContent='障害';obstacleTag.hidden=!obstacle;
