@@ -77,7 +77,7 @@ let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','WIN5対象5レースを公式一覧と通常の出馬表に合わせて表示します。現在、本購入は検証のため停止中。デモ表示では残高を使わず操作できます。');note.className='w5-note';
+const note=node('p','11月15日限定で、ゲーム内残高を使ったWIN5購入ができます。JRAの実際の馬券購入ではありません。的中券は公式WIN5払戻金の確認まで結果待ちとなります。デモ表示なら残高は変わりません。');note.className='w5-note';
 const sourceLink=node('a','JRA公式のWIN5対象レースを確認');sourceLink.href=OFFICIAL_SCHEDULE_URL;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.className='w5-source-link';
 const trial=node('section');trial.className='w5-watch-panel';
 const trialTitle=node('strong','WIN5公式結果・自動監視テスト');
@@ -194,7 +194,7 @@ function render(){
  total.textContent=x.count.every(n=>n>0)?x.points+'点・合計 '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5 レース';
  buy.disabled=expired||!x.ok;
  const snapshot=walletSnapshot();
- message.textContent=!demoMode&&!isLivePurchaseEnabled()?'本購入は現在停止中：デモ表示で操作できます':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
+ message.textContent=!demoMode&&!isLivePurchaseEnabled()?'11月15日限定：現在はデモ表示のみ購入可':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
  const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  purchased.slice(-20).reverse().forEach(t=>{
@@ -322,7 +322,7 @@ buy.onclick=()=>{
  second.append(node('span','合計金額'));
  const big=node('strong',fmt(before.stake));big.className='w5-confirm-amount';second.append(big);
  summary.append(line,second);contents.append(summary);
- const hint=node('p',demoMode?'デモ表示です。購入記録は保存されず残高も変わりません。':'購入を確定するとゲーム内残高から差し引かれ、結果待ちの購入履歴に保存されます。');hint.className='w5-confirm-caption';contents.append(hint);
+ const hint=node('p',demoMode?'デモ表示です。購入記録は保存されず残高も変わりません。':'ゲーム内通貨での購入です（JRA実馬券ではありません）。確定すると残高から差し引き、買い目を結果待ちで保存します。WIN5公式払戻金が確認できない的中券は精算保留となります。');hint.className='w5-confirm-caption';contents.append(hint);
  const back=node('button','戻って修正'),preview=node('button','投票券を表示');back.className='outline';
  let close;
  back.onclick=()=>close();
