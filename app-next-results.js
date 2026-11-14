@@ -35,7 +35,7 @@
  function hasPendingWagers(){
   try{
    const state=JSON.parse(localStorage.getItem('keiba-demo-v1')||'null');
-   return (Array.isArray(state?.bets)&&state.bets.some(b=>
+   return state?.win5Watch?.status==='watching'||(Array.isArray(state?.bets)&&state.bets.some(b=>
     b&&b.status==='pending'&&b.officialReady!==true&&b.specialManualResult!==true&&
     typeof b.realRaceId==='string'&&b.realRaceId.length>0))||
     (Array.isArray(state?.win5Tickets)&&state.win5Tickets.some(t=>
