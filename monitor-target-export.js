@@ -10,7 +10,7 @@
   function read(key){
     try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}
   }
-  function extractTargets(bets,cards,win5Tickets=[]){
+  function extractTargets(bets,cards,win5Tickets=[],win5Watch=null){
     if(!Array.isArray(bets)||!Array.isArray(cards))return [];
     const starts=new Map();
     for(const c of cards){
@@ -44,6 +44,18 @@
         result.set(key,{date:ticket.date,venue:leg.venue,raceNumber:leg.raceNumber});
       }
     }
+    // Explicit WIN5 read-only test registration; only identities go to monitor API.
+    if(win5Watch?.status==='watching'&&datePattern.test(win5Watch.date)&&
+       Array.isArray(win5Watch.legs)&&win5Watch.legs.length===5){
+      const resolved=new Set((Array.isArray(win5Watch.confirmed)?win5Watch.confirmed:[])
+       .filter(Boolean).map(l=>win5Watch.date+'|'+l.venue+'|'+l.raceNumber));
+      for(const leg of win5Watch.legs){
+       if(!leg||!VENUES.has(leg.venue)||!Number.isInteger(leg.raceNumber)||leg.raceNumber<1||leg.raceNumber>12)continue;
+       const key=win5Watch.date+'|'+leg.venue+'|'+leg.raceNumber;
+       if(!resolved.has(key)&&Number.isFinite(starts.get(key)))
+        result.set(key,{date:win5Watch.date,venue:leg.venue,raceNumber:leg.raceNumber});
+      }
+    }
     return [...result.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.venue.localeCompare(b.venue,'ja')||a.raceNumber-b.raceNumber);
   }
   window.BakenMonitoringTargets={extractTargets};
@@ -64,7 +76,7 @@
       const state=read(BETS_KEY);
       const stored=read(CARDS_KEY);
       const cards=Array.isArray(stored)?stored:stored?.races;
-      const targets=extractTargets(state?.bets,cards,state?.win5Tickets);
+      const targets=extractTargets(state?.bets,cards,state?.win5Tickets,state?.win5Watch);
       if(!targets.length){msg.textContent='対象レースなし。発走時刻付きの出馬表と購入済み・未精算馬券を確認してください。';return}
       const payload={schemaVersion:1,kind:'baken-monitor-targets',targets};
       const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
