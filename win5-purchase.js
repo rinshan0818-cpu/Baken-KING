@@ -128,8 +128,11 @@ function check(){
  const cards=getRaces(),count=picks.map((list,i)=>list.filter(n=>cards[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)).length);
  const points=count.reduce((a,b)=>a*b,1),price=Number(unit.value),stake=points*price;
  const start=timeOf(cards[0]);const cutoff=start?Date.parse(selectedDate+'T'+start+':00+09:00')-300000:NaN;
- const ok=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i])&&
- Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000;
+ const snapshot=walletSnapshot();
+ const validCard=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i]);
+ const purchaseWindow=demoMode||(selectedDate>=today()&&Number.isFinite(cutoff)&&Date.now()<cutoff);
+ const enough=demoMode||Boolean(snapshot&&!snapshot.seasonOver&&stake<=snapshot.balance);
+ const ok=validCard&&Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000&&purchaseWindow&&enough;
  return {cards,count,points,price,stake,cutoff,ok};
 }
 function chooseUpcomingFromCards(){
@@ -174,11 +177,12 @@ function render(){
  section.append(grid)}races.append(section)});
  total.textContent=x.count.every(n=>n>0)?x.points+'点・合計 '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5 レース';
  buy.disabled=expired||!x.ok;
- message.textContent=expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'プレビュー上限100万円':'UIプレビュー・残高変更なし';
- const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 投票券プレビュー履歴（'+demoTickets.length+'件）');history.append(historyHeading);history.open=wasOpen;
- const purchased=demoTickets;
+ const snapshot=walletSnapshot();
+ message.textContent=expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
+ const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
+ const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  purchased.slice(-20).reverse().forEach(t=>{
- const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　UIプレビュー'));
+ const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　'+(t.status==='preview'?'UIプレビュー':'結果待ち')));
  t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);history.append(box)});
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
@@ -190,6 +194,8 @@ demoSwitch.onclick=()=>{
 };
 unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);render()};
 const demoTickets=[];
+const wallet=()=>window.BakenWin5Wallet;
+const walletSnapshot=()=>wallet()?.snapshot?.()||null;
 
 
 function digitalTicket(ticket){
@@ -199,7 +205,7 @@ function digitalTicket(ticket){
  const title=node('div','WIN 5');title.className='w5-digital-brand';
  const subtitle=node('div','BAKEN-KING / DIGITAL TICKET');subtitle.className='w5-digital-sub';
  brand.append(title,subtitle);
- const status=node('span','UI SAMPLE');status.className='w5-digital-state';
+ const status=node('span',ticket.status==='preview'?'UI SAMPLE':ticket.status==='pending'?'結果待ち':'精算済み');status.className='w5-digital-state';
  header.append(brand,status);card.append(header);
  ticket.legs.forEach((leg,i)=>{
   const row=node('div');row.className='w5-digital-leg';
@@ -212,7 +218,7 @@ function digitalTicket(ticket){
  const count=node('div');count.append(node('small','購入点数'),node('strong',ticket.points+'点'));
  const amount=node('div');amount.style.textAlign='right';amount.append(node('small','購入金額'),node('strong',fmt(ticket.stake)));
  totals.append(count,amount);card.append(totals);
- const code=node('div','WIN5 · '+ticket.date.replace(/-/g,'.')+' · PREVIEW');
+ const code=node('div','WIN5 · '+ticket.date.replace(/-/g,'.')+(ticket.status==='preview'?' · PREVIEW':' · BAKEN-KING'));
  code.className='w5-digital-code';card.append(code);
  return card;
 }
@@ -243,7 +249,7 @@ function modal(title,body,actions){
 function showTicket(ticket){
  const body=node('div','w5-history-preview');
  body.append(digitalTicket(ticket));
- const hint=node('p','画面確認用のデジタル投票券です。実際の購入・残高変更はありません。');hint.className='w5-ticket-hint';body.append(hint);
+ const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':'購入記録は保存されています。結果取得と精算は次の実装段階です。');hint.className='w5-ticket-hint';body.append(hint);
  const closeButton=node('button','閉じる');let close;
  closeButton.onclick=()=>close();
  close=modal('WIN5 デジタル投票券',body,[closeButton]);
@@ -272,7 +278,7 @@ buy.onclick=()=>{
  second.append(node('span','合計金額'));
  const big=node('strong',fmt(before.stake));big.className='w5-confirm-amount';second.append(big);
  summary.append(line,second);contents.append(summary);
- const hint=node('p','これはUIプレビューです。残高の減算や購入データの保存は行いません。');hint.className='w5-confirm-caption';contents.append(hint);
+ const hint=node('p',demoMode?'デモ表示です。購入記録は保存されず残高も変わりません。':'購入を確定するとゲーム内残高から差し引かれ、結果待ちの購入履歴に保存されます。');hint.className='w5-confirm-caption';contents.append(hint);
  const back=node('button','戻って修正'),preview=node('button','投票券を表示');back.className='outline';
  let close;
  back.onclick=()=>close();
@@ -282,14 +288,23 @@ buy.onclick=()=>{
    selectedDate!==chosenDate||demoMode!==chosenMode||JSON.stringify(picks)!==JSON.stringify(chosenPicks)){
    close();render();return;
   }
-  const ticket={id:demoTickets.length+1,date:chosenDate,stake:before.stake,unitStake:before.price,points:before.points,status:'preview',legs};
-  demoTickets.push(ticket);close();render();showTicket(ticket);
+  let ticket;
+  if(chosenMode){
+   ticket={id:demoTickets.length+1,date:chosenDate,stake:before.stake,unitStake:before.price,points:before.points,status:'preview',legs};
+   demoTickets.push(ticket);
+  }else{
+   const result=wallet()?.purchase?.({date:chosenDate,unitStake:before.price,legs});
+   if(!result?.ok){close();render();alert(result?.error||'購入処理が利用できません');return}
+   ticket=result.ticket;
+  }
+  close();render();showTicket(ticket);
  };
  close=modal('WIN5 購入内容の確認',contents,[back,preview]);
 };
 
 loadDraft();
 window.addEventListener('baken:cards-imported',render);
+window.addEventListener('baken:wagers-updated',render);
 window.addEventListener('storage',event=>{if(event.key===CARD_KEY)render()});
 window.addEventListener('focus',render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
