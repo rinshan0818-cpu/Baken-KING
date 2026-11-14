@@ -65,6 +65,7 @@ styles.textContent+=`
 .w5-horses button:focus-visible,.w5-jump-button:focus-visible,.w5-purchase-actions button:focus-visible{outline:3px solid #f7b632;outline-offset:2px}
 @media(max-width:355px){.w5-purchase-actions{grid-template-columns:90px minmax(0,1fr)}.w5-purchase-total p:first-child{font-size:15px}.w5-horses{gap:4px}}
 `;
+styles.textContent+=`.w5-record .w5-settle-btn{background:#155a47!important;color:white!important;border:1px solid #155a47!important}.w5-record p{margin:7px 0}.w5-record .w5-note{font-size:11px;color:#4e667e}.w5-record button{min-height:43px}`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
@@ -182,8 +183,26 @@ function render(){
  const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  purchased.slice(-20).reverse().forEach(t=>{
- const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　'+(t.status==='preview'?'UIプレビュー':'結果待ち')));
- t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);history.append(box)});
+ const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　'+ticketStateLabel(t)));
+ if(t.win5Evaluation?.complete===true){
+  const outcome=t.win5Evaluation;
+  const resultLine=node('p',outcome.void?'WIN5開催無効・全額返還':outcome.hitCount>0?'的中組合せ '+outcome.hitCount+'点 ／ WIN5公式払戻金の確認待ち':'不的中 ／ 返還 '+fmt(outcome.refundYen));
+  resultLine.className='w5-note';box.append(resultLine);
+ }
+
+ t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);
+ if(t.status==='pending'&&t.win5Evaluation?.complete===true&&t.win5Evaluation.hitCount===0){
+  const settle=node('button',t.win5Evaluation.refundYen>0?'返還を精算する':'不的中を精算する');
+  settle.className='w5-settle-btn';settle.type='button';
+  settle.onclick=()=>{
+   if(!window.confirm('WIN5の結果を確認し、'+fmt(t.win5Evaluation.refundYen)+'を精算して履歴を確定しますか？'))return;
+   const outcome=wallet()?.settle?.(t.id);
+   if(!outcome?.ok){window.alert(outcome?.error||'精算できませんでした');return}
+   render();
+  };
+  box.append(settle)
+ }
+ history.append(box)});
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
 dateSelect.onchange=()=>{dateManuallyChosen=true;selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
@@ -196,6 +215,7 @@ unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);rende
 const demoTickets=[];
 const wallet=()=>window.BakenWin5Wallet;
 const walletSnapshot=()=>wallet()?.snapshot?.()||null;
+const ticketStateLabel=t=>t.status==='preview'?'UIプレビュー':t.status==='settled'?'精算済み':t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?'WIN5払戻金待ち':'精算待ち'):'結果待ち';
 
 
 function digitalTicket(ticket){
@@ -205,7 +225,7 @@ function digitalTicket(ticket){
  const title=node('div','WIN 5');title.className='w5-digital-brand';
  const subtitle=node('div','BAKEN-KING / DIGITAL TICKET');subtitle.className='w5-digital-sub';
  brand.append(title,subtitle);
- const status=node('span',ticket.status==='preview'?'UI SAMPLE':ticket.status==='pending'?'結果待ち':'精算済み');status.className='w5-digital-state';
+ const status=node('span',ticket.status==='preview'?'UI SAMPLE':ticketStateLabel(ticket));status.className='w5-digital-state';
  header.append(brand,status);card.append(header);
  ticket.legs.forEach((leg,i)=>{
   const row=node('div');row.className='w5-digital-leg';
@@ -249,7 +269,7 @@ function modal(title,body,actions){
 function showTicket(ticket){
  const body=node('div','w5-history-preview');
  body.append(digitalTicket(ticket));
- const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':'購入記録は保存されています。結果取得と精算は次の実装段階です。');hint.className='w5-ticket-hint';body.append(hint);
+ const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':ticket.status==='settled'?'精算済みの購入記録です。':ticket.win5Evaluation?.hitCount>0?'5レースの結果を確認しました。WIN5公式払戻金が未取得のため精算待機中です。':'購入記録は保存されています。確定結果を取得後、履歴から精算できます。');hint.className='w5-ticket-hint';body.append(hint);
  const closeButton=node('button','閉じる');let close;
  closeButton.onclick=()=>close();
  close=modal('WIN5 デジタル投票券',body,[closeButton]);
