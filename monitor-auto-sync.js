@@ -30,7 +30,7 @@
  function config(){return get(SETTINGS)}
  function targets(){
    const source=get(CARDS),cards=Array.isArray(source)?source:source?.races;
-   return window.BakenMonitoringTargets.extractTargets(get(BETS)?.bets,cards);
+   return window.BakenMonitoringTargets.extractTargets(get(BETS)?.bets,cards,get(BETS)?.win5Tickets);
  }
  function validEndpoint(url){
    const parsed=new URL(url);
