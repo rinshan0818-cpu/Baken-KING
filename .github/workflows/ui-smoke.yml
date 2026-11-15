@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - 'index.html'
+      - 'pin-collection.html'
+      - 'win5-purchase.js'
+      - 'monitor-auto-sync.js'
+      - 'monitor-lifecycle.js'
+      - 'tests/win5-wallet-isolation.test.cjs'
       - 'account-backup.js'
       - 'account-backup-transport.js'
       - 'tests/account-backup-transport.test.cjs'
@@ -99,6 +104,8 @@ jobs:
       - name: Validate all browser regression test scripts
         run: |
           find tests -maxdepth 1 -name '*.cjs' -print0 | xargs -0 -r -n 1 node --check
+      - name: Test WIN5 dedicated wallet, badge integration and isolated reset
+        run: node --test tests/win5-wallet-isolation.test.cjs
       - name: Install browser test dependency
         run: |
           npm install --no-save playwright@1.58.2

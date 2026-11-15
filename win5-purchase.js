@@ -66,7 +66,7 @@ styles.textContent+=`
 @media(max-width:355px){.w5-purchase-actions{grid-template-columns:90px minmax(0,1fr)}.w5-purchase-total p:first-child{font-size:15px}.w5-horses{gap:4px}}
 `;
 styles.textContent+=`.w5-record .w5-settle-btn{background:#155a47!important;color:white!important;border:1px solid #155a47!important}.w5-record p{margin:7px 0}.w5-record .w5-note{font-size:11px;color:#4e667e}.w5-record button{min-height:43px}`;
-styles.textContent+=`.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
+styles.textContent+=`.w5-wallet-panel{padding:12px;background:#f7f9fc;border:1px solid #dce5ef;border-radius:12px;margin:8px 0}.w5-wallet-info{font-size:12px;font-weight:650;color:#15395e;line-height:1.6}.w5-wallet-panel button{margin-top:8px;min-height:39px;width:100%;font-size:11px}.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
@@ -77,7 +77,7 @@ let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','11月15日限定で、ゲーム内残高を使ったWIN5購入ができます。JRAの実際の馬券購入ではありません。的中券は公式WIN5払戻金の確認まで結果待ちとなります。デモ表示なら残高は変わりません。');note.className='w5-note';
+const note=node('p','WIN5の購入は通常馬券の財布とは完全に別。初期30万円のWIN5・ガチャ共通財布から引き落とします。JRAの実馬券ではありません。公式払戻金の確定まで的中券の精算は保留します。');note.className='w5-note';
 const sourceLink=node('a','JRA公式のWIN5対象レースを確認');sourceLink.href=OFFICIAL_SCHEDULE_URL;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.className='w5-source-link';
 const trial=node('section');trial.className='w5-watch-panel';
 const trialTitle=node('strong','WIN5公式結果・自動監視テスト');
@@ -86,6 +86,10 @@ trialNote.className='w5-note';
 const trialButton=node('button','この日の5レースを監視登録');trialButton.type='button';trialButton.className='outline';
 const trialStatus=node('p');trialStatus.className='w5-note';trialStatus.setAttribute('role','status');
 trial.append(trialTitle,trialNote,trialButton,trialStatus);
+const walletPanel=node('section');walletPanel.className='w5-wallet-panel';
+const walletInfo=node('div');walletInfo.className='w5-wallet-info';
+const resetWallet=node('button','WIN5タブを完全初期化');resetWallet.type='button';resetWallet.className='outline';
+walletPanel.append(walletInfo,resetWallet);
 const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
 const total=node('p'),message=node('p');message.className='w5-note';
@@ -99,7 +103,7 @@ const history=node('details');history.className='w5-hist';history.open=false;
 const jump=node('div');jump.className='w5-jump';
 const demoSwitch=node('button','デモ表示に切替');demoSwitch.type='button';demoSwitch.className='outline w5-demo-switch';
 demoSwitch.setAttribute('aria-pressed','false');
-body.append(head,note,sourceLink,demoSwitch,trial,jump,races,bar,history);host.replaceChildren(styles,body);
+body.append(head,note,walletPanel,sourceLink,demoSwitch,trial,jump,races,bar,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
 // Read exactly the same validated race-card cache used by the regular prediction screen.
 const CARD_KEY='baken-king-personal-cards-v1';
@@ -141,7 +145,7 @@ function check(){
  const snapshot=walletSnapshot();
  const validCard=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i]);
  const purchaseWindow=demoMode||(selectedDate==='2026-11-15'&&today()==='2026-11-15'&&Number.isFinite(cutoff)&&Date.now()<cutoff);
- const enough=demoMode||Boolean(isLivePurchaseEnabled()&&snapshot&&!snapshot.seasonOver&&stake<=snapshot.balance);
+ const enough=demoMode||Boolean(isLivePurchaseEnabled()&&snapshot&&!snapshot.seasonOver&&!snapshot.error&&!snapshot.legacyCount&&stake<=snapshot.balance);
  const ok=validCard&&Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000&&purchaseWindow&&enough;
  return {cards,count,points,price,stake,cutoff,ok};
 }
@@ -160,6 +164,12 @@ function render(){
  const live=getRaces();
  picks=picks.map((numbers,i)=>!live[i]?numbers:numbers.filter(n=>live[i].horses.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
+ const walletState=walletSnapshot();
+ walletInfo.textContent=walletState?.error?'WIN5財布：'+walletState.error:
+  'WIN5・ガチャ共通財布：残高 '+fmt(walletState?.balance??0)+' ／ WIN5購入累計 '+fmt(walletState?.totalStake||0)+' ／ WIN5払戻累計 '+fmt(walletState?.totalPaid||0);
+ if(walletState?.legacyCount){
+  walletInfo.textContent+=' ／ 旧共通財布のWIN5券 '+walletState.legacyCount+'件（保護中・移行前）';
+ }
  const watched=watchSnapshot();
  trialButton.disabled=demoMode||selectedDate<today()||watched?.date===selectedDate&&watched?.status==='watching';
  trialButton.textContent=watched?.date===selectedDate&&watched?.status==='watching'?'監視登録済み（端末）':'この日の5レースを監視登録';
@@ -195,7 +205,7 @@ function render(){
  total.textContent=x.count.every(n=>n>0)?x.points+'点・合計 '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5 レース';
  buy.disabled=expired||!x.ok;
  const snapshot=walletSnapshot();
- message.textContent=!demoMode&&!isLivePurchaseEnabled()?'11月15日限定：現在はデモ表示のみ購入可':!demoMode&&selectedDate!=='2026-11-15'?'11月15日のWIN5のみ本購入できます':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
+ message.textContent=!demoMode&&snapshot?.legacyCount?'旧共通財布のWIN5券が残っています。二重計上防止のため購入を保留しています':!demoMode&&!isLivePurchaseEnabled()?'11月15日限定：現在はデモ表示のみ購入可':!demoMode&&selectedDate!=='2026-11-15'?'11月15日のWIN5のみ本購入できます':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
  const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  purchased.slice(-20).reverse().forEach(t=>{
@@ -223,6 +233,16 @@ function render(){
  if(!purchased.length)history.append(node('p','購入履歴はありません'));
 }
 dateSelect.onchange=()=>{dateManuallyChosen=true;selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
+resetWallet.onclick=()=>{
+ if(!window.confirm('WIN5の購入履歴・WIN5専用残高・ガチャポイント・全バッジを初期化します。通常馬券の残高や成績は変更しません。続行しますか？'))return;
+ if(!window.confirm('最終確認：WIN5タブの購入記録と全バッジが消え、WIN5専用残高は30万円に戻ります。実行しますか？'))return;
+ const result=wallet()?.reset?.();
+ if(!result?.ok){window.alert(result?.error||'初期化できませんでした');return}
+ demoTickets.length=0;picks=Array.from({length:5},()=>[]);
+ render();
+ const frame=document.getElementById('bkWin5Frame');
+ if(frame?.getAttribute('src')){try{frame.contentWindow?.location.reload()}catch{}}
+};
 trialButton.onclick=()=>{
  const result=wallet()?.watch?.({date:selectedDate,legs:current().legs.map(l=>({venue:l.venue,raceNumber:l.raceNumber}))});
  if(!result?.ok){window.alert(result?.error||'監視の登録に失敗しました');return}
@@ -351,7 +371,8 @@ buy.onclick=()=>{
 loadDraft();
 window.addEventListener('baken:cards-imported',render);
 window.addEventListener('baken:wagers-updated',render);
-window.addEventListener('storage',event=>{if(event.key===CARD_KEY)render()});
+window.addEventListener('baken:win5-wallet-updated',render);
+window.addEventListener('storage',event=>{if(event.key===CARD_KEY||event.key==='baken-king-g1-pins-mvp-v1-'+(localStorage.getItem('baken-king-mode-v1')==='test'?'test':'production'))render()});
 window.addEventListener('focus',render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
 
