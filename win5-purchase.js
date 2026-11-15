@@ -356,4 +356,5 @@ window.addEventListener('focus',render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
 
 render();
+window.BakenWin5PurchaseReady=true;
 })();
