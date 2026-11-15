@@ -249,7 +249,7 @@ function render(){
  t.legs.forEach((l,i)=>picksDetail.append(node('div','WIN'+(i+1)+' '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));
  box.append(picksDetail);
  if(readyToSettle){
-  const settle=node('button','5レースを順番に判定する');
+  const settle=node('button','WIN5の結果を判定する');
   settle.className='w5-settle-btn';settle.type='button';
   settle.onclick=()=>showStepSettlement(t);
   box.append(settle)
@@ -346,9 +346,11 @@ function showStepSettlement(ticket){
  const final=node('div');final.className='w5-settle-final';final.hidden=true;
  body.append(progress,results,final);
  const cancel=node('button','閉じる');cancel.className='outline';
- const next=node('button','WIN1を判定する');
+ const skip=node('button','結果までスキップ');skip.className='outline';
  const finish=node('button','精算を確定する');finish.hidden=true;
- let close,step=0,completed=false;
+ let close,step=0,completed=false,timer=null,stopped=false;
+ const INTERVAL_MS=1250;
+ const stop=()=>{stopped=true;if(timer!==null){clearTimeout(timer);timer=null}};
  const rows=Array.isArray(evaluation.results)?evaluation.results:[];
  const isVoid=evaluation.void===true;
  if(!isVoid&&rows.length!==5)return;
@@ -370,17 +372,24 @@ function showStepSettlement(ticket){
   const label=isVoid?'開催無効・全額返還':evaluation.hitCount>0?'WIN5 的中！':'WIN5 不的中';
   final.replaceChildren(node('div',label),node('div','払戻・返還　'+fmt(total)));
   progress.textContent='5/5 判定完了 — 精算内容を確認してください';
-  next.hidden=true;finish.hidden=false;finish.focus();
+  skip.hidden=true;finish.hidden=false;finish.focus();
  }
- next.onclick=()=>{
-  if(completed)return;
+ function advance(){
+  if(stopped||completed||!body.isConnected)return;
   if(isVoid){showFinal();return}
   if(step>=5)return;
   results.append(buildRow(step));
   step++;
   progress.textContent=step+'/5 レース判定済み';
+  results.lastElementChild?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
   if(step===5){showFinal();return}
-  next.textContent='WIN'+(step+1)+'を判定する';
+  timer=setTimeout(advance,INTERVAL_MS);
+ }
+ skip.onclick=()=>{
+  if(stopped||completed||!body.isConnected)return;
+  if(timer!==null){clearTimeout(timer);timer=null}
+  while(step<5&&!isVoid){results.append(buildRow(step));step++}
+  showFinal();
  };
  finish.onclick=()=>{
   if(completed||final.hidden)return;
@@ -390,21 +399,22 @@ function showStepSettlement(ticket){
      JSON.stringify(current.win5Evaluation)!==JSON.stringify(evaluation)||
      current.win5PayoutReady!==ticket.win5PayoutReady||
      JSON.stringify(current.win5OfficialPayout??null)!==JSON.stringify(ticket.win5OfficialPayout??null)){
-   window.alert('精算データが更新されました。履歴からもう一度確認してください');close();render();return;
+   window.alert('精算データが更新されました。履歴からもう一度確認してください');stop();close();render();return;
   }
   const result=wallet()?.settle?.(ticket.id);
   if(!result?.ok){window.alert(result?.error||'精算できませんでした');return}
-  completed=true;close();render();
+  completed=true;stop();close();render();
  };
- cancel.onclick=()=>close();
- close=modal('WIN5 順番に判定',body,[cancel,next,finish]);
- progress.textContent='0/5 — 1レースずつ確定結果を表示します';
- if(isVoid){progress.textContent='開催無効が公式確認されています';next.textContent='返還内容を見る'}
+ cancel.onclick=()=>{stop();close()};
+ close=modal('WIN5 順番に判定',body,[cancel,skip,finish]);
+ progress.textContent='0/5 — 自動判定を開始します';
+ // No wallet writes happen from the clock; only an explicit final confirmation settles.
+ timer=setTimeout(advance,500);
 }
 function showTicket(ticket){
  const body=node('div','w5-history-preview');
  body.append(digitalTicket(ticket));
- const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':ticket.status==='settled'?'精算済みの購入記録です。':ticket.win5Evaluation?.complete===true?'確定結果を受信済みです。精算可能な場合は「5レースを順番に判定する」から確認できます。':'購入記録は保存されています。確定結果を取得後、履歴から精算できます。');hint.className='w5-ticket-hint';body.append(hint);
+ const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':ticket.status==='settled'?'精算済みの購入記録です。':ticket.win5Evaluation?.complete===true?'確定結果を受信済みです。精算可能な場合は「WIN5の結果を判定する」から確認できます。':'購入記録は保存されています。確定結果を取得後、履歴から精算できます。');hint.className='w5-ticket-hint';body.append(hint);
  const closeButton=node('button','閉じる');let close;
  closeButton.onclick=()=>close();
  close=modal('WIN5 デジタル投票券',body,[closeButton]);
