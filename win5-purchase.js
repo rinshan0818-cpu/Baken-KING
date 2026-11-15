@@ -77,7 +77,7 @@ let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','WIN5の購入は通常馬券の財布とは完全に別。初期30万円のWIN5・ガチャ共通財布から引き落とします。JRAの実馬券ではありません。公式払戻金の確定まで的中券の精算は保留します。');note.className='w5-note';
+const note=node('p','WIN5の購入財布は通常馬券と別管理。ガチャは支給残高では引けず、WIN5的中で得たガチャ券だけを使用します。公式WIN5払戻金の確定までは的中精算を保留します。');note.className='w5-note';
 const sourceLink=node('a','JRA公式のWIN5対象レースを確認');sourceLink.href=OFFICIAL_SCHEDULE_URL;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.className='w5-source-link';
 const trial=node('section');trial.className='w5-watch-panel';
 const trialTitle=node('strong','WIN5公式結果・自動監視テスト');
@@ -166,7 +166,7 @@ function render(){
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
  const walletState=walletSnapshot();
  walletInfo.textContent=walletState?.error?'WIN5財布：'+walletState.error:
-  'WIN5・ガチャ共通財布：残高 '+fmt(walletState?.balance??0)+' ／ WIN5購入累計 '+fmt(walletState?.totalStake||0)+' ／ WIN5払戻累計 '+fmt(walletState?.totalPaid||0);
+  'WIN5購入財布：残高 '+fmt(walletState?.balance??0)+' ／ WIN5購入累計 '+fmt(walletState?.totalStake||0)+' ／ WIN5払戻累計 '+fmt(walletState?.totalPaid||0)+' ／ ガチャ券 '+(walletState?.gachaTickets||0)+'枚';
  if(walletState?.legacyCount){
   walletInfo.textContent+=' ／ 旧共通財布のWIN5券 '+walletState.legacyCount+'件（保護中・移行前）';
  }
@@ -214,6 +214,10 @@ function render(){
   const outcome=t.win5Evaluation;
   const resultLine=node('p',outcome.void?'WIN5開催無効・全額返還':outcome.hitCount>0?'的中組合せ '+outcome.hitCount+'点 ／ '+(t.win5PayoutReady?'払戻 '+fmt(t.win5OfficialPayout.totalYen):'WIN5公式払戻金の確認待ち'):'不的中 ／ 返還 '+fmt(outcome.refundYen));
   resultLine.className='w5-note';box.append(resultLine);
+  if(t.status==='settled'&&t.win5GachaGranted){
+   const rewardLine=node('p','WIN5的中特典：ガチャ券 '+t.win5GachaGranted+'枚 ／ 通常馬券財布へ '+fmt(t.win5TransferYen||0));
+   rewardLine.className='w5-note';box.append(rewardLine);
+  }
  }
 
  t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);
@@ -234,8 +238,8 @@ function render(){
 }
 dateSelect.onchange=()=>{dateManuallyChosen=true;selectedDate=dateSelect.value;picks=Array.from({length:5},()=>[]);render()};
 resetWallet.onclick=()=>{
- if(!window.confirm('WIN5の購入履歴・WIN5専用残高・ガチャポイント・全バッジを初期化します。通常馬券の残高や成績は変更しません。続行しますか？'))return;
- if(!window.confirm('最終確認：WIN5タブの購入記録と全バッジが消え、WIN5専用残高は30万円に戻ります。実行しますか？'))return;
+ if(!window.confirm('WIN5の購入履歴・専用残高・ガチャ券・全バッジを初期化します。既に通常馬券財布へ付与済みの還元は戻しません。通常馬券の残高や成績は変更しません。続行しますか？'))return;
+ if(!window.confirm('最終確認：WIN5タブの購入記録・ガチャ券・全バッジが消え、WIN5購入財布は30万円に戻ります。実行しますか？'))return;
  const result=wallet()?.reset?.();
  if(!result?.ok){window.alert(result?.error||'初期化できませんでした');return}
  demoTickets.length=0;picks=Array.from({length:5},()=>[]);
