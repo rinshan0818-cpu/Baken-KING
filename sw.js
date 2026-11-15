@@ -9,7 +9,24 @@ self.addEventListener('install',event=>{
   await self.skipWaiting();
  })());
 });
-self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
+self.addEventListener('activate',event=>event.waitUntil((async()=>{
+ await self.clients.claim();
+ // Repair already-installed iOS PWAs still running an old HTML shell.
+ // Only refresh an existing in-scope app page once when this worker activates.
+ const pages=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+ for(const page of pages){
+  try{
+   const url=new URL(page.url);
+   const scope=new URL(self.registration.scope);
+   if(url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))continue;
+   if(url.searchParams.has('bk-recovered-v157'))continue;
+   const target=new URL('./index.html',scope);
+   target.searchParams.set('bk-recovered-v157','1');
+   target.searchParams.set('t',String(Date.now()));
+   await page.navigate(target.href);
+  }catch(e){console.warn('PWA refresh deferred',e)}
+ }
+})()));
 self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting()});
 self.addEventListener('fetch',event=>{
  const url=new URL(event.request.url);
