@@ -1,5 +1,5 @@
 {
-  "version": "v1.54",
+  "version": "v1.55",
   "updated": "2026-11-15",
-  "notes": "Fix HTML version regex and force fresh PWA navigation"
+  "notes": "Remove duplicate reward details above WIN5 gacha"
 }
