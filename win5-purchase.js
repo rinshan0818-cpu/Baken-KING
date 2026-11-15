@@ -66,7 +66,7 @@ styles.textContent+=`
 @media(max-width:355px){.w5-purchase-actions{grid-template-columns:90px minmax(0,1fr)}.w5-purchase-total p:first-child{font-size:15px}.w5-horses{gap:4px}}
 `;
 styles.textContent+=`.w5-record .w5-settle-btn{background:#155a47!important;color:white!important;border:1px solid #155a47!important}.w5-record p{margin:7px 0}.w5-record .w5-note{font-size:11px;color:#4e667e}.w5-record button{min-height:43px}.w5-result-status{font-size:15px;font-weight:850;margin:9px 0 5px!important;color:#173f76}.w5-result-status[data-outcome="loss"]{color:#9b3640}.w5-result-status[data-outcome="win"]{color:#147153}.w5-result-legs{font-size:12px;line-height:1.65;padding:8px 10px;background:#f4f7fb;border-radius:10px;margin:7px 0}.w5-result-legs>div{padding:2px 0}.w5-management-body{padding:10px 0 4px}.w5-management-body>.w5-demo-switch{margin:4px 0 12px auto}.w5-management-body>button{margin-top:12px;width:100%;min-height:43px}.w5-wallet-panel{margin-top:11px}`;
-styles.textContent+=`.w5-wallet-panel{padding:12px;background:#f7f9fc;border:1px solid #dce5ef;border-radius:12px;margin:8px 0}.w5-wallet-info{font-size:12px;font-weight:650;color:#15395e;line-height:1.6}.w5-wallet-panel button{margin-top:8px;min-height:39px;width:100%;font-size:11px}.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
+styles.textContent+=`.w5-ticket-first{width:100%;min-height:46px}.w5-history-picks{margin:8px 0 10px;font-size:12px;color:#51647d}.w5-history-picks summary{padding:7px 0;cursor:pointer}.w5-history-picks>div{padding:3px 8px}.w5-settle-progress{font-size:12px;color:#506d8e;margin-bottom:12px}.w5-settle-row{padding:12px;margin:8px 0;border-radius:12px;border:1px solid #d9e4f1;background:#f7faff}.w5-settle-row strong{display:block;font-size:15px}.w5-settle-row p{margin:5px 0;font-size:13px}.w5-settle-row[data-result="hit"]{background:#ecf8f2;border-color:#a4d8bd}.w5-settle-row[data-result="miss"]{background:#fff1f1;border-color:#f0c5c5}.w5-settle-final{padding:14px;border-radius:12px;background:#edf4fd;margin:12px 0;font-weight:750;line-height:1.7}.w5-wallet-panel{padding:12px;background:#f7f9fc;border:1px solid #dce5ef;border-radius:12px;margin:8px 0}.w5-wallet-info{font-size:12px;font-weight:650;color:#15395e;line-height:1.6}.w5-wallet-panel button{margin-top:8px;min-height:39px;width:100%;font-size:11px}.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
@@ -216,10 +216,12 @@ function render(){
  purchased.slice(-20).reverse().forEach(t=>{
  const box=node('div');box.className='w5-record';
  box.append(node('strong',t.date+'　'+fmt(t.stake)));
- const stateLabel=node('p',ticketStateLabel(t));stateLabel.className='w5-result-status';
- stateLabel.dataset.outcome=t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?'win':'loss'):'pending';
+ const settledReveal=t.status==='settled';
+ const readyToSettle=t.status==='pending'&&t.win5Evaluation?.complete===true&&(t.win5Evaluation.hitCount===0||t.win5PayoutReady===true);
+ const stateLabel=node('p',readyToSettle?'結果確定・判定を確認':ticketStateLabel(t));stateLabel.className='w5-result-status';
+ stateLabel.dataset.outcome=settledReveal&&t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?'win':'loss'):'pending';
  box.append(stateLabel);
- if(t.win5Evaluation?.complete===true){
+ if(settledReveal&&t.win5Evaluation?.complete===true){
   const outcome=t.win5Evaluation;
   const resultLine=node('p',outcome.void?'WIN5開催無効・全額返還':outcome.hitCount>0?'的中組合せ '+outcome.hitCount+'点 ／ '+(t.win5PayoutReady?'払戻 '+fmt(t.win5OfficialPayout.totalYen):'WIN5公式払戻金の確認待ち'):'不的中 ／ 返還 '+fmt(outcome.refundYen));
   resultLine.className='w5-note';box.append(resultLine);
@@ -240,17 +242,16 @@ function render(){
   }
  }
 
- t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);
- if(t.status==='pending'&&t.win5Evaluation?.complete===true&&(t.win5Evaluation.hitCount===0||t.win5PayoutReady===true)){
-  const settle=node('button','精算する');
+ const show=node('button','デジタル投票券を見る');show.className='outline w5-ticket-first';show.style.marginTop='9px';show.onclick=()=>showTicket(t);
+ box.append(show);
+ const picksDetail=node('details');picksDetail.className='w5-history-picks';
+ picksDetail.append(node('summary','購入した買い目を見る'));
+ t.legs.forEach((l,i)=>picksDetail.append(node('div','WIN'+(i+1)+' '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));
+ box.append(picksDetail);
+ if(readyToSettle){
+  const settle=node('button','5レースを順番に判定する');
   settle.className='w5-settle-btn';settle.type='button';
-  settle.onclick=()=>{
-   const amount=t.win5PayoutReady?t.win5OfficialPayout?.totalYen:t.win5Evaluation.refundYen;
-   if(!window.confirm('WIN5の確定結果と払戻 '+fmt(amount)+'を確認して精算しますか？'))return;
-   const outcome=wallet()?.settle?.(t.id);
-   if(!outcome?.ok){window.alert(outcome?.error||'精算できませんでした');return}
-   render();
-  };
+  settle.onclick=()=>showStepSettlement(t);
   box.append(settle)
  }
  history.append(box)});
@@ -333,6 +334,72 @@ function modal(title,body,actions){
  document.addEventListener('keydown',onKey);
  (focusable()[0]||panel).focus();
  return close;
+}
+// Show one verified WIN5 leg per explicit tap. Only the final button mutates balances.
+function showStepSettlement(ticket){
+ const evaluation=ticket.win5Evaluation;
+ if(ticket.status!=='pending'||evaluation?.complete!==true||
+   !(evaluation.hitCount===0||ticket.win5PayoutReady===true))return;
+ const body=node('div');
+ const progress=node('p');progress.className='w5-settle-progress';
+ const results=node('div');
+ const final=node('div');final.className='w5-settle-final';final.hidden=true;
+ body.append(progress,results,final);
+ const cancel=node('button','閉じる');cancel.className='outline';
+ const next=node('button','WIN1を判定する');
+ const finish=node('button','精算を確定する');finish.hidden=true;
+ let close,step=0,completed=false;
+ const rows=Array.isArray(evaluation.results)?evaluation.results:[];
+ const isVoid=evaluation.void===true;
+ if(!isVoid&&rows.length!==5)return;
+ function buildRow(i){
+  const leg=ticket.legs[i],r=rows[i];
+  const winning=Array.isArray(r.winning)?r.winning:[];
+  const hit=winning.some(n=>leg.numbers.includes(n));
+  const refunded=Array.isArray(r.refunded)?r.refunded:[];
+  const row=node('div');row.className='w5-settle-row';row.dataset.result=hit?'hit':'miss';
+  row.append(node('strong','WIN'+(i+1)+'　'+leg.venue+leg.raceNumber+'R　'+(hit?'的中 ✓':'不的中 ×')));
+  row.append(node('p','購入　'+leg.numbers.join('・')));
+  row.append(node('p','確定1着　'+winning.join('・')));
+  if(refunded.length)row.append(node('p','返還対象馬番　'+refunded.join('・')));
+  return row;
+ }
+ function showFinal(){
+  final.hidden=false;
+  const total=ticket.win5PayoutReady?ticket.win5OfficialPayout?.totalYen:evaluation.refundYen;
+  const label=isVoid?'開催無効・全額返還':evaluation.hitCount>0?'WIN5 的中！':'WIN5 不的中';
+  final.replaceChildren(node('div',label),node('div','払戻・返還　'+fmt(total)));
+  progress.textContent='5/5 判定完了 — 精算内容を確認してください';
+  next.hidden=true;finish.hidden=false;finish.focus();
+ }
+ next.onclick=()=>{
+  if(completed)return;
+  if(isVoid){showFinal();return}
+  if(step>=5)return;
+  results.append(buildRow(step));
+  step++;
+  progress.textContent=step+'/5 レース判定済み';
+  if(step===5){showFinal();return}
+  next.textContent='WIN'+(step+1)+'を判定する';
+ };
+ finish.onclick=()=>{
+  if(completed||final.hidden)return;
+  // Re-evaluate authoritative local state before applying any payout or reward.
+  const current=walletSnapshot()?.tickets?.find(t=>t.id===ticket.id);
+  if(!current||current.status!=='pending'||current.win5Evaluation?.complete!==true||
+     JSON.stringify(current.win5Evaluation)!==JSON.stringify(evaluation)||
+     current.win5PayoutReady!==ticket.win5PayoutReady||
+     JSON.stringify(current.win5OfficialPayout??null)!==JSON.stringify(ticket.win5OfficialPayout??null)){
+   window.alert('精算データが更新されました。履歴からもう一度確認してください');close();render();return;
+  }
+  const result=wallet()?.settle?.(ticket.id);
+  if(!result?.ok){window.alert(result?.error||'精算できませんでした');return}
+  completed=true;close();render();
+ };
+ cancel.onclick=()=>close();
+ close=modal('WIN5 順番に判定',body,[cancel,next,finish]);
+ progress.textContent='0/5 — 1レースずつ確定結果を表示します';
+ if(isVoid){progress.textContent='開催無効が公式確認されています';next.textContent='返還内容を見る'}
 }
 function showTicket(ticket){
  const body=node('div','w5-history-preview');
