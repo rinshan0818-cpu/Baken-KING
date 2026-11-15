@@ -1,4 +1,4 @@
-// Baken-KING PWA: network-first navigation and opt-in settlement-ready Web Push.
+// Baken-KING PWA v1.51: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
 const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
 const BK_GACHA_IMAGE_FILES=['./assets/badges/collection-hero-hq.webp','./assets/badges/collection-hero.webp'];
@@ -10,8 +10,10 @@ self.addEventListener('install',event=>{
  })());
 });
 self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
+self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting()});
 self.addEventListener('fetch',event=>{
  const url=new URL(event.request.url);
+ if(url.origin===self.location.origin&&url.pathname.endsWith('/app-version.json')){event.respondWith(fetch(new Request(event.request,{cache:'no-store'})));return;}
  const localImage=url.origin===self.location.origin&&BK_GACHA_IMAGE_FILES.some(file=>url.pathname===new URL(file,self.registration.scope).pathname);
  if(localImage){
   event.respondWith((async()=>{
