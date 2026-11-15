@@ -1,5 +1,5 @@
 {
-  "version": "v1.52",
+  "version": "v1.53",
   "updated": "2026-11-15",
-  "notes": "Refresh existing installed PWA entry and update detection"
+  "notes": "Update check uses published HTML to prevent stale version prompts"
 }
