@@ -1,3 +1,4 @@
+// PWA recovery revision 2026-11-16 v1.60; no local data or cache deletion.
 // Baken-KING PWA refresh fix: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
 const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
@@ -19,9 +20,11 @@ self.addEventListener('activate',event=>event.waitUntil((async()=>{
    const url=new URL(page.url);
    const scope=new URL(self.registration.scope);
    if(url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))continue;
-   if(url.searchParams.has('bk-recovered-v157'))continue;
+   // v1.60 recovery: refresh an existing installed PWA exactly once
+   // when this updated service worker activates; keep same origin/storage.
+   if(url.searchParams.has('bk-recovered-v160'))continue;
    const target=new URL('./index.html',scope);
-   target.searchParams.set('bk-recovered-v157','1');
+   target.searchParams.set('bk-recovered-v160','1');
    target.searchParams.set('t',String(Date.now()));
    await page.navigate(target.href);
   }catch(e){console.warn('PWA refresh deferred',e)}
