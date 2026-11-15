@@ -1,5 +1,5 @@
 {
-  "version": "v1.56",
-  "updated": "2026-11-15",
-  "notes": "Keep WIN5 reward rules below tabs, remove duplicate above collection image"
+  "version": "v1.57",
+  "updated": "2026-11-16",
+  "notes": "Hide WIN5 test management and WIN1–WIN5 quick jump controls; verify existing PWA update"
 }
