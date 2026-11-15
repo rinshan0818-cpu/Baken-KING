@@ -1,5 +1,5 @@
 {
-  "version": "v1.51",
+  "version": "v1.52",
   "updated": "2026-11-15",
-  "notes": "WIN5 gacha reward help and PWA update reliability"
+  "notes": "Refresh existing installed PWA entry and update detection"
 }
