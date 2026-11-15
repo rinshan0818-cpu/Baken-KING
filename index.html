@@ -4134,14 +4134,31 @@ function bkCompareVersions(a,b){
  return 0;
 }
 async function bkFetchLatestVersion(){
- // The published HTML is the source of truth; a stale version.json must not cause downgrade prompts.
- const url='./index.html?bk-version-probe='+Date.now()+'-'+Math.random().toString(36).slice(2);
- const response=await fetch(url,{cache:'no-store'});
- if(!response.ok)throw Error('network');
- const html=await response.text();
- const match=html.match(/<title>Baken-KING[^<]*?(v\d+\.\d+(?:\.\d+)?)/);
- if(!match)throw Error('version');
- return match[1];
+ // Check an independent small manifest first. Never treat an old HTML response
+ // as proof that this installed PWA is current.
+ const nonce=Date.now()+'-'+Math.random().toString(36).slice(2);
+ let manifestVersion=null, htmlVersion=null;
+ try{
+  const response=await fetch('./app-version.json?bk-version='+nonce,{cache:'no-store',redirect:'follow'});
+  if(response.ok){
+   const data=await response.json();
+   if(/^v\d+\.\d+(?:\.\d+)?$/.test(data.version||''))manifestVersion=data.version;
+  }
+ }catch(e){console.warn('PWA version manifest unavailable',e)}
+ try{
+  const response=await fetch('./index.html?bk-version-probe='+nonce,{cache:'no-store'});
+  if(response.ok){
+   const html=await response.text();
+   const match=html.match(/<title>Baken-KING[^<]*?(v\d+\.\d+(?:\.\d+)?)/);
+   if(match)htmlVersion=match[1];
+  }
+ }catch(e){console.warn('PWA HTML version probe unavailable',e)}
+ if(!manifestVersion&&!htmlVersion)throw Error('version_unavailable');
+ // The published manifest can be ahead of HTML during a deploy; only navigate
+ // when the HTML has actually caught up to the declared version.
+ if(manifestVersion&&htmlVersion&&bkCompareVersions(manifestVersion,htmlVersion)>0)
+  throw Error('deployment_in_progress');
+ return manifestVersion&&(!htmlVersion||bkCompareVersions(manifestVersion,htmlVersion)>=0)?manifestVersion:htmlVersion;
 }
 async function checkForUpdate(silent=false){
  const label=document.getElementById('updateStatus');
@@ -4159,7 +4176,7 @@ async function checkForUpdate(silent=false){
    updateButton.textContent='最新版を確認';
    updateButton.onclick=()=>checkForUpdate(false);
   }
- }catch(e){if(!silent)label.textContent='更新確認に失敗しました。通信状況を確認してください';}
+ }catch(e){if(!silent)label.textContent='最新版を確認できませんでした。通信状況を確認して再試行してください';}
 }
 async function applyAppUpdate(automatic=false){
  if(bkUpdateApplying||(automatic&&!bkCanAutoApplyUpdate()))return;
