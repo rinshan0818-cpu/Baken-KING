@@ -7,7 +7,7 @@
  if(location.hostname!=='baken-king-app-next.vercel.app')return;
  // Load account-authenticated verified result polling in the same-origin app.
  const resultScript=document.createElement('script');
- resultScript.src='./app-next-results.js?v=3';
+ resultScript.src='./app-next-results.js?v=20261115-wallet';
  resultScript.async=true;
  document.head.append(resultScript);
  // Race cards use the same verified account, never the old device token.
