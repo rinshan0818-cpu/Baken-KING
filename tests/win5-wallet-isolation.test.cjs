@@ -179,7 +179,7 @@ test('failed standard wallet save retains transfer journal and retries on reload
 });
 test('gacha spend guard never uses the WIN5 betting wallet balance',()=>{
  const gacha=fs.readFileSync('pin-collection.html','utf8');
- assert.match(gacha,/state\.gachaTickets\s*<\s*10/);
+ assert.match(gacha,/\(state\.gachaTickets\|\|0\)\s*<\s*10/);
  assert.match(gacha,/gachaTickets:state\.gachaTickets-\(isPointDraw\?0:n\)/);
  assert.doesNotMatch(gacha,/wallet:state\.wallet-\(isPointDraw/);
  assert.match(gacha,/draw\(1,1\)/);
