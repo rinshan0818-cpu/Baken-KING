@@ -14,7 +14,6 @@
   const sections=[
    {id:'account',name:'アカウント・友達',hint:'ログイン・表示名・友達登録・成績共有',open:false},
    {id:'general',name:'通知・アプリ',hint:'プッシュ通知・共通チャイム・更新',open:false},
-   {id:'collection',name:'G1ピンバッジ',hint:'ガチャ・バッジ図鑑・所持状況',open:false},
    {id:'data',name:'データ管理',hint:'バックアップ・復元・購入履歴',open:false},
    {id:'admin',name:'管理・接続設定',hint:'出馬表・結果取得・診断（管理者向け）',open:false}
   ];
@@ -69,7 +68,7 @@
   pinLink.href='./pin-collection.html';
   pinLink.textContent='ピンバッジ図鑑・ガチャを開く';
   pinPanel.append(pinTitle,pinText,pinLink);
-  groups.collection.append(pinPanel);
+  // The collection lives in WIN5; do not duplicate its entry in Settings.
   // Beta mode selector: never copy or overwrite production wallet data.
   const modeKey='baken-king-mode-v1';
   const testStateKey='baken-king-test-state-v1';
@@ -108,6 +107,19 @@
   // Test mode is an ordinary user feature. Keep its ticket-creation controls
   // in the visible settings section rather than the hidden admin diagnostics.
   groups.general.prepend(modePanel);
+  // Separate WIN5 demo display toggle; does not switch the ordinary wallet's test mode.
+  const win5DemoKey='baken-king-win5-demo-enabled-v1';
+  const win5DemoPanel=document.createElement('section');
+  win5DemoPanel.className='card bk-settings-item';
+  const win5DemoTitle=document.createElement('h3');win5DemoTitle.textContent='WIN5のデモ表示';
+  const win5DemoNote=document.createElement('p');win5DemoNote.className='muted';
+  win5DemoNote.textContent='ONでは架空の出馬表を使って操作を試せます。デモの購入は記録されず、WIN5財布も減りません。変更後は画面を再読み込みします。';
+  const win5DemoButton=document.createElement('button');win5DemoButton.type='button';win5DemoButton.className='outline';
+  const refreshDemo=()=>{const on=localStorage.getItem(win5DemoKey)==='true';win5DemoButton.textContent='WIN5デモ表示：'+(on?'ON':'OFF');win5DemoButton.setAttribute('aria-pressed',String(on));};
+  refreshDemo();
+  win5DemoButton.onclick=()=>{const next=localStorage.getItem(win5DemoKey)!=='true';localStorage.setItem(win5DemoKey,String(next));refreshDemo();location.reload();};
+  win5DemoPanel.append(win5DemoTitle,win5DemoNote,win5DemoButton);
+  groups.general.append(win5DemoPanel);
   // Existing nickname remains controlled by the account profile, never by a second local field.
   const nicknameHint=document.createElement('p');
   nicknameHint.className='muted';
