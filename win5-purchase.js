@@ -145,7 +145,7 @@ function check(){
  const snapshot=walletSnapshot();
  const validCard=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i]);
  const purchaseWindow=demoMode||(selectedDate==='2026-11-15'&&today()==='2026-11-15'&&Number.isFinite(cutoff)&&Date.now()<cutoff);
- const enough=demoMode||Boolean(isLivePurchaseEnabled()&&snapshot&&!snapshot.seasonOver&&stake<=snapshot.balance);
+ const enough=demoMode||Boolean(isLivePurchaseEnabled()&&snapshot&&!snapshot.seasonOver&&!snapshot.error&&!snapshot.legacyCount&&stake<=snapshot.balance);
  const ok=validCard&&Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000&&purchaseWindow&&enough;
  return {cards,count,points,price,stake,cutoff,ok};
 }
@@ -205,7 +205,7 @@ function render(){
  total.textContent=x.count.every(n=>n>0)?x.points+'点・合計 '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5 レース';
  buy.disabled=expired||!x.ok;
  const snapshot=walletSnapshot();
- message.textContent=!demoMode&&!isLivePurchaseEnabled()?'11月15日限定：現在はデモ表示のみ購入可':!demoMode&&selectedDate!=='2026-11-15'?'11月15日のWIN5のみ本購入できます':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
+ message.textContent=!demoMode&&snapshot?.legacyCount?'旧共通財布のWIN5券が残っています。二重計上防止のため購入を保留しています':!demoMode&&!isLivePurchaseEnabled()?'11月15日限定：現在はデモ表示のみ購入可':!demoMode&&selectedDate!=='2026-11-15'?'11月15日のWIN5のみ本購入できます':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
  const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  purchased.slice(-20).reverse().forEach(t=>{
