@@ -38,9 +38,9 @@
    return state?.win5Watch?.status==='watching'||(Array.isArray(state?.bets)&&state.bets.some(b=>
     b&&b.status==='pending'&&b.officialReady!==true&&b.specialManualResult!==true&&
     typeof b.realRaceId==='string'&&b.realRaceId.length>0))||
-    (Array.isArray(state?.win5Tickets)&&state.win5Tickets.some(t=>
+    (window.BakenWin5Wallet?.snapshot?.()?.tickets||state?.win5Tickets||[]).some(t=>
      t&&t.status==='pending'&&(t.win5Evaluation?.complete!==true||
-       (t.win5Evaluation.hitCount>0&&t.win5PayoutReady!==true))));
+       (t.win5Evaluation.hitCount>0&&t.win5PayoutReady!==true)));
   }catch{return false}
  }
  function tick(){
