@@ -1,5 +1,5 @@
 {
-  "version": "v1.57",
+  "version": "v1.58",
   "updated": "2026-11-16",
-  "notes": "Hide WIN5 test management and WIN1–WIN5 quick jump controls; verify existing PWA update"
+  "notes": "WIN5 wallet summary, settings demo switch, gacha duplicate points, reset picks after purchase"
 }
