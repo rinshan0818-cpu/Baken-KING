@@ -66,7 +66,7 @@ styles.textContent+=`
 @media(max-width:355px){.w5-purchase-actions{grid-template-columns:90px minmax(0,1fr)}.w5-purchase-total p:first-child{font-size:15px}.w5-horses{gap:4px}}
 `;
 styles.textContent+=`.w5-record .w5-settle-btn{background:#155a47!important;color:white!important;border:1px solid #155a47!important}.w5-record p{margin:7px 0}.w5-record .w5-note{font-size:11px;color:#4e667e}.w5-record button{min-height:43px}.w5-result-status{font-size:15px;font-weight:850;margin:9px 0 5px!important;color:#173f76}.w5-result-status[data-outcome="loss"]{color:#9b3640}.w5-result-status[data-outcome="win"]{color:#147153}.w5-result-legs{font-size:12px;line-height:1.65;padding:8px 10px;background:#f4f7fb;border-radius:10px;margin:7px 0}.w5-result-legs>div{padding:2px 0}.w5-management-body{padding:10px 0 4px}.w5-management-body>.w5-demo-switch{margin:4px 0 12px auto}.w5-management-body>button{margin-top:12px;width:100%;min-height:43px}.w5-wallet-panel{margin-top:11px}`;
-styles.textContent+=`.w5-ticket-first{width:100%;min-height:46px}.w5-history-picks{margin:8px 0 10px;font-size:12px;color:#51647d}.w5-history-picks summary{padding:7px 0;cursor:pointer}.w5-history-picks>div{padding:3px 8px}.w5-settle-progress{font-size:12px;color:#506d8e;margin-bottom:12px}.w5-settle-row{padding:12px;margin:8px 0;border-radius:12px;border:1px solid #d9e4f1;background:#f7faff}.w5-settle-row strong{display:block;font-size:15px}.w5-settle-row p{margin:5px 0;font-size:13px}.w5-settle-row[data-result="hit"]{background:#ecf8f2;border-color:#a4d8bd}.w5-settle-row[data-result="miss"]{background:#fff1f1;border-color:#f0c5c5}.w5-settle-final{padding:14px;border-radius:12px;background:#edf4fd;margin:12px 0;font-weight:750;line-height:1.7}.w5-wallet-panel{padding:12px;background:#f7f9fc;border:1px solid #dce5ef;border-radius:12px;margin:8px 0}.w5-wallet-info{font-size:12px;font-weight:650;color:#15395e;line-height:1.6}.w5-wallet-panel button{margin-top:8px;min-height:39px;width:100%;font-size:11px}.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
+styles.textContent+=`.w5-modal-actions button[hidden]{display:none!important}.w5-ticket-first{width:100%;min-height:46px}.w5-history-picks{margin:8px 0 10px;font-size:12px;color:#51647d}.w5-history-picks summary{padding:7px 0;cursor:pointer}.w5-history-picks>div{padding:3px 8px}.w5-settle-progress{font-size:12px;color:#506d8e;margin-bottom:12px}.w5-settle-row{padding:12px;margin:8px 0;border-radius:12px;border:1px solid #d9e4f1;background:#f7faff}.w5-settle-row strong{display:block;font-size:15px}.w5-settle-row p{margin:5px 0;font-size:13px}.w5-settle-row[data-result="hit"]{background:#ecf8f2;border-color:#a4d8bd}.w5-settle-row[data-result="miss"]{background:#fff1f1;border-color:#f0c5c5}.w5-settle-final{padding:14px;border-radius:12px;background:#edf4fd;margin:12px 0;font-weight:750;line-height:1.7}.w5-wallet-panel{padding:12px;background:#f7f9fc;border:1px solid #dce5ef;border-radius:12px;margin:8px 0}.w5-wallet-info{font-size:12px;font-weight:650;color:#15395e;line-height:1.6}.w5-wallet-panel button{margin-top:8px;min-height:39px;width:100%;font-size:11px}.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
@@ -216,6 +216,8 @@ function render(){
  purchased.slice(-20).reverse().forEach(t=>{
  const box=node('div');box.className='w5-record';
  box.append(node('strong',t.date+'　'+fmt(t.stake)));
+ const show=node('button','デジタル投票券を見る');show.className='outline w5-ticket-first';show.style.marginTop='9px';show.onclick=()=>showTicket(t);
+ box.append(show);
  const settledReveal=t.status==='settled';
  const readyToSettle=t.status==='pending'&&t.win5Evaluation?.complete===true&&(t.win5Evaluation.hitCount===0||t.win5PayoutReady===true);
  const stateLabel=node('p',readyToSettle?'結果確定・判定を確認':ticketStateLabel(t));stateLabel.className='w5-result-status';
@@ -242,8 +244,6 @@ function render(){
   }
  }
 
- const show=node('button','デジタル投票券を見る');show.className='outline w5-ticket-first';show.style.marginTop='9px';show.onclick=()=>showTicket(t);
- box.append(show);
  const picksDetail=node('details');picksDetail.className='w5-history-picks';
  picksDetail.append(node('summary','購入した買い目を見る'));
  t.legs.forEach((l,i)=>picksDetail.append(node('div','WIN'+(i+1)+' '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));
