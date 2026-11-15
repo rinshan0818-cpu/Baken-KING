@@ -2523,6 +2523,24 @@ const BK_WIN5_LIVE_LEGS=[
 ];
 const bkWin5Today=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
 const bkWin5BuyingEnabled=()=>bkWin5Today()===BK_WIN5_LIVE_DATE;
+// WIN5 and its badge/gacha funds are a single isolated, atomic localStorage record.
+// Never debit the standard-ticket state, standard stake totals, or its payouts.
+const BK_WIN5_WALLET_KEY='baken-king-g1-pins-mvp-v1-'+(IS_TEST_MODE?'test':'production');
+function bkWin5WalletRead(){
+ const raw=localStorage.getItem(BK_WIN5_WALLET_KEY);
+ if(raw===null)return {version:1,wallet:300000,points:0,owned:{},history:[],win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};
+ let v;try{v=JSON.parse(raw)}catch{throw Error('WIN5財布データを読み取れません。書き換えを停止しました')}
+ if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||
+  !Number.isSafeInteger(v.points??0)||(v.points??0)<0||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||
+  !Array.isArray(v.history)||!Array.isArray(v.win5Tickets||[])||
+  !Number.isSafeInteger(v.win5TotalStake??0)||!Number.isSafeInteger(v.win5TotalPaid??0))
+  throw Error('WIN5財布が不正です。記録を保護するため停止しました');
+ return {...v,points:v.points??0,win5Tickets:v.win5Tickets||[],win5TotalStake:v.win5TotalStake||0,win5TotalPaid:v.win5TotalPaid||0};
+}
+function bkWin5WalletWrite(v){
+ localStorage.setItem(BK_WIN5_WALLET_KEY,JSON.stringify(v));
+ window.dispatchEvent(new Event('baken:win5-wallet-updated'));
+}
 window.BakenWin5Wallet={
  enabled:()=>bkWin5BuyingEnabled(),
  monitorSnapshot:()=>s.win5Watch&&typeof s.win5Watch==='object'?JSON.parse(JSON.stringify(s.win5Watch)):null,
@@ -2549,9 +2567,10 @@ window.BakenWin5Wallet={
 
  ingestVerifiedWin5Payouts:payload=>{
   const engine=window.BakenWin5PayoutEngine;
-  if(!engine||payload?.schemaVersion!==1||!Array.isArray(payload.win5)||!Array.isArray(s.win5Tickets))return 0;
+  if(!engine||payload?.schemaVersion!==1||!Array.isArray(payload.win5))return 0;
+  const state=bkWin5WalletRead();
   let updated=0;
-  for(const ticket of s.win5Tickets){
+  for(const ticket of state.win5Tickets){
    if(ticket?.status!=='pending'||ticket.win5Evaluation?.complete!==true||
       ticket.win5Evaluation.hitCount<=0||ticket.win5PayoutReady===true)continue;
    const matching=payload.win5.filter(p=>p?.date===ticket.date);
@@ -2562,7 +2581,7 @@ window.BakenWin5Wallet={
    ticket.win5PayoutReady=true;
    updated++;
   }
-  if(updated)save();
+  if(updated)bkWin5WalletWrite(state);
   return updated;
  },
  ingestVerifiedResults:payload=>{
@@ -2582,9 +2601,10 @@ window.BakenWin5Wallet={
    }
   }
   const engine=window.BakenWin5ResultEngine;
-  if(!engine||!Array.isArray(s.win5Tickets))return 0;
+  if(!engine)return 0;
+  const state=bkWin5WalletRead();
   let updated=0;
-  for(const ticket of s.win5Tickets){
+  for(const ticket of state.win5Tickets){
    if(ticket?.status!=='pending'||ticket.win5Evaluation?.complete===true)continue;
    const resolution=engine.assess(ticket,payload);
    if(!resolution.complete)continue;
@@ -2592,34 +2612,48 @@ window.BakenWin5Wallet={
    ticket.officialReady=true;
    updated++;
   }
-  if(updated)save();
+  if(updated)bkWin5WalletWrite(state);
   return updated;
  },
  settle:ticketId=>{
   if(typeof ticketId!=='string')return {ok:false,error:'投票券が不正です'};
-  const ticket=(Array.isArray(s.win5Tickets)?s.win5Tickets:[]).find(t=>t.id===ticketId);
-  if(!ticket)return {ok:false,error:'投票券が見つかりません'};
-  if(ticket.status==='settled')return {ok:true,ticket,duplicate:true};
-  const result=ticket.win5Evaluation;
-  if(ticket.status!=='pending'||result?.complete!==true)return {ok:false,error:'5レースすべての確定結果を待っています'};
-  if(result.hitCount>0&&!ticket.win5PayoutReady)return {ok:false,error:'的中しています。WIN5公式払戻金を確認するまで精算できません'};
-  const paid=result.hitCount>0?ticket.win5OfficialPayout?.totalYen:result.refundYen;
-  if(result.hitCount>0&&(!ticket.win5OfficialPayout||ticket.win5OfficialPayout.hitCount!==result.hitCount||
-     ticket.win5OfficialPayout.refundYen!==result.refundYen||ticket.win5OfficialPayout.source!=='JRA_WIN5'))
-    return {ok:false,error:'WIN5の払戻データが一致しません'};
-  if(!Number.isSafeInteger(paid)||paid<0||(result.hitCount===0&&paid>ticket.stake)||!Number.isSafeInteger(s.balance+paid)||!Number.isSafeInteger(s.totalPaid+paid))
-   return {ok:false,error:'返還額を確認できません'};
-  const prev={balance:s.balance,totalPaid:s.totalPaid,status:ticket.status,paid:ticket.paid};
   try{
+   const wallet=bkWin5WalletRead();
+   const ticket=wallet.win5Tickets.find(t=>t.id===ticketId);
+   if(!ticket)return {ok:false,error:'WIN5専用財布に投票券が見つかりません'};
+   if(ticket.status==='settled')return {ok:true,ticket,duplicate:true};
+   const result=ticket.win5Evaluation;
+   if(ticket.status!=='pending'||result?.complete!==true)return {ok:false,error:'5レースすべての確定結果を待っています'};
+   if(result.hitCount>0&&!ticket.win5PayoutReady)return {ok:false,error:'WIN5公式払戻金の確認まで精算できません'};
+   const paid=result.hitCount>0?ticket.win5OfficialPayout?.totalYen:result.refundYen;
+   if(result.hitCount>0&&(!ticket.win5OfficialPayout||
+     ticket.win5OfficialPayout.hitCount!==result.hitCount||
+     ticket.win5OfficialPayout.refundYen!==result.refundYen||
+     ticket.win5OfficialPayout.source!=='JRA_WIN5'))
+    return {ok:false,error:'WIN5公式払戻金が一致しません'};
+   if(!Number.isSafeInteger(paid)||paid<0||(!result.hitCount&&paid>ticket.stake)||
+     !Number.isSafeInteger(wallet.wallet+paid)||wallet.wallet+paid>1e12||
+     !Number.isSafeInteger(wallet.win5TotalPaid+paid))
+    return {ok:false,error:'WIN5払戻額が不正です'};
    ticket.status='settled';ticket.paid=paid;
-   s.balance+=paid;s.totalPaid+=paid;
-   save();return {ok:true,ticket};
-  }catch(e){
-   ticket.status=prev.status;ticket.paid=prev.paid;s.balance=prev.balance;s.totalPaid=prev.totalPaid;
-   return {ok:false,error:'精算記録の保存に失敗しました'};
-  }
+   wallet.wallet+=paid;wallet.win5TotalPaid+=paid;
+   bkWin5WalletWrite(wallet);
+   return {ok:true,ticket};
+  }catch(error){return {ok:false,error:error.message||'WIN5財布への精算に失敗しました'}}
  },
- snapshot:()=>({balance:s.balance,season:s.season,seasonOver:s.seasonOver,mode:IS_TEST_MODE?'test':'production',tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():[]}),
+ snapshot:()=>{
+  try{
+   const w=bkWin5WalletRead();
+   return {balance:w.wallet,totalStake:w.win5TotalStake,totalPaid:w.win5TotalPaid,
+    season:1,seasonOver:false,mode:IS_TEST_MODE?'test':'production',
+    tickets:w.win5Tickets.slice(),legacyCount:(s.win5Tickets||[]).length};
+  }catch(e){return {balance:0,tickets:[],seasonOver:true,error:e.message}}
+ },
+ reset:()=>{
+  if(Array.isArray(s.win5Tickets)&&s.win5Tickets.length)return {ok:false,error:'旧共通財布にWIN5券が残っています。個別移行前の削除を防止しました'};
+  const reset={version:1,wallet:300000,points:0,owned:{},history:[],win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};
+  try{bkWin5WalletWrite(reset);return {ok:true}}catch(e){return {ok:false,error:'WIN5初期化に失敗しました'}}
+ },
  purchase:request=>{
   if(!bkWin5BuyingEnabled())return {ok:false,error:'WIN5の本購入は11月15日限定です'};
   if(request?.date!==BK_WIN5_LIVE_DATE)return {ok:false,error:'11月15日のWIN5のみ購入できます'};
@@ -2628,10 +2662,11 @@ window.BakenWin5Wallet={
     return {ok:false,error:'JRA公式のWIN5対象5レースと一致しません'};
   const cardKey='baken-king-personal-cards-v1';
   if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
-  if(s.seasonOver)return {ok:false,error:'シーズン終了中は購入できません'};
+  if(Array.isArray(s.win5Tickets)&&s.win5Tickets.length)return {ok:false,error:'旧共通財布のWIN5券を保護中。移行が必要です'};
   const requestId=typeof request.requestId==='string'?request.requestId:'';
   if(!/^[a-zA-Z0-9-]{10,100}$/.test(requestId))return {ok:false,error:'購入リクエストが不正です'};
-  const existing=(Array.isArray(s.win5Tickets)?s.win5Tickets:[]).find(t=>t.requestId===requestId);
+  let wallet;try{wallet=bkWin5WalletRead()}catch(e){return {ok:false,error:e.message}}
+  const existing=wallet.win5Tickets.find(t=>t.requestId===requestId);
   if(existing)return {ok:true,ticket:existing,duplicate:true};
   const date=request.date,unit=Number(request.unitStake),legs=request.legs;
   if(typeof date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Array.isArray(legs)||legs.length!==5)return {ok:false,error:'対象5レースが不正です'};
@@ -2665,21 +2700,17 @@ window.BakenWin5Wallet={
   if(Date.now()>=Math.min(firstAt-300000,Date.parse(BK_WIN5_LIVE_DATE+'T14:35:00+09:00')))return {ok:false,error:'WIN5の購入締切（14:35）を過ぎています'};
   const points=normalized.reduce((n,leg)=>n*leg.numbers.length,1),stake=points*unit;
   if(!Number.isSafeInteger(stake)||points>5000||stake>1000000)return {ok:false,error:'点数・購入額が上限を超えています'};
-  if(!Number.isSafeInteger(s.balance)||s.balance<0)return {ok:false,error:'ゲーム内残高が不正です'};
-  if(stake>s.balance)return {ok:false,error:'残高が不足しています'};
-  if(!Number.isSafeInteger(s.totalStake+stake))return {ok:false,error:'累計購入額が上限を超えています'};
-  const ticket={id:'win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),requestId,date,season:s.season,unitStake:unit,points,stake,paid:0,status:'pending',purchasedAt:new Date().toISOString(),legs:normalized};
-  const prior={balance:s.balance,totalStake:s.totalStake,win5Tickets:Array.isArray(s.win5Tickets)?s.win5Tickets.slice():null};
+  if(!Number.isSafeInteger(wallet.wallet)||wallet.wallet<0)return {ok:false,error:'WIN5専用残高が不正です'};
+  if(stake>wallet.wallet)return {ok:false,error:'WIN5専用残高が不足しています'};
+  if(!Number.isSafeInteger(wallet.win5TotalStake+stake))return {ok:false,error:'WIN5累計購入額が上限を超えています'};
+  const ticket={id:'win5-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),requestId,date,season:1,unitStake:unit,points,stake,paid:0,status:'pending',purchasedAt:new Date().toISOString(),legs:normalized};
   try{
-   s.win5Tickets=[...(prior.win5Tickets||[]),ticket];
-   s.balance-=stake;s.totalStake+=stake;
-   save();
+   wallet.win5Tickets=[...wallet.win5Tickets,ticket];
+   wallet.wallet-=stake;wallet.win5TotalStake+=stake;
+   bkWin5WalletWrite(wallet);
    return {ok:true,ticket};
-  }catch(e){
-   s.balance=prior.balance;s.totalStake=prior.totalStake;
-   if(prior.win5Tickets===null)delete s.win5Tickets;else s.win5Tickets=prior.win5Tickets;
-   return {ok:false,error:'購入記録の保存に失敗しました'};
-  }
+  }catch(e){return {ok:false,error:'WIN5専用財布への購入記録保存に失敗しました'}}
+
  }
 };
 function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2800)}let selected=[];function keyFor(type,nums){return ordered.has(type)||specs[type]===1?nums.join('-'):nums.slice().sort((a,b)=>a-b).join('-')}
