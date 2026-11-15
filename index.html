@@ -2671,6 +2671,12 @@ window.BakenWin5Wallet={
    if(!Number.isSafeInteger(result.refundYen)||result.refundYen<0||
       !Number.isSafeInteger(winningYen)||winningYen<0)return {ok:false,error:'的中額と返還額の整合性が不正です'};
    const reward=bkWin5Reward(winningYen);
+   // Cap combined transfer from all successful tickets on the same WIN5 date.
+   const creditedForDate=wallet.win5Tickets.filter(t=>t.date===ticket.date&&t.status==='settled')
+    .reduce((n,t)=>n+(Number.isSafeInteger(t.win5TransferYen)?t.win5TransferYen:0),0);
+   if(!Number.isSafeInteger(creditedForDate)||creditedForDate<0||creditedForDate>200000)
+    return {ok:false,error:'同一開催日の還元上限を確認できません'};
+   reward.transfer=Math.min(reward.transfer,200000-creditedForDate);
    const win5Paid=paid-reward.transfer;
    if(!Number.isSafeInteger(wallet.wallet+win5Paid)||wallet.wallet+win5Paid>1e12||
      !Number.isSafeInteger(wallet.win5TotalPaid+paid)||
