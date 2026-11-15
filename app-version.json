@@ -1,5 +1,5 @@
 {
-  "version": "v1.53",
+  "version": "v1.54",
   "updated": "2026-11-15",
-  "notes": "Update check uses published HTML to prevent stale version prompts"
+  "notes": "Fix HTML version regex and force fresh PWA navigation"
 }
