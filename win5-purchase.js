@@ -65,7 +65,7 @@ styles.textContent+=`
 .w5-horses button:focus-visible,.w5-jump-button:focus-visible,.w5-purchase-actions button:focus-visible{outline:3px solid #f7b632;outline-offset:2px}
 @media(max-width:355px){.w5-purchase-actions{grid-template-columns:90px minmax(0,1fr)}.w5-purchase-total p:first-child{font-size:15px}.w5-horses{gap:4px}}
 `;
-styles.textContent+=`.w5-record .w5-settle-btn{background:#155a47!important;color:white!important;border:1px solid #155a47!important}.w5-record p{margin:7px 0}.w5-record .w5-note{font-size:11px;color:#4e667e}.w5-record button{min-height:43px}`;
+styles.textContent+=`.w5-record .w5-settle-btn{background:#155a47!important;color:white!important;border:1px solid #155a47!important}.w5-record p{margin:7px 0}.w5-record .w5-note{font-size:11px;color:#4e667e}.w5-record button{min-height:43px}.w5-result-status{font-size:15px;font-weight:850;margin:9px 0 5px!important;color:#173f76}.w5-result-status[data-outcome="loss"]{color:#9b3640}.w5-result-status[data-outcome="win"]{color:#147153}.w5-result-legs{font-size:12px;line-height:1.65;padding:8px 10px;background:#f4f7fb;border-radius:10px;margin:7px 0}.w5-result-legs>div{padding:2px 0}.w5-management-body{padding:10px 0 4px}.w5-management-body>.w5-demo-switch{margin:4px 0 12px auto}.w5-management-body>button{margin-top:12px;width:100%;min-height:43px}.w5-wallet-panel{margin-top:11px}`;
 styles.textContent+=`.w5-wallet-panel{padding:12px;background:#f7f9fc;border:1px solid #dce5ef;border-radius:12px;margin:8px 0}.w5-wallet-info{font-size:12px;font-weight:650;color:#15395e;line-height:1.6}.w5-wallet-panel button{margin-top:8px;min-height:39px;width:100%;font-size:11px}.w5-watch-panel{padding:12px;background:#f2f7ff;border:1px solid #c9d9ef;border-radius:12px;margin:8px 0 10px}.w5-watch-panel strong{font-size:13px;color:#183f74}.w5-watch-panel .w5-note{margin:5px 0 8px;font-size:11px}.w5-watch-panel button{min-height:43px;width:100%;font-size:12px;margin:2px 0 5px}.w5-watch-panel button:disabled{background:#dae5f4!important;color:#46617f!important}`;
 const body=node('div'),head=node('div'),dateSelect=node('select');
 dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対象日');
@@ -77,7 +77,7 @@ let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
 head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='center';
 head.append(node('strong','WIN5を購入'),dateSelect);
-const note=node('p','WIN5の購入財布は通常馬券と別管理。ガチャは支給残高では引けず、WIN5的中で得たガチャ券だけを使用します。公式WIN5払戻金の確定までは的中精算を保留します。');note.className='w5-note';
+const note=node('p','WIN5専用財布で購入。的中時の報酬は公式払戻確認後に付与します。');note.className='w5-note';
 const sourceLink=node('a','JRA公式のWIN5対象レースを確認');sourceLink.href=OFFICIAL_SCHEDULE_URL;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.className='w5-source-link';
 const trial=node('section');trial.className='w5-watch-panel';
 const trialTitle=node('strong','WIN5公式結果・自動監視テスト');
@@ -89,7 +89,12 @@ trial.append(trialTitle,trialNote,trialButton,trialStatus);
 const walletPanel=node('section');walletPanel.className='w5-wallet-panel';
 const walletInfo=node('div');walletInfo.className='w5-wallet-info';
 const resetWallet=node('button','WIN5タブを完全初期化');resetWallet.type='button';resetWallet.className='outline';
-walletPanel.append(walletInfo,resetWallet);
+walletPanel.append(walletInfo);
+const management=node('details');management.className='w5-hist w5-management';
+management.append(node('summary','テスト・管理'));
+const managementBody=node('div');managementBody.className='w5-management-body';
+managementBody.append(demoSwitch,trial,resetWallet);
+management.append(managementBody);
 const races=node('div'),bar=node('div');bar.className='w5-bar';
 const unitLabel=node('label','1点あたり（円）'),unit=node('input');unit.type='number';unit.min='100';unit.step='100';unit.value='100';unit.inputMode='numeric';unit.style.marginTop='6px';unitLabel.append(unit);
 const total=node('p'),message=node('p');message.className='w5-note';
@@ -103,7 +108,7 @@ const history=node('details');history.className='w5-hist';history.open=false;
 const jump=node('div');jump.className='w5-jump';
 const demoSwitch=node('button','デモ表示に切替');demoSwitch.type='button';demoSwitch.className='outline w5-demo-switch';
 demoSwitch.setAttribute('aria-pressed','false');
-body.append(head,note,walletPanel,sourceLink,demoSwitch,trial,jump,races,bar,history);host.replaceChildren(styles,body);
+body.append(head,walletPanel,note,sourceLink,management,jump,races,bar,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
 // Read exactly the same validated race-card cache used by the regular prediction screen.
 const CARD_KEY='baken-king-personal-cards-v1';
@@ -209,11 +214,26 @@ function render(){
  const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  purchased.slice(-20).reverse().forEach(t=>{
- const box=node('div');box.className='w5-record';box.append(node('strong',t.date+'　'+fmt(t.stake)+'　'+ticketStateLabel(t)));
+ const box=node('div');box.className='w5-record';
+ box.append(node('strong',t.date+'　'+fmt(t.stake)));
+ const stateLabel=node('p',ticketStateLabel(t));stateLabel.className='w5-result-status';
+ stateLabel.dataset.outcome=t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?'win':'loss'):'pending';
+ box.append(stateLabel);
  if(t.win5Evaluation?.complete===true){
   const outcome=t.win5Evaluation;
   const resultLine=node('p',outcome.void?'WIN5開催無効・全額返還':outcome.hitCount>0?'的中組合せ '+outcome.hitCount+'点 ／ '+(t.win5PayoutReady?'払戻 '+fmt(t.win5OfficialPayout.totalYen):'WIN5公式払戻金の確認待ち'):'不的中 ／ 返還 '+fmt(outcome.refundYen));
   resultLine.className='w5-note';box.append(resultLine);
+  if(!outcome.void&&Array.isArray(outcome.results)&&outcome.results.length===5){
+   const details=node('div');details.className='w5-result-legs';
+   outcome.results.forEach((r,i)=>{
+    const selections=t.legs[i]?.numbers||[];
+    const winners=Array.isArray(r.winning)?r.winning:[];
+    const hit=winners.some(n=>selections.includes(n));
+    const row=node('div','WIN'+(i+1)+' '+(hit?'✓':'×')+'　'+t.legs[i].venue+t.legs[i].raceNumber+'R　1着 '+winners.join('・'));
+    details.append(row);
+   });
+   box.append(details);
+  }
   if(t.status==='settled'&&t.win5GachaGranted){
    const rewardLine=node('p','WIN5的中特典：ガチャ券 '+t.win5GachaGranted+'枚 ／ 通常馬券財布へ '+fmt(t.win5TransferYen||0));
    rewardLine.className='w5-note';box.append(rewardLine);
@@ -222,7 +242,7 @@ function render(){
 
  t.legs.forEach((l,i)=>box.append(node('div',(i+1)+'R '+l.venue+l.raceNumber+'R　'+l.numbers.join('・'))));const show=node('button','デジタル投票券を見る');show.className='outline';show.style.marginTop='8px';show.onclick=()=>showTicket(t);box.append(show);
  if(t.status==='pending'&&t.win5Evaluation?.complete===true&&(t.win5Evaluation.hitCount===0||t.win5PayoutReady===true)){
-  const settle=node('button',t.win5Evaluation.hitCount>0?'WIN5的中を精算する':t.win5Evaluation.refundYen>0?'返還を精算する':'不的中を精算する');
+  const settle=node('button','精算する');
   settle.className='w5-settle-btn';settle.type='button';
   settle.onclick=()=>{
    const amount=t.win5PayoutReady?t.win5OfficialPayout?.totalYen:t.win5Evaluation.refundYen;
@@ -263,7 +283,7 @@ const wallet=()=>window.BakenWin5Wallet;
 const walletSnapshot=()=>wallet()?.snapshot?.()||null;
 const watchSnapshot=()=>wallet()?.monitorSnapshot?.()||null;
 const isLivePurchaseEnabled=()=>wallet()?.enabled?.()===true;
-const ticketStateLabel=t=>t.status==='preview'?'UIプレビュー':t.status==='settled'?'精算済み':t.win5Evaluation?.complete===true?(t.win5Evaluation.hitCount>0?(t.win5PayoutReady?'的中・精算待ち':'WIN5払戻金待ち'):'精算待ち'):'結果待ち';
+const ticketStateLabel=t=>t.status==='preview'?'UIプレビュー':t.win5Evaluation?.complete===true?(t.win5Evaluation.void?'開催無効・返還':t.win5Evaluation.hitCount>0?(t.status==='settled'?'的中・精算済み':t.win5PayoutReady?'的中・精算待ち':'的中・公式払戻待ち'):t.win5Evaluation.refundYen>0?(t.status==='settled'?'不的中・返還精算済み':'不的中・返還あり'):t.status==='settled'?'不的中・精算済み':'不的中・精算待ち'):'結果待ち';
 
 
 function digitalTicket(ticket){
