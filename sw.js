@@ -1,8 +1,29 @@
 // Baken-KING PWA: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
-self.addEventListener('install',()=>self.skipWaiting());
+const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
+const BK_GACHA_IMAGE_FILES=['./assets/badges/collection-hero-hq.webp','./assets/badges/collection-hero.webp'];
+self.addEventListener('install',event=>{
+ event.waitUntil((async()=>{
+  // Installation must succeed even if an image is temporarily unavailable.
+  try{const cache=await caches.open(BK_GACHA_IMAGE_CACHE);await Promise.allSettled(BK_GACHA_IMAGE_FILES.map(file=>cache.add(file)))}catch(e){console.warn('ガチャ画像の先読み:',e)}
+  await self.skipWaiting();
+ })());
+});
 self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',event=>{
+ const url=new URL(event.request.url);
+ const localImage=url.origin===self.location.origin&&BK_GACHA_IMAGE_FILES.some(file=>url.pathname===new URL(file,self.registration.scope).pathname);
+ if(localImage){
+  event.respondWith((async()=>{
+   const cache=await caches.open(BK_GACHA_IMAGE_CACHE);
+   const key=new Request(url.origin+url.pathname);
+   const cached=await cache.match(key);
+   if(cached)return cached;
+   const response=await fetch(event.request);
+   if(response.ok)await cache.put(key,response.clone());
+   return response;
+  })());return;
+ }
  if(event.request.mode!=='navigate')return;
  event.respondWith(fetch(new Request(event.request,{cache:'no-store'})).catch(()=>fetch(event.request)));
 });
