@@ -294,7 +294,7 @@ function digitalTicket(ticket){
  const title=node('div','WIN 5');title.className='w5-digital-brand';
  const subtitle=node('div','BAKEN-KING / DIGITAL TICKET');subtitle.className='w5-digital-sub';
  brand.append(title,subtitle);
- const status=node('span',ticket.status==='preview'?'UI SAMPLE':ticketStateLabel(ticket));status.className='w5-digital-state';
+ const status=node('span',ticket.status==='preview'?'UI SAMPLE':ticket.status==='pending'&&ticket.win5Evaluation?.complete===true?'結果確定・判定待ち':ticketStateLabel(ticket));status.className='w5-digital-state';
  header.append(brand,status);card.append(header);
  ticket.legs.forEach((leg,i)=>{
   const row=node('div');row.className='w5-digital-leg';
@@ -404,7 +404,7 @@ function showStepSettlement(ticket){
 function showTicket(ticket){
  const body=node('div','w5-history-preview');
  body.append(digitalTicket(ticket));
- const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':ticket.status==='settled'?'精算済みの購入記録です。':ticket.win5PayoutReady?'WIN5公式払戻 '+fmt(ticket.win5OfficialPayout?.totalYen)+'を確認済み。購入履歴から精算できます。':ticket.win5Evaluation?.hitCount>0?'5レースの結果を確認しました。WIN5公式払戻金が未取得のため精算待機中です。':'購入記録は保存されています。確定結果を取得後、履歴から精算できます。');hint.className='w5-ticket-hint';body.append(hint);
+ const hint=node('p',ticket.status==='preview'?'デモ表示です。残高は変更されません。':ticket.status==='settled'?'精算済みの購入記録です。':ticket.win5Evaluation?.complete===true?'確定結果を受信済みです。精算可能な場合は「5レースを順番に判定する」から確認できます。':'購入記録は保存されています。確定結果を取得後、履歴から精算できます。');hint.className='w5-ticket-hint';body.append(hint);
  const closeButton=node('button','閉じる');let close;
  closeButton.onclick=()=>close();
  close=modal('WIN5 デジタル投票券',body,[closeButton]);
