@@ -1,5 +1,5 @@
 {
-  "version": "v1.59",
+  "version": "v1.60",
   "updated": "2026-11-16",
-  "notes": "WIN5 wallet: monthly JST refill to 1,000,000 yen starting next month, preserving balance and all existing records"
+  "notes": "Aligned bottom navigation icons and labels; added separate WIN5 metrics on home; clarified game-over count and WIN5 transfer amounts"
 }
