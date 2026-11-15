@@ -185,3 +185,19 @@ test('gacha spend guard never uses the WIN5 betting wallet balance',()=>{
  assert.match(gacha,/draw\(1,1\)/);
  assert.match(gacha,/draw\(10,10\)/);
 });
+
+test('same race-day transfer across two winning tickets never exceeds 200k',()=>{
+ const wallet=winningWallet(1500000);
+ const other=structuredClone(wallet.win5Tickets[0]);
+ other.id='win5-winning-stub-2';
+ wallet.win5Tickets.push(other);
+ const e=setup(undefined,{wallet});
+ assert.equal(e.api.settle('win5-winning-stub').ok,true);
+ assert.equal(e.api.settle('win5-winning-stub-2').ok,true);
+ assert.equal(e.original.balance,212000);
+ assert.equal(e.api.snapshot().gachaTickets,60);
+ const paid=e.api.snapshot().tickets.map(t=>t.win5TransferYen);
+ assert.deepEqual(paid,[150000,50000]);
+ assert.equal(e.api.settle('win5-winning-stub-2').duplicate,true);
+ assert.equal(e.original.balance,212000);
+});
