@@ -307,7 +307,7 @@ html.bk-embedded img.bk-unowned-art.bk-solid-silhouette{
  <img class="bk-hero-legacy" src="./assets/badges/display/step-01.webp?v=2" alt="ステップレースのバッジ" loading="lazy">
  <img class="bk-hero-legacy" src="./assets/badges/display/derby-normal.webp?v=2" alt="GⅠ通常バッジ" loading="lazy">
  <img class="bk-hero-legacy" src="./assets/badges/display/arima-holo.webp?v=2" alt="GⅠホロバッジ" loading="lazy">
-</div><div class="summary"><div class="metric"><small>所持バリエーション</small><strong id="owned">0 / 98</strong></div><div class="metric"><small>WIN5準備財布</small><strong id="wallet">¥300,000</strong></div><div class="metric"><small>交換ポイント</small><strong id="points">0 pt</strong></div></div><div class="progress"><div id="progressFill" style="width:0%"></div></div><p class="sub" id="progressLabel">未収集：98種類</p><p class="note">これはWIN5機能ができるまでの独立した準備財布です。初回30万円から開始し、通常馬券の残高・精算・購入履歴には一切影響しません。現在、WIN5の的中金はまだ自動入金されません。</p><div class="actions"><button id="drawOne">1回ガチャ ¥5,000</button><button id="drawTen">10連ガチャ ¥45,000</button></div><div class="actions" style="grid-template-columns:1fr"><button type="button" class="secondary" id="drawPoints">1回ガチャ 1,000 pt</button></div><p class="sub">同じバッジを引くとポイントを自動獲得します。ステップレース：30 pt／GⅠ通常版：100 pt／GⅠホロ版：500 pt。1,000 ptで1回引けます。獲得ポイントは重複したバッジを消費せず、所持数も減りません。ポイントはこの端末のコレクションデータに保存されます。</p><p class="sub">ステップレース75%／GⅠ通常21%／GⅠホロ4%。各枠内の対象レースは均等抽選。GⅠは承認済み24レースが対象です。ポイントガチャも同じ確率で、10連の確定枠はありません。</p><p id="message" class="status" role="status" aria-live="polite"></p><div id="result" class="result" hidden></div><p class="sub" id="drawHint">抽選後に開封画面が表示されます。演出はスキップできます。</p></section>
+</div><div class="summary"><div class="metric"><small>所持バリエーション</small><strong id="owned">0 / 98</strong></div><div class="metric"><small>WIN5購入財布</small><strong id="wallet">¥300,000</strong></div><div class="metric"><small>ガチャ券</small><strong id="points">0枚</strong></div></div><div class="progress"><div id="progressFill" style="width:0%"></div></div><p class="sub" id="progressLabel">未収集：98種類</p><p class="note">WIN5の的中払戻額に応じてガチャ券を5〜50枚獲得します。購入財布の残高からガチャは引けません。</p><div class="actions"><button id="drawOne">ガチャ券1枚で1回</button><button id="drawTen">ガチャ券10枚で10連</button></div><div class="actions" style="grid-template-columns:1fr"><button type="button" class="secondary" id="drawPoints">重複ポイントで1回（1,000pt）</button></div><p class="sub">同じバッジを引くとポイントを自動獲得します。ステップレース：30 pt／GⅠ通常版：100 pt／GⅠホロ版：500 pt。1,000 ptで1回引けます（的中ガチャで得た重複ポイントのみ）。獲得ポイントは重複したバッジを消費せず、所持数も減りません。ポイントはこの端末のコレクションデータに保存されます。</p><p class="sub">ステップレース75%／GⅠ通常21%／GⅠホロ4%。各枠内の対象レースは均等抽選。GⅠは承認済み24レースが対象です。ポイントガチャも同じ確率で、10連の確定枠はありません。</p><p id="message" class="status" role="status" aria-live="polite"></p><div id="result" class="result" hidden></div><p class="sub" id="drawHint">抽選後に開封画面が表示されます。演出はスキップできます。</p></section>
 <section class="panel" data-collection-panel><div class="bk-collection-heading"><h2>GⅠバッジ図鑑</h2><span id="bkCollectionOwned">0 / 98種類収集</span></div><p class="sub" id="g1Status">24レース・通常版とホロ版の48種類を読み込み中。承認済み画像はGitHub登録後に表示されます。</p><div class="tabs" role="group" aria-label="ピンバッジの表示切替"><button data-filter="all" aria-pressed="true">すべて</button><button data-filter="normal" aria-pressed="false">通常版</button><button data-filter="holo" aria-pressed="false">ホロ版</button><button data-filter="owned" aria-pressed="false" class="bk-legacy-filter">所持済み</button><button data-filter="missing" aria-pressed="false" class="bk-legacy-filter">未所持</button></div><div class="bk-collection-select" hidden><label>表示するバッジ <select id="bkG1Filter"><option value="all">すべて（ホロ→通常）</option><option value="holo">ホロのみ</option><option value="normal">通常のみ</option></select></label></div><div id="pins" class="pins"></div><div id="detail" class="detail hidden"></div></section>
 <section class="panel" data-collection-panel id="stepBadgePanel" aria-labelledby="stepBadgeTitle"><h2 id="stepBadgeTitle">ステップレースバッジ</h2><p class="sub bk-step-description">GⅡ＝赤・GⅢ＝緑・L＝ブロンズの全50種。承認済みのオリジナル画像を収録した図鑑です。ガチャで獲得したものはカラー、未所持は暗く表示します。重複時はポイントを獲得できます。</p>
 <div class="bk-step-dropdowns" hidden>
@@ -340,9 +340,9 @@ const badgePreloads=new Map();
 let displayBadgeFiles=new Set();
 let displayBadgeVersion=1;
 let g1AssetsReady=false;
-function empty(){return {version:1,wallet:INITIAL,points:0,owned:{},history:[],win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};}
-function valid(v){if(v?.win5Tickets!==undefined&&(!Array.isArray(v.win5Tickets)||v.win5Tickets.length>100000||v.win5Tickets.some(t=>!t||typeof t!=='object'||!Number.isSafeInteger(t.stake)||t.stake<100||!['pending','settled','refunded'].includes(t.status))))return false;if(!Number.isSafeInteger(v?.win5TotalStake??0)||!Number.isSafeInteger(v?.win5TotalPaid??0)||(v?.win5TotalStake??0)<0||(v?.win5TotalPaid??0)<0)return false;if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(?:derby|arima|tenno-autumn|oka|japan-cup|february|takamatsunomiya|osaka|satsuki|tenno-spring|nhk-mile|victoria-mile|oaks|yasuda|takarazuka|sprinters|shuka|kikka|elizabeth|mile-cs|champions|hanshin-jf|asahi|hopeful)_(?:normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
-function load(){try{const s=localStorage.getItem(KEY);if(!s)return empty();const v=JSON.parse(s);return valid(v)?{...v,points:v.points??0}:empty()}catch{return empty()}}
+function empty(){return {version:1,wallet:INITIAL,points:0,owned:{},history:[],gachaTickets:0,win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};}
+function valid(v){if(!Number.isSafeInteger(v?.gachaTickets??0)||(v?.gachaTickets??0)<0)return false;if(v?.win5Tickets!==undefined&&(!Array.isArray(v.win5Tickets)||v.win5Tickets.length>100000||v.win5Tickets.some(t=>!t||typeof t!=='object'||!Number.isSafeInteger(t.stake)||t.stake<100||!['pending','settled','refunded'].includes(t.status))))return false;if(!Number.isSafeInteger(v?.win5TotalStake??0)||!Number.isSafeInteger(v?.win5TotalPaid??0)||(v?.win5TotalStake??0)<0||(v?.win5TotalPaid??0)<0)return false;if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||(v.points!==undefined&&(!Number.isSafeInteger(v.points)||v.points<0||v.points>1e12))||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||!Array.isArray(v.history)||v.history.length>10000)return false;for(const [k,n] of Object.entries(v.owned)){if(!(/^(?:derby|arima|tenno-autumn|oka|japan-cup|february|takamatsunomiya|osaka|satsuki|tenno-spring|nhk-mile|victoria-mile|oaks|yasuda|takarazuka|sprinters|shuka|kikka|elizabeth|mile-cs|champions|hanshin-jf|asahi|hopeful)_(?:normal|holo)$/.test(k)||/^step-(0[1-9]|[1-4][0-9]|50)$/.test(k))||!Number.isSafeInteger(n)||n<0||n>100000)return false;}return true;}
+function load(){try{const s=localStorage.getItem(KEY);if(!s)return empty();const v=JSON.parse(s);return valid(v)?{...v,points:v.points??0,gachaTickets:v.gachaTickets??0}:empty()}catch{return empty()}}
 let state=load();
 window.addEventListener('storage',e=>{if(e.key===KEY){state=load();render();displayStepBadges();}});
 function persist(next){if(!valid(next))throw Error('コレクションデータの検証に失敗しました');const s=JSON.stringify(next);localStorage.setItem(KEY,s);state=next;}
@@ -377,8 +377,8 @@ function render(){
  const unifiedOwned=$('bkUnifiedOwned');if(unifiedOwned)unifiedOwned.textContent=owned+' / 98種類収集';
  const catalogReady=stepEntries.length===50&&g1Items.length===48&&g1AssetsReady;
  const total=(g1Items.length||10)+stepEntries.length;
- $('wallet').textContent=fmt(state.wallet);$('points').textContent=state.points.toLocaleString('ja-JP')+' pt';$('drawPoints').disabled=!catalogReady||state.points<POINT_COST;$('owned').textContent=owned+' / '+total;$('progressFill').style.width=(owned/total*100)+'%';$('progressLabel').textContent='未収集：'+(total-owned)+'種類';
- $('drawOne').disabled=!catalogReady||state.wallet<5000;$('drawTen').disabled=!catalogReady||state.wallet<45000;
+ $('wallet').textContent=fmt(state.wallet);$('points').textContent=(state.gachaTickets||0).toLocaleString('ja-JP')+'枚';$('drawPoints').disabled=!catalogReady||state.points<POINT_COST;$('owned').textContent=owned+' / '+total;$('progressFill').style.width=(owned/total*100)+'%';$('progressLabel').textContent='未収集：'+(total-owned)+'種類';
+ $('drawOne').disabled=!catalogReady||(state.gachaTickets||0)<1;$('drawTen').disabled=!catalogReady||(state.gachaTickets||0)<10;
  const list=(g1Items.length?g1Items:RACES.flatMap(r=>['normal','holo'].map(v=>({r,v,key:itemKey(r,v),name:r.name})))).filter(x=>filter==='all'||filter===x.v||(filter==='missing'&&!state.owned[x.key])||(filter==='owned'&&state.owned[x.key]>0))
  .sort((a,b)=>(a.v==='holo'?0:1)-(b.v==='holo'?0:1));
  $('pins').replaceChildren();
@@ -482,14 +482,14 @@ function drawArt(d){
  if(g1AssetsReady&&registered){const image=document.createElement('img');image.src=badgeAssetURL(d);image.alt=registered.name+'のバッジ';image.style.cssText='width:100%;height:auto;aspect-ratio:1/1.16;object-fit:contain;';return image;}
  const wrapper=document.createElement('div');wrapper.innerHTML=pinArtwork(d.r,d.v);return wrapper.firstElementChild;
 }
-function draw(n,price,currency='wallet'){
+function draw(n,price,currency='tickets'){
  state=load(); // refresh from the WIN5 ticket + gacha shared wallet before spending
  const isPointDraw=currency==='points';
  if(stepEntries.length!==50||g1Items.length!==48||!g1AssetsReady){$('message').textContent='バッジデータの読み込み完了後にお試しください。';return;}
  if(isPointDraw&&n!==1){$('message').textContent='ポイントガチャは1回ずつ利用できます。';return;}
- if((isPointDraw?state.points:state.wallet)<price){$('message').textContent=isPointDraw?'ポイントが足りません。':'残高が足りません。';return;}
+ if((isPointDraw?state.points:state.gachaTickets)<(isPointDraw?price:n)){$('message').textContent=isPointDraw?'ポイントが足りません。':'WIN5的中で得られるガチャ券が足りません。';return;}
  try{
-  const next={...state,version:1,wallet:state.wallet-(isPointDraw?0:price),points:state.points-(isPointDraw?price:0),owned:{...state.owned},history:state.history.slice()};
+  const next={...state,version:1,gachaTickets:state.gachaTickets-(isPointDraw?0:n),points:state.points-(isPointDraw?price:0),owned:{...state.owned},history:state.history.slice()};
   const drawn=[];let earned=0;
   for(let i=0;i<n;i++){
    const {r,v,key}=pickBadge();
@@ -498,7 +498,7 @@ function draw(n,price,currency='wallet'){
    drawn.push({r,v,key,first,pointsEarned});
   }
   next.points+=earned;
-  next.history.push(...drawn.map(d=>({itemKey:d.key,at:new Date().toISOString(),price:price/n,currency,pointsEarned:d.pointsEarned})));
+  next.history.push(...drawn.map(d=>({itemKey:d.key,at:new Date().toISOString(),price:isPointDraw?price/n:0,currency,pointsEarned:d.pointsEarned})));
   if(next.history.length>10000)next.history=next.history.slice(-10000);
   persist(next);lastDraw=drawn;render();displayStepBadges();
   $('result').hidden=false;$('result').replaceChildren();
@@ -517,7 +517,7 @@ function draw(n,price,currency='wallet'){
   $('message').textContent=cost+'を使用。'+(earned?'重複ボーナス +'+earned.toLocaleString('ja-JP')+' pt。':'')+'ポイント残高：'+state.points.toLocaleString('ja-JP')+' pt';
  }catch(e){$('message').textContent=e?.name==='QuotaExceededError'?'端末の保存容量が不足しています。コレクションのバックアップを保存してください。':e?.message==='コレクションデータの検証に失敗しました'?'コレクションの保存データを確認できませんでした。':'ガチャ処理でエラーが発生しました。履歴を確認してから再操作してください。';console.error('badge gacha error:',e);}
 }
-$('drawOne').addEventListener('click',()=>draw(1,5000));$('drawTen').addEventListener('click',()=>draw(10,45000));
+$('drawOne').addEventListener('click',()=>draw(1,1));$('drawTen').addEventListener('click',()=>draw(10,10));
 $('drawPoints').addEventListener('click',()=>draw(1,POINT_COST,'points'));
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));$('detail').classList.add('hidden');render()}));
 $('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({type:'BAKEN_KING_PIN_COLLECTION',mode,data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='baken-king-pin-collection-'+mode+'-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)});
