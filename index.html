@@ -2528,14 +2528,43 @@ const bkWin5BuyingEnabled=()=>bkWin5Today()===BK_WIN5_LIVE_DATE;
 const BK_WIN5_WALLET_KEY='baken-king-g1-pins-mvp-v1-'+(IS_TEST_MODE?'test':'production');
 function bkWin5WalletRead(){
  const raw=localStorage.getItem(BK_WIN5_WALLET_KEY);
- if(raw===null)return {version:1,wallet:300000,points:0,owned:{},history:[],win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};
+ if(raw===null)return {version:1,wallet:300000,points:0,owned:{},history:[],gachaTickets:0,win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};
  let v;try{v=JSON.parse(raw)}catch{throw Error('WIN5財布データを読み取れません。書き換えを停止しました')}
  if(!v||v.version!==1||!Number.isSafeInteger(v.wallet)||v.wallet<0||v.wallet>1e12||
   !Number.isSafeInteger(v.points??0)||(v.points??0)<0||!v.owned||typeof v.owned!=='object'||Array.isArray(v.owned)||
   !Array.isArray(v.history)||!Array.isArray(v.win5Tickets||[])||
-  !Number.isSafeInteger(v.win5TotalStake??0)||!Number.isSafeInteger(v.win5TotalPaid??0))
+  !Number.isSafeInteger(v.win5TotalStake??0)||!Number.isSafeInteger(v.win5TotalPaid??0)||
+  !Number.isSafeInteger(v.gachaTickets??0)||(v.gachaTickets??0)<0)
   throw Error('WIN5財布が不正です。記録を保護するため停止しました');
- return {...v,points:v.points??0,win5Tickets:v.win5Tickets||[],win5TotalStake:v.win5TotalStake||0,win5TotalPaid:v.win5TotalPaid||0};
+ return {...v,points:v.points??0,gachaTickets:v.gachaTickets??0,win5Tickets:v.win5Tickets||[],win5TotalStake:v.win5TotalStake||0,win5TotalPaid:v.win5TotalPaid||0};
+}
+// Verified WIN5 winnings: 10% to regular wallet (max 200,000 yen per ticket),
+// plus gacha spins. Refunds are not a reward.
+function bkWin5Reward(winningYen){
+ if(!Number.isSafeInteger(winningYen)||winningYen<=0)return {transfer:0,spins:0};
+ return {
+  transfer:Math.min(Math.floor(winningYen/10),200000),
+  spins:winningYen<100000?5:winningYen<1000000?10:winningYen<10000000?30:50
+ };
+}
+function bkWin5TransferPending(){
+ const wallet=bkWin5WalletRead();
+ if(!Array.isArray(wallet.win5Tickets))return 0;
+ const applied=Array.isArray(s.win5TransferIds)?s.win5TransferIds:[];
+ const done=new Set(applied);
+ const pending=wallet.win5Tickets.filter(t=>t.status==='settled'&&Number.isSafeInteger(t.win5TransferYen)&&t.win5TransferYen>0&&!done.has(t.id));
+ if(!pending.length)return 0;
+ const newTotal=pending.reduce((n,t)=>n+t.win5TransferYen,0);
+ if(!Number.isSafeInteger(newTotal)||!Number.isSafeInteger(s.balance+newTotal)||
+  !Number.isSafeInteger((s.win5TransferTotal||0)+newTotal))throw Error('通常財布へのWIN5還元額を保存できません');
+ const before={balance:s.balance,ids:s.win5TransferIds,total:s.win5TransferTotal};
+ s.balance+=newTotal;s.win5TransferIds=[...applied,...pending.map(t=>t.id)];s.win5TransferTotal=(s.win5TransferTotal||0)+newTotal;
+ try{save();return newTotal}catch(e){
+  s.balance=before.balance;
+  if(before.ids===undefined)delete s.win5TransferIds;else s.win5TransferIds=before.ids;
+  if(before.total===undefined)delete s.win5TransferTotal;else s.win5TransferTotal=before.total;
+  throw e;
+ }
 }
 function bkWin5WalletWrite(v){
  localStorage.setItem(BK_WIN5_WALLET_KEY,JSON.stringify(v));
@@ -2618,10 +2647,15 @@ window.BakenWin5Wallet={
  settle:ticketId=>{
   if(typeof ticketId!=='string')return {ok:false,error:'投票券が不正です'};
   try{
+   // Finish any committed-but-uncredited WIN5 rewards first.
+   bkWin5TransferPending();
    const wallet=bkWin5WalletRead();
    const ticket=wallet.win5Tickets.find(t=>t.id===ticketId);
    if(!ticket)return {ok:false,error:'WIN5専用財布に投票券が見つかりません'};
-   if(ticket.status==='settled')return {ok:true,ticket,duplicate:true};
+   if(ticket.status==='settled'){
+    bkWin5TransferPending();
+    return {ok:true,ticket,duplicate:true};
+   }
    const result=ticket.win5Evaluation;
    if(ticket.status!=='pending'||result?.complete!==true)return {ok:false,error:'5レースすべての確定結果を待っています'};
    if(result.hitCount>0&&!ticket.win5PayoutReady)return {ok:false,error:'WIN5公式払戻金の確認まで精算できません'};
@@ -2631,27 +2665,39 @@ window.BakenWin5Wallet={
      ticket.win5OfficialPayout.refundYen!==result.refundYen||
      ticket.win5OfficialPayout.source!=='JRA_WIN5'))
     return {ok:false,error:'WIN5公式払戻金が一致しません'};
-   if(!Number.isSafeInteger(paid)||paid<0||(!result.hitCount&&paid>ticket.stake)||
-     !Number.isSafeInteger(wallet.wallet+paid)||wallet.wallet+paid>1e12||
-     !Number.isSafeInteger(wallet.win5TotalPaid+paid))
+   if(!Number.isSafeInteger(paid)||paid<0||(!result.hitCount&&paid>ticket.stake))
     return {ok:false,error:'WIN5払戻額が不正です'};
-   ticket.status='settled';ticket.paid=paid;
-   wallet.wallet+=paid;wallet.win5TotalPaid+=paid;
+   const winningYen=result.hitCount>0?paid-result.refundYen:0;
+   if(!Number.isSafeInteger(result.refundYen)||result.refundYen<0||
+      !Number.isSafeInteger(winningYen)||winningYen<0)return {ok:false,error:'的中額と返還額の整合性が不正です'};
+   const reward=bkWin5Reward(winningYen);
+   const win5Paid=paid-reward.transfer;
+   if(!Number.isSafeInteger(wallet.wallet+win5Paid)||wallet.wallet+win5Paid>1e12||
+     !Number.isSafeInteger(wallet.win5TotalPaid+paid)||
+     !Number.isSafeInteger(wallet.gachaTickets+reward.spins)||
+     !Number.isSafeInteger(s.balance+reward.transfer))
+    return {ok:false,error:'WIN5払戻額・特典が上限を超えています'};
+   ticket.status='settled';ticket.paid=paid;ticket.win5TransferYen=reward.transfer;ticket.win5GachaGranted=reward.spins;
+   wallet.wallet+=win5Paid;wallet.win5TotalPaid+=paid;wallet.gachaTickets+=reward.spins;
+   // Commit ticket, gacha spins and WIN5 wallet together. This is the recovery journal.
    bkWin5WalletWrite(wallet);
-   return {ok:true,ticket};
-  }catch(error){return {ok:false,error:error.message||'WIN5財布への精算に失敗しました'}}
+   // Only after the first durable write, credit the ordinary wallet once per ticket.
+   bkWin5TransferPending();
+   return {ok:true,ticket,transfer:reward.transfer,spins:reward.spins};
+  }catch(error){return {ok:false,error:error.message||'WIN5特典の精算に失敗しました'}}
  },
  snapshot:()=>{
   try{
    const w=bkWin5WalletRead();
    return {balance:w.wallet,totalStake:w.win5TotalStake,totalPaid:w.win5TotalPaid,
     season:1,seasonOver:false,mode:IS_TEST_MODE?'test':'production',
-    tickets:w.win5Tickets.slice(),legacyCount:(s.win5Tickets||[]).length};
+    tickets:w.win5Tickets.slice(),gachaTickets:w.gachaTickets,legacyCount:(s.win5Tickets||[]).length};
   }catch(e){return {balance:0,tickets:[],seasonOver:true,error:e.message}}
  },
  reset:()=>{
   if(Array.isArray(s.win5Tickets)&&s.win5Tickets.length)return {ok:false,error:'旧共通財布にWIN5券が残っています。個別移行前の削除を防止しました'};
-  const reset={version:1,wallet:300000,points:0,owned:{},history:[],win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};
+  try{bkWin5TransferPending()}catch(e){return {ok:false,error:'通常財布への未反映還元が残っています。初期化できません'}}
+  const reset={version:1,wallet:300000,points:0,owned:{},history:[],gachaTickets:0,win5Tickets:[],win5TotalStake:0,win5TotalPaid:0};
   try{bkWin5WalletWrite(reset);return {ok:true}}catch(e){return {ok:false,error:'WIN5初期化に失敗しました'}}
  },
  purchase:request=>{
@@ -2713,6 +2759,7 @@ window.BakenWin5Wallet={
 
  }
 };
+try{bkWin5TransferPending()}catch(e){console.warn('WIN5還元の反映待ち:',e.message)}
 function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2800)}let selected=[];function keyFor(type,nums){return ordered.has(type)||specs[type]===1?nums.join('-'):nums.slice().sort((a,b)=>a-b).join('-')}
 
 /* Multi-combination ticket builder. A ticket contains picks[] and one unit stake. */
