@@ -4008,6 +4008,7 @@ function bkValidatedExtras(v){
     !Number.isSafeInteger(value.points??0)||(value.points??0)<0||
     !value.owned||typeof value.owned!=='object'||Array.isArray(value.owned)||!Array.isArray(value.history)||
     !Array.isArray(value.win5Tickets||[])||value.win5Tickets.length>100000||
+    (!Number.isSafeInteger(value.gachaTickets??0)||(value.gachaTickets??0)<0)||
     value.win5Tickets?.some(t=>!t||!Number.isSafeInteger(t.stake)||t.stake<100||
      !['pending','settled','refunded'].includes(t.status))))throw Error('win5_wallet');
   extras[key]=JSON.stringify(value);
