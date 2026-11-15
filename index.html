@@ -3918,7 +3918,7 @@ $('settle').onclick=()=>{return toast('練習結果による精算は廃止し�
 if(s.raceClosed)return toast('精算済みです');if(!confirm('架空のレース結果で確定し、全馬券を精算しますか？'))return;
  for(const b of bkCurrentRaceBets().filter(x=>x.status==='pending')){b.paid=bkTicketPayout(b);b.status='settled';s.balance+=b.paid;s.totalPaid+=b.paid}
  s.raceClosed=true;toast('結果を確定し精算しました');save()};$('csv').onclick=()=>{const quote=v=>'"'+String(v??'').replaceAll('"','""')+'"';const rows=[['ID','購入日時','シーズン','券種','馬番','購入額','払戻額','状態'],...s.bets.map(b=>[b.id,b.purchasedAt||'',b.season,b.type,bkTicketPicksFromSaved(b).map(p=>p.join('-')).join(' / '),b.stake,b.paid,b.status==='pending'?'未精算':'精算済み'])];const csv='\uFEFF'+rows.map(row=>row.map(quote).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='baken-king-history-'+new Date().toISOString().slice(0,10)+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};// Portable backup v2: only user records and public race data. Never export bridge credentials.
-const BK_BACKUP_KEYS=['baken-king-tags-v1','baken-king-real-notes-v1','baken-king-imported-race-v1','baken-king-imported-race-drafts-v1','baken-king-personal-cards-v1'];
+const BK_BACKUP_KEYS=['baken-king-tags-v1','baken-king-real-notes-v1','baken-king-imported-race-v1','baken-king-imported-race-drafts-v1','baken-king-personal-cards-v1','baken-king-g1-pins-mvp-v1-'+(IS_TEST_MODE?'test':'production')];
 function bkValidBackupState(v){
  return v&&typeof v==='object'&&!Array.isArray(v)&&Array.isArray(v.bets)&&v.bets.length<=100000&&
  Array.isArray(v.seasons)&&v.seasons.length<=10000&&
@@ -3950,6 +3950,13 @@ function bkValidatedExtras(v){
   if(key==='baken-king-real-notes-v1'&&(!Array.isArray(value)||value.length>100))throw Error('notes');
   if(key==='baken-king-imported-race-drafts-v1'&&(!Array.isArray(value)||value.length>100))throw Error('drafts');
   if(key==='baken-king-personal-cards-v1'&&(!value||!Array.isArray(value.races)||value.races.length>108))throw Error('cards');
+  if(key.startsWith('baken-king-g1-pins-mvp-v1-')&&
+   (!value||value.version!==1||!Number.isSafeInteger(value.wallet)||value.wallet<0||value.wallet>1e12||
+    !Number.isSafeInteger(value.points??0)||(value.points??0)<0||
+    !value.owned||typeof value.owned!=='object'||Array.isArray(value.owned)||!Array.isArray(value.history)||
+    !Array.isArray(value.win5Tickets||[])||value.win5Tickets.length>100000||
+    value.win5Tickets?.some(t=>!t||!Number.isSafeInteger(t.stake)||t.stake<100||
+     !['pending','settled','refunded'].includes(t.status))))throw Error('win5_wallet');
   extras[key]=JSON.stringify(value);
  }
  return extras;
