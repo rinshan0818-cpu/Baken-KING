@@ -1,4 +1,4 @@
-// Baken-KING PWA v1.51: network-first navigation and opt-in settlement-ready Web Push.
+// Baken-KING PWA v1.52: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
 const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
 const BK_GACHA_IMAGE_FILES=['./assets/badges/collection-hero-hq.webp','./assets/badges/collection-hero.webp'];
@@ -27,6 +27,20 @@ self.addEventListener('fetch',event=>{
   })());return;
  }
  if(event.request.mode!=='navigate')return;
+ // Existing iOS home-screen installs launch the manifest's original './' URL.
+ // Resolve that entry point to a versioned HTML URL without changing scope or storage.
+ const scope=new URL(self.registration.scope);
+ if(url.origin===scope.origin&&url.pathname===scope.pathname&&!url.search){
+  event.respondWith((async()=>{
+   const target=new URL('./index.html?pwa-entry=v1.52',scope);
+   try{
+    const response=await fetch(new Request(target.href,{cache:'no-store'}));
+    if(response.ok)return response;
+   }catch(e){}
+   return fetch(new Request(event.request,{cache:'no-store'}));
+  })());
+  return;
+ }
  event.respondWith(fetch(new Request(event.request,{cache:'no-store'})).catch(()=>fetch(event.request)));
 });
 self.addEventListener('push',event=>{
