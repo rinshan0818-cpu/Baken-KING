@@ -15,6 +15,14 @@ const baseSelector='main.wrap > [data-tab]';
   // Run entirely against a fresh, disposable Playwright browser profile.
   await page.route('**/data/authorized-race-cards.json*',route=>
    route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({races:[]})}));
+  // Seed test-only WIN5 reward tickets; real users must win verified WIN5 to obtain these.
+  await page.addInitScript(()=>{
+   const key='baken-king-g1-pins-mvp-v1-production';
+   if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({
+    version:1,wallet:300000,points:0,owned:{},history:[],gachaTickets:10,
+    win5Tickets:[],win5TotalStake:0,win5TotalPaid:0
+   }));
+  });
   await page.goto(origin,{waitUntil:'domcontentloaded'});
   await page.waitForSelector('[data-nav="home"].active');
 
