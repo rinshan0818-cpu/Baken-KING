@@ -2541,7 +2541,7 @@ function bkWin5WalletRead(){
   !Array.isArray(v.history)||!Array.isArray(v.win5Tickets||[])||
   !Number.isSafeInteger(v.win5TotalStake??0)||!Number.isSafeInteger(v.win5TotalPaid??0)||
   !Number.isSafeInteger(v.gachaTickets??0)||(v.gachaTickets??0)<0||
-  (v.lastMonthlyTopUpMonth!==undefined&&!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(v.lastMonthlyTopUpMonth)))
+  (v.lastMonthlyTopUpMonth!==undefined&&!/^20\d{2}-(0[1-9]|1[0-2])$/.test(v.lastMonthlyTopUpMonth)))
   throw Error('WIN5財布が不正です。記録を保護するため停止しました');
  if(!v.lastMonthlyTopUpMonth){
   // Existing users are enrolled without an immediate grant or reset.
