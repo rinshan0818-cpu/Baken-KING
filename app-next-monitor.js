@@ -46,7 +46,7 @@
   if(!state||!Array.isArray(state.bets)||!Array.isArray(cards))return null;
   const extract=window.BakenMonitoringTargets?.extractTargets;
   if(typeof extract!=='function')return null;
-  return extract(state.bets,cards,state.win5Tickets,state.win5Watch);
+  return extract(state.bets,cards,window.BakenWin5Wallet?.snapshot?.()?.tickets||state.win5Tickets,state.win5Watch);
  }
  async function sync(){
   if(document.visibilityState==='hidden')return;
