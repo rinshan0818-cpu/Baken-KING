@@ -80,7 +80,7 @@
       const state=read(BETS_KEY);
       const stored=read(CARDS_KEY);
       const cards=Array.isArray(stored)?stored:stored?.races;
-      const targets=extractTargets(state?.bets,cards,state?.win5Tickets,state?.win5Watch);
+      const targets=extractTargets(state?.bets,cards,window.BakenWin5Wallet?.snapshot?.()?.tickets||state?.win5Tickets,state?.win5Watch);
       if(!targets.length){msg.textContent='対象レースなし。発走時刻付きの出馬表と購入済み・未精算馬券を確認してください。';return}
       const payload={schemaVersion:1,kind:'baken-monitor-targets',targets};
       const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
