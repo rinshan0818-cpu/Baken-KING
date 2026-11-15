@@ -111,7 +111,8 @@ management.append(node('summary','テスト・管理'));
 const managementBody=node('div');managementBody.className='w5-management-body';
 managementBody.append(demoSwitch,trial,resetWallet);
 management.append(managementBody);
-votingSection.append(head,walletPanel,note,sourceLink,management,jump,races,bar);
+// Keep internal test controls and WIN1–WIN5 quick-jump buttons out of the public purchase UI.
+votingSection.append(head,walletPanel,note,sourceLink,races,bar);
 body.append(ticketHome,votingSection,history);host.replaceChildren(styles,body);
 const current=()=>schedule.find(x=>x.date===selectedDate);
 // Read exactly the same validated race-card cache used by the regular prediction screen.
