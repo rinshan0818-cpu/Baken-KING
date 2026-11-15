@@ -1,4 +1,4 @@
-// Baken-KING PWA v1.52: network-first navigation and opt-in settlement-ready Web Push.
+// Baken-KING PWA v1.54: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
 const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
 const BK_GACHA_IMAGE_FILES=['./assets/badges/collection-hero-hq.webp','./assets/badges/collection-hero.webp'];
@@ -32,7 +32,7 @@ self.addEventListener('fetch',event=>{
  const scope=new URL(self.registration.scope);
  if(url.origin===scope.origin&&url.pathname===scope.pathname&&!url.search){
   event.respondWith((async()=>{
-   const target=new URL('./index.html?pwa-entry=v1.52',scope);
+   const target=new URL('./index.html?pwa-entry=v1.54',scope);
    try{
     const response=await fetch(new Request(target.href,{cache:'no-store'}));
     if(response.ok)return response;
@@ -41,7 +41,17 @@ self.addEventListener('fetch',event=>{
   })());
   return;
  }
- event.respondWith(fetch(new Request(event.request,{cache:'no-store'})).catch(()=>fetch(event.request)));
+ // Always use a fresh URL for navigations, including update-button reloads.
+ // Keep the same origin/scope so existing local data and installed icons survive.
+ event.respondWith((async()=>{
+  const fresh=new URL(event.request.url);
+  fresh.searchParams.set('bk-sw-refresh','v1.54');
+  try{
+   const response=await fetch(new Request(fresh.href,{cache:'no-store',credentials:'same-origin'}));
+   if(response.ok)return response;
+  }catch(e){}
+  return fetch(new Request(event.request,{cache:'no-store'}));
+ })());
 });
 self.addEventListener('push',event=>{
  let data={};
