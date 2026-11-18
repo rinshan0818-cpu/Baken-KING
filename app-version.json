@@ -1,5 +1,5 @@
 {
-  "version": "v1.65",
+  "version": "v1.66",
   "updated": "2026-11-19",
-  "notes": "Use preserved historical ticket field size before looking up expired race-card caches; keep original purchase and payout records unchanged"
+  "notes": "Restore 24 archived 2026-11-01 race condition records from user's Nov 3 backup for analytics only, without changing any ticket or wallet data"
 }
