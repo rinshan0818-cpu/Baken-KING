@@ -1,5 +1,5 @@
 {
-  "version": "v1.63",
+  "version": "v1.64",
   "updated": "2026-11-19",
-  "notes": "Correct conflicting bottom-offset CSS so WIN5 purchase controls follow all race cards without overlap"
+  "notes": "Preserve race conditions on new normal ticket purchases for accurate future data-tab analysis; reuse more stored race-card fields; no historical data rewriting"
 }
