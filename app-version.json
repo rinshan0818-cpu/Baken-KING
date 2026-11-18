@@ -1,5 +1,5 @@
 {
-  "version": "v1.70",
+  "version": "v1.71",
   "updated": "2026-11-19",
-  "notes": "Simplify entry condition analytics to female-only, male/gelding-only, young-jockey, and other/unverified; preserve original race metadata and all bet/wallet data."
+  "notes": "Split general entry conditions from unverified data in analytics. Unknown historical restrictions are not classified as general. No changes to ticket history or balances."
 }
