@@ -1,5 +1,5 @@
 {
-  "version": "v1.67",
+  "version": "v1.68",
   "updated": "2026-11-19",
-  "notes": "Restore historical course and distance for Nov 7, 8 and 14 (108 races) for analytics only; preserve ticket and wallet data"
+  "notes": "Restore historical race class and weight rules; add verified explicit entry restrictions for analytics. Track remains unverified; preserve all tickets and balances."
 }
