@@ -3513,6 +3513,15 @@ function bkSaveOfficialGoing(races){
 }
 function bkMeta(b,key){
  const existing=b&&b.raceMeta&&typeof b.raceMeta==='object'?b.raceMeta[key]:null;
+ if(key==='going'){
+  const historical=bkHistoricalGoing.get([b?.raceDate,b?.raceVenue,Number(b?.raceNumber)].join('|'));
+  if(['良','稍重','重','不良'].includes(historical))return historical;
+  try{
+   const official=JSON.parse(localStorage.getItem(bkOfficialGoingKey)||'{}');
+   const confirmed=official?.[[b?.raceDate,b?.raceVenue,Number(b?.raceNumber)].join('|')];
+   if(['良','稍重','重','不良'].includes(confirmed))return confirmed;
+  }catch{}
+ }
  if(key==='fieldSize'&&Number.isInteger(Number(b.fieldSize))&&Number(b.fieldSize)>0)return Number(b.fieldSize);
  if(key==='raceKind'){
   // Re-evaluate the course type from the actual race identity / race card.
