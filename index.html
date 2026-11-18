@@ -3501,7 +3501,7 @@ function bkSaveOfficialGoing(races){
   const next=old&&typeof old==='object'&&!Array.isArray(old)?{...old}:{};
   let changed=false;
   for(const race of races||[]){
-   if(!race||race.status!=='final'||!/^20\\d{2}-\\d{2}-\\d{2}$/.test(race.date||'')||
+   if(!race||race.status!=='final'||!/^20\d{2}-\d{2}-\d{2}$/.test(race.date||'')||
       !['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'].includes(race.venue)||
       !Number.isInteger(race.raceNumber)||race.raceNumber<1||race.raceNumber>12||
       !['良','稍重','重','不良'].includes(race.going))continue;
