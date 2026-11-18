@@ -1,5 +1,5 @@
 {
-  "version": "v1.62",
+  "version": "v1.63",
   "updated": "2026-11-19",
-  "notes": "WIN5 purchase panel follows race cards in normal scroll flow, without overlap; user data unchanged"
+  "notes": "Correct conflicting bottom-offset CSS so WIN5 purchase controls follow all race cards without overlap"
 }
