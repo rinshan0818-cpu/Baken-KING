@@ -1,5 +1,5 @@
 {
-  "version": "v1.73",
+  "version": "v1.74",
   "updated": "2026-11-19",
-  "notes": "Support optional verified per-race going in results for analytics, isolated from settlement. Delivery integration pending."
+  "notes": "Historical going for 144 races (Nov 7/8/14/15) added directly to analytics; no historical monitoring or settlement changes."
 }
