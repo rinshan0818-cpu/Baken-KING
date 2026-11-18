@@ -1,5 +1,5 @@
 {
-  "version": "v1.68",
+  "version": "v1.69",
   "updated": "2026-11-19",
-  "notes": "Restore historical race class and weight rules; add verified explicit entry restrictions for analytics. Track remains unverified; preserve all tickets and balances."
+  "notes": "Supplement verified historical entry restrictions from JRA; unverified races remain unlinked; no changes to bets or wallets."
 }
