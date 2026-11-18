@@ -1,5 +1,5 @@
 {
-  "version": "v1.69",
+  "version": "v1.70",
   "updated": "2026-11-19",
-  "notes": "Supplement verified historical entry restrictions from JRA; unverified races remain unlinked; no changes to bets or wallets."
+  "notes": "Simplify entry condition analytics to female-only, male/gelding-only, young-jockey, and other/unverified; preserve original race metadata and all bet/wallet data."
 }
