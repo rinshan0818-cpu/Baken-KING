@@ -1,4 +1,4 @@
-// PWA recovery revision 2026-11-16 v1.60; no local data or cache deletion.
+// PWA network recovery v1.60b; preserve all app storage and user data.
 // Baken-KING PWA refresh fix: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
 const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
@@ -12,29 +12,41 @@ self.addEventListener('install',event=>{
 });
 self.addEventListener('activate',event=>event.waitUntil((async()=>{
  await self.clients.claim();
- // Repair already-installed iOS PWAs still running an old HTML shell.
- // Only refresh an existing in-scope app page once when this worker activates.
+ // Tell any open legacy app that a new worker has activated.
  const pages=await self.clients.matchAll({type:'window',includeUncontrolled:true});
  for(const page of pages){
   try{
    const url=new URL(page.url);
    const scope=new URL(self.registration.scope);
    if(url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))continue;
-   // v1.60 recovery: refresh an existing installed PWA exactly once
-   // when this updated service worker activates; keep same origin/storage.
-   if(url.searchParams.has('bk-recovered-v160'))continue;
+   if(url.searchParams.has('bk-recovered-v160b'))continue;
    const target=new URL('./index.html',scope);
-   target.searchParams.set('bk-recovered-v160','1');
+   target.searchParams.set('bk-recovered-v160b','1');
    target.searchParams.set('t',String(Date.now()));
    await page.navigate(target.href);
-  }catch(e){console.warn('PWA refresh deferred',e)}
+  }catch(e){console.warn('PWA recovery deferred',e)}
  }
 })()));
 self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting()});
 self.addEventListener('fetch',event=>{
  const url=new URL(event.request.url);
- if(url.origin===self.location.origin&&url.pathname.endsWith('/app-version.json')){event.respondWith(fetch(new Request(event.request,{cache:'no-store'})));return;}
- const localImage=url.origin===self.location.origin&&BK_GACHA_IMAGE_FILES.some(file=>url.pathname===new URL(file,self.registration.scope).pathname);
+ const scope=new URL(self.registration.scope);
+ const isLocal=url.origin===scope.origin&&url.pathname.startsWith(scope.pathname);
+ // Never serve old application/version documents from any service-worker cache.
+ if(isLocal&&(/\/(?:app-version\.json|index\.html|sw\.js)$/.test(url.pathname)||url.pathname===scope.pathname)){
+  event.respondWith((async()=>{
+   const target=new URL(event.request.url);
+   target.searchParams.set('bk-network-recovery','v160b');
+   target.searchParams.set('t',String(Date.now()));
+   try{
+    const response=await fetch(new Request(target.href,{cache:'no-store',credentials:'same-origin',redirect:'follow'}));
+    if(response.ok)return response;
+   }catch(e){}
+   return fetch(event.request);
+  })());
+  return;
+ }
+ const localImage=isLocal&&BK_GACHA_IMAGE_FILES.some(file=>url.pathname===new URL(file,scope).pathname);
  if(localImage){
   event.respondWith((async()=>{
    const cache=await caches.open(BK_GACHA_IMAGE_CACHE);
@@ -44,35 +56,8 @@ self.addEventListener('fetch',event=>{
    const response=await fetch(event.request);
    if(response.ok)await cache.put(key,response.clone());
    return response;
-  })());return;
- }
- if(event.request.mode!=='navigate')return;
- // Existing iOS home-screen installs launch the manifest's original './' URL.
- // Resolve that entry point to a versioned HTML URL without changing scope or storage.
- const scope=new URL(self.registration.scope);
- if(url.origin===scope.origin&&url.pathname===scope.pathname&&!url.search){
-  event.respondWith((async()=>{
-   const target=new URL('./index.html',scope);
-   target.searchParams.set('bk-sw-refresh',String(Date.now()));
-   try{
-    const response=await fetch(new Request(target.href,{cache:'no-store'}));
-    if(response.ok)return response;
-   }catch(e){}
-   return fetch(new Request(event.request,{cache:'no-store'}));
   })());
-  return;
  }
- // Always use a fresh URL for navigations, including update-button reloads.
- // Keep the same origin/scope so existing local data and installed icons survive.
- event.respondWith((async()=>{
-  const fresh=new URL(event.request.url);
-  fresh.searchParams.set('bk-sw-refresh',String(Date.now()));
-  try{
-   const response=await fetch(new Request(fresh.href,{cache:'no-store',credentials:'same-origin'}));
-   if(response.ok)return response;
-  }catch(e){}
-  return fetch(new Request(event.request,{cache:'no-store'}));
- })());
 });
 self.addEventListener('push',event=>{
  let data={};
