@@ -1,5 +1,5 @@
 {
-  "version": "v1.72",
+  "version": "v1.73",
   "updated": "2026-11-19",
-  "notes": "JRA daily race-program classification for Nov 7/8/14/15: female-only, young-jockey, general; historical analysis only; no changes to bets, settlements, or balances."
+  "notes": "Support optional verified per-race going in results for analytics, isolated from settlement. Delivery integration pending."
 }
