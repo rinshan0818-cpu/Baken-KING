@@ -1,5 +1,5 @@
 {
-  "version": "v1.64",
+  "version": "v1.65",
   "updated": "2026-11-19",
-  "notes": "Preserve race conditions on new normal ticket purchases for accurate future data-tab analysis; reuse more stored race-card fields; no historical data rewriting"
+  "notes": "Use preserved historical ticket field size before looking up expired race-card caches; keep original purchase and payout records unchanged"
 }
