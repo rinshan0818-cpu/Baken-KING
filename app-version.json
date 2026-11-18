@@ -1,5 +1,5 @@
 {
-  "version": "v1.71",
+  "version": "v1.72",
   "updated": "2026-11-19",
-  "notes": "Split general entry conditions from unverified data in analytics. Unknown historical restrictions are not classified as general. No changes to ticket history or balances."
+  "notes": "JRA daily race-program classification for Nov 7/8/14/15: female-only, young-jockey, general; historical analysis only; no changes to bets, settlements, or balances."
 }
