@@ -1,5 +1,5 @@
 {
-  "version": "v1.61",
+  "version": "v1.62",
   "updated": "2026-11-19",
-  "notes": "Fix analytics filter alignment; expose unlinked purchase and payout amounts rather than silently omitting them; reuse explicit saved race metadata"
+  "notes": "WIN5 purchase panel follows race cards in normal scroll flow, without overlap; user data unchanged"
 }
