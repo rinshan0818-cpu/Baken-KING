@@ -51,7 +51,7 @@ styles.textContent+=`
 .w5-hist{padding:9px 12px;margin-top:16px}
 .w5-hist>summary{font-weight:800;color:#254a76;cursor:pointer;list-style-position:inside;min-height:42px;display:list-item;align-content:center}
 .w5-hist[open]>summary{border-bottom:1px solid #dbe5f1;margin-bottom:10px}
-.w5-bar{padding:10px 11px;bottom:calc(66px + env(safe-area-inset-bottom));max-width:100%}
+.w5-bar{padding:10px 11px;position:static;bottom:auto;max-width:100%;margin:16px 0 0;clear:both}
 .w5-control-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .w5-control-row label{min-width:92px;max-width:118px;font-size:11px;line-height:1.2;color:#426184;flex-shrink:0}
 .w5-control-row input{width:100%;min-width:0;max-width:112px;min-height:39px;margin-top:4px!important;padding:5px 7px;font-size:16px}
