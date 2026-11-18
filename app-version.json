@@ -1,5 +1,5 @@
 {
-  "version": "v1.60",
-  "updated": "2026-11-16",
-  "notes": "Aligned bottom navigation icons and labels; added separate WIN5 metrics on home; clarified game-over count and WIN5 transfer amounts"
+  "version": "v1.61",
+  "updated": "2026-11-19",
+  "notes": "Fix analytics filter alignment; expose unlinked purchase and payout amounts rather than silently omitting them; reuse explicit saved race metadata"
 }
