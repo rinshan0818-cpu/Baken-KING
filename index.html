@@ -4377,7 +4377,25 @@ async function checkForUpdate(silent=false){
    updateButton.textContent='最新版を確認';
    updateButton.onclick=()=>checkForUpdate(false);
   }
- }catch(e){if(!silent)label.textContent='最新版を確認できませんでした。通信状況を確認して再試行してください';}
+ }catch(e){
+  if(!silent){
+    label.textContent='最新版の確認に失敗しました。再読み込みで復旧を試せます（保存データは維持）。';
+    updateButton.textContent='アプリを再読み込み';
+    updateButton.onclick=()=>bkForceRefreshApp();
+  }
+}
+}
+async function bkForceRefreshApp(){
+ const label=document.getElementById('updateStatus');
+ label.textContent='最新の画面を読み込んでいます…';
+ try{
+  if('serviceWorker' in navigator){
+   const registration=await navigator.serviceWorker.getRegistration();
+   if(registration)await registration.update();
+  }
+ }catch(e){console.warn('Service worker refresh deferred',e)}
+ // A URL with a fresh query forces a new navigation without clearing localStorage.
+ location.replace('./index.html?bk-force-refresh='+Date.now());
 }
 async function applyAppUpdate(automatic=false){
  if(bkUpdateApplying||(automatic&&!bkCanAutoApplyUpdate()))return;
