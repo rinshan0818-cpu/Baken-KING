@@ -1,4 +1,4 @@
-// PWA recovery v1.75b; retain origin storage, wallet, bets and friend data.
+// PWA recovery v1.75c; retain origin storage, wallet, bets and friend data.
 // Baken-KING PWA refresh fix: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
 const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
@@ -23,7 +23,16 @@ self.addEventListener('activate',event=>event.waitUntil((async()=>{
    const target=new URL('./index.html',scope);
    target.searchParams.set('bk-recovered-v175b','1');
    target.searchParams.set('t',String(Date.now()));
-   await page.navigate(target.href);
+   // A legacy standalone iOS PWA may not respond to the update button.
+   // Navigate the existing client without deleting its origin storage.
+   try{
+    const navigated=await page.navigate(target.href);
+    if(!navigated)console.warn('PWA recovery navigation returned no client');
+   }catch(navigationError){
+    // Existing versions may not listen for this message; it is a safe fallback.
+    try{page.postMessage({type:'BAKEN_PWA_RECOVERY',url:target.href})}catch(_){}
+    console.warn('PWA recovery navigation deferred',navigationError);
+   }
   }catch(e){console.warn('PWA recovery deferred',e)}
  }
 })()));
