@@ -1,5 +1,5 @@
 {
-  "version": "v1.74",
-  "updated": "2026-11-19",
-  "notes": "Historical going for 144 races (Nov 7/8/14/15) added directly to analytics; no historical monitoring or settlement changes."
+  "version": "v1.75",
+  "updated": "2026-11-21",
+  "notes": "WIN5 upcoming-date purchase unlocked and demo disabled; refresh PWA without clearing saved data."
 }
