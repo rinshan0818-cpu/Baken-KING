@@ -4803,7 +4803,7 @@ bkTicketRaceTitle=function(b){
    const shown=new Set();
    const labels=[];
    for(const label of Array.isArray(rule.restrictions)?rule.restrictions:[]){
-    if(['混合','牝馬限定','牡・せん限定','指定','特別指定','国際','若手騎手'].includes(label)&&!shown.has(label)){
+    if(['牝馬限定','牡・せん限定','若手騎手'].includes(label)&&!shown.has(label)){
      shown.add(label);labels.push(label);
     }
    }
