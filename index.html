@@ -4350,7 +4350,7 @@ async function bkFetchLatestVersion(){
    const response=await fetch(new URL('./',location.href).href+'?bk-version-retry='+nonce,{cache:'reload'});
    if(response.ok){
     const html=await response.text();
-    htmlVersion=html.match(/<title>Baken-KING[^<]*?(v\\d+\\.\\d+(?:\\.\\d+)?)/)?.[1]||null;
+    htmlVersion=html.match(/<title>Baken-KING[^<]*?(v\d+\.\d+(?:\.\d+)?)/)?.[1]||null;
    }
   }catch(e){console.warn('PWA version retry unavailable',e)}
  }
