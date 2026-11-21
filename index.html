@@ -4343,6 +4343,17 @@ async function bkFetchLatestVersion(){
    if(match)htmlVersion=match[1];
   }
  }catch(e){console.warn('PWA HTML version probe unavailable',e)}
+ if(!manifestVersion&&!htmlVersion){
+  // A temporary offline/network error must not leave the user with a dead update button.
+  // Retry against the origin root; do not delete caches or any local app data.
+  try{
+   const response=await fetch(new URL('./',location.href).href+'?bk-version-retry='+nonce,{cache:'reload'});
+   if(response.ok){
+    const html=await response.text();
+    htmlVersion=html.match(/<title>Baken-KING[^<]*?(v\\d+\\.\\d+(?:\\.\\d+)?)/)?.[1]||null;
+   }
+  }catch(e){console.warn('PWA version retry unavailable',e)}
+ }
  if(!manifestVersion&&!htmlVersion)throw Error('version_unavailable');
  // The published manifest can be ahead of HTML during a deploy; only navigate
  // when the HTML has actually caught up to the declared version.
@@ -5303,4 +5314,4 @@ try{const saved=localStorage.getItem(cardStorageKey);if(saved)importCardData(JSO
 loadAuthorizedCards();
 date.addEventListener('change',()=>{if(cards.length)syncImportedOptions();show();window.dispatchEvent(new Event('baken:cards-imported'))});venue.addEventListener('change',()=>{if(cards.length)syncImportedOptions();show();window.dispatchEvent(new Event('baken:cards-imported'))});race.addEventListener('change',()=>{show();window.dispatchEvent(new Event('baken:cards-imported'))});
 })();
-</script><script src="./monitor-target-export.js?v=20261115-wallet" defer></script><script src="./monitor-lifecycle.js?v=20261115-wallet" defer></script><script src="./monitor-auto-sync.js?v=20261115-wallet" defer></script><script src="./race-card-auto-sync.js?v=5" defer></script><script src="./result-auto-sync.js?v=4" defer></script><script src="./push-notifications.js?v=7" defer></script><script src="./settings-surface.js?v=20261116-v158" defer></script><script src="./race-diagnostics.js?v=1" defer></script><script src="./friend-cloud-sync.js?v=4" defer></script><script src="./app-next-cloud.js?v=4" defer></script><script src="./app-next-monitor.js?v=20261115-wallet" defer></script><script src="./win5-results-engine.js?v=20261115"></script><script src="./win5-payouts-engine.js?v=20261115"></script><script src="./win5-purchase.js?v=20261121-win5-live-unlock" onerror="document.querySelector('[data-win5-panel=&quot;purchase&quot;] .bk-win5-coming')?.replaceChildren('WIN5の購入プログラムを読み込めません。通信状態を確認し、Safariで再読み込みしてください。')"></script><script>(function(){const p=document.querySelector('[data-win5-panel="purchase"]');if(p&&p.querySelector('.bk-win5-purchase')&&!window.BakenWin5PurchaseReady){const label=p.querySelector('.bk-win5-coming');if(label)label.textContent='WIN5購入画面の起動に失敗しました。Safariで再読み込みしてください。';}})();</script></body></html>
+</script><script src="./monitor-target-export.js?v=20261115-wallet" defer></script><script src="./monitor-lifecycle.js?v=20261115-wallet" defer></script><script src="./monitor-auto-sync.js?v=20261115-wallet" defer></script><script src="./race-card-auto-sync.js?v=5" defer></script><script src="./result-auto-sync.js?v=4" defer></script><script src="./push-notifications.js?v=7" defer></script><script src="./settings-surface.js?v=20261121-no-win5-demo" defer></script><script src="./race-diagnostics.js?v=1" defer></script><script src="./friend-cloud-sync.js?v=4" defer></script><script src="./app-next-cloud.js?v=4" defer></script><script src="./app-next-monitor.js?v=20261115-wallet" defer></script><script src="./win5-results-engine.js?v=20261115"></script><script src="./win5-payouts-engine.js?v=20261115"></script><script src="./win5-purchase.js?v=20261121-win5-live-unlock" onerror="document.querySelector('[data-win5-panel=&quot;purchase&quot;] .bk-win5-coming')?.replaceChildren('WIN5の購入プログラムを読み込めません。通信状態を確認し、Safariで再読み込みしてください。')"></script><script>(function(){const p=document.querySelector('[data-win5-panel="purchase"]');if(p&&p.querySelector('.bk-win5-purchase')&&!window.BakenWin5PurchaseReady){const label=p.querySelector('.bk-win5-coming');if(label)label.textContent='WIN5購入画面の起動に失敗しました。Safariで再読み込みしてください。';}})();</script></body></html>
