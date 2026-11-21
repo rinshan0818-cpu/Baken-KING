@@ -107,19 +107,6 @@
   // Test mode is an ordinary user feature. Keep its ticket-creation controls
   // in the visible settings section rather than the hidden admin diagnostics.
   groups.general.prepend(modePanel);
-  // Separate WIN5 demo display toggle; does not switch the ordinary wallet's test mode.
-  const win5DemoKey='baken-king-win5-demo-enabled-v1';
-  const win5DemoPanel=document.createElement('section');
-  win5DemoPanel.className='card bk-settings-item';
-  const win5DemoTitle=document.createElement('h3');win5DemoTitle.textContent='WIN5のデモ表示';
-  const win5DemoNote=document.createElement('p');win5DemoNote.className='muted';
-  win5DemoNote.textContent='ONでは架空の出馬表を使って操作を試せます。デモの購入は記録されず、WIN5財布も減りません。変更後は画面を再読み込みします。';
-  const win5DemoButton=document.createElement('button');win5DemoButton.type='button';win5DemoButton.className='outline';
-  const refreshDemo=()=>{const on=localStorage.getItem(win5DemoKey)==='true';win5DemoButton.textContent='WIN5デモ表示：'+(on?'ON':'OFF');win5DemoButton.setAttribute('aria-pressed',String(on));};
-  refreshDemo();
-  win5DemoButton.onclick=()=>{const next=localStorage.getItem(win5DemoKey)!=='true';localStorage.setItem(win5DemoKey,String(next));refreshDemo();location.reload();};
-  win5DemoPanel.append(win5DemoTitle,win5DemoNote,win5DemoButton);
-  groups.general.append(win5DemoPanel);
   // Existing nickname remains controlled by the account profile, never by a second local field.
   const nicknameHint=document.createElement('p');
   nicknameHint.className='muted';
