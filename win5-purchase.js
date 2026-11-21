@@ -75,7 +75,7 @@ dateSelect.className='w5-select';dateSelect.setAttribute('aria-label','WIN5対�
 schedule.forEach(x=>{const option=node('option',x.date.replace(/-/g,'/'));option.value=x.date;dateSelect.append(option)});
 const upcoming=schedule.find(x=>x.date>=today());
 const DEMO_KEY='baken-king-win5-demo-enabled-v1';
-let demoMode=localStorage.getItem(DEMO_KEY)==='true';
+let demoMode=false; // Demo mode retired; preserve historical demo records without enabling synthetic purchases.
 let selectedDate=(upcoming||schedule[schedule.length-1]).date;
 let dateManuallyChosen=false;
 let picks=Array.from({length:5},()=>[]);
@@ -110,7 +110,7 @@ demoSwitch.setAttribute('aria-pressed','false');
 const management=node('details');management.className='w5-hist w5-management';
 management.append(node('summary','テスト・管理'));
 const managementBody=node('div');managementBody.className='w5-management-body';
-managementBody.append(demoSwitch,trial,resetWallet);
+managementBody.append(trial,resetWallet);
 management.append(managementBody);
 // Keep internal test controls and WIN1–WIN5 quick-jump buttons out of the public purchase UI.
 votingSection.append(head,walletPanel,note,sourceLink,races,bar);
@@ -152,10 +152,10 @@ function check(){
  const cards=getRaces(),count=picks.map((list,i)=>list.filter(n=>cards[i]?.horses?.some(h=>available(h)&&Number(h.number)===n)).length);
  const points=count.reduce((a,b)=>a*b,1),price=Number(unit.value),stake=points*price;
  const start=timeOf(cards[0]);const rawCutoff=start?Date.parse(selectedDate+'T'+start+':00+09:00')-300000:NaN;
- const cutoff=selectedDate==='2026-11-15'?Math.min(rawCutoff,Date.parse('2026-11-15T14:35:00+09:00')):rawCutoff;
+ const cutoff=rawCutoff;
  const snapshot=walletSnapshot();
  const validCard=cards.every((c,i)=>c&&Array.isArray(c.horses)&&c.horses.length&&count[i]>0&&picks[i].length===count[i]);
- const purchaseWindow=demoMode||(selectedDate==='2026-11-15'&&today()==='2026-11-15'&&Number.isFinite(cutoff)&&Date.now()<cutoff);
+ const purchaseWindow=selectedDate>=today()&&Number.isFinite(cutoff)&&Date.now()<cutoff;
  const enough=demoMode||Boolean(isLivePurchaseEnabled()&&snapshot&&!snapshot.seasonOver&&!snapshot.error&&!snapshot.legacyCount&&stake<=snapshot.balance);
  const ok=validCard&&Number.isSafeInteger(price)&&price>=100&&price%100===0&&points<=5000&&Number.isSafeInteger(stake)&&stake<=1000000&&purchaseWindow&&enough;
  return {cards,count,points,price,stake,cutoff,ok};
@@ -170,8 +170,6 @@ function chooseUpcomingFromCards(){
 }
 function render(){
  chooseUpcomingFromCards();
- demoSwitch.textContent=demoMode?'実際の出馬表に戻す':'デモ表示で操作する';
- demoSwitch.setAttribute('aria-pressed',String(demoMode));
  const live=getRaces();
  picks=picks.map((numbers,i)=>!live[i]?numbers:numbers.filter(n=>live[i].horses.some(h=>available(h)&&Number(h.number)===n)));
  const x=check();dateSelect.value=selectedDate;races.replaceChildren();
@@ -223,7 +221,7 @@ function render(){
  total.textContent=x.count.every(n=>n>0)?x.points+'点・合計 '+fmt(x.stake):'選択 '+x.count.filter(n=>n>0).length+'/5 レース';
  buy.disabled=expired||!x.ok;
  const snapshot=walletSnapshot();
- message.textContent=!demoMode&&snapshot?.legacyCount?'旧共通財布のWIN5券が残っています。二重計上防止のため購入を保留しています':!demoMode&&!isLivePurchaseEnabled()?'11月15日限定：現在はデモ表示のみ購入可':!demoMode&&selectedDate!=='2026-11-15'?'11月15日のWIN5のみ本購入できます':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
+ message.textContent=!demoMode&&snapshot?.legacyCount?'旧共通財布のWIN5券が残っています。二重計上防止のため購入を保留しています':expired?'今後の日程は未公開です':!x.cards.every(Boolean)?'対象レースの出馬表を待っています':x.count.some(n=>n===0)?'残り'+x.count.filter(n=>n===0).length+'レース':x.points>5000?'5,000点以内にしてください':x.stake>1000000?'購入額は100万円以内':!demoMode&&selectedDate<today()?'過去開催日は購入できません':!demoMode&&(!Number.isFinite(x.cutoff)||Date.now()>=x.cutoff)?'発売締切を過ぎています':!demoMode&&snapshot?.seasonOver?'シーズン終了中':!demoMode&&x.stake>(snapshot?.balance||0)?'残高不足（残高 '+fmt(snapshot?.balance||0)+'）':demoMode?'デモ表示：残高変更なし':'購入後残高 '+fmt((snapshot?.balance||0)-x.stake);
  const wasOpen=history.open;history.replaceChildren();const historyHeading=node('summary','WIN5 購入履歴（'+((walletSnapshot()?.tickets?.length||0)+demoTickets.length)+'件）');history.append(historyHeading);history.open=wasOpen;
  const purchased=[...demoTickets,...(walletSnapshot()?.tickets||[])].filter(t=>t&&Array.isArray(t.legs));
  // Display every purchased digital ticket on the WIN5 home screen, newest first.
@@ -304,12 +302,6 @@ trialButton.onclick=()=>{
  const result=wallet()?.watch?.({date:selectedDate,legs:current().legs.map(l=>({venue:l.venue,raceNumber:l.raceNumber}))});
  if(!result?.ok){window.alert(result?.error||'監視の登録に失敗しました');return}
  render();
-};
-demoSwitch.onclick=()=>{
- demoMode=!demoMode;
- localStorage.setItem(DEMO_KEY,String(demoMode));
- // A switch between real data and synthetic data must never carry over selections.
- picks=Array.from({length:5},()=>[]);render();
 };
 unit.oninput=render;clear.onclick=()=>{picks=Array.from({length:5},()=>[]);render()};
 const demoTickets=[];
