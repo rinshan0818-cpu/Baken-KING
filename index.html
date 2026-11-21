@@ -2534,14 +2534,10 @@ function save(){
 }
 // WIN5 wallet bridge: only invoked on the isolated development branch's real-card purchase path.
 // Records are embedded in the primary state and therefore in the existing full backup.
-// Temporary production gate: only the verified 2026-11-15 WIN5 can debit game balance.
-// This does NOT activate a real JRA purchase or bypass the unverified WIN5 payout hold.
-const BK_WIN5_LIVE_DATE='2026-11-15';
-const BK_WIN5_LIVE_LEGS=[
- ['東京',10],['京都',10],['福島',11],['東京',11],['京都',11]
-];
+// WIN5 purchasing is available for a current or future scheduled card, subject to
+// the five validated race cards, cutoff, and isolated wallet checks below.
 const bkWin5Today=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
-const bkWin5BuyingEnabled=()=>bkWin5Today()===BK_WIN5_LIVE_DATE;
+const bkWin5BuyingEnabled=()=>true;
 // WIN5 and its badge/gacha funds are a single isolated, atomic localStorage record.
 // Never debit the standard-ticket state, standard stake totals, or its payouts.
 const BK_WIN5_WALLET_KEY='baken-king-g1-pins-mvp-v1-'+(IS_TEST_MODE?'test':'production');
@@ -2742,11 +2738,6 @@ window.BakenWin5Wallet={
   try{bkWin5WalletWrite(reset);return {ok:true}}catch(e){return {ok:false,error:'WIN5初期化に失敗しました'}}
  },
  purchase:request=>{
-  if(!bkWin5BuyingEnabled())return {ok:false,error:'WIN5の本購入は11月15日限定です'};
-  if(request?.date!==BK_WIN5_LIVE_DATE)return {ok:false,error:'11月15日のWIN5のみ購入できます'};
-  if(!Array.isArray(request.legs)||request.legs.length!==BK_WIN5_LIVE_LEGS.length||
-     request.legs.some((leg,i)=>leg?.venue!==BK_WIN5_LIVE_LEGS[i][0]||leg?.raceNumber!==BK_WIN5_LIVE_LEGS[i][1]))
-    return {ok:false,error:'JRA公式のWIN5対象5レースと一致しません'};
   const cardKey='baken-king-personal-cards-v1';
   if(!request||typeof request!=='object'||Array.isArray(request))return {ok:false,error:'購入内容が不正です'};
   if(Array.isArray(s.win5Tickets)&&s.win5Tickets.length)return {ok:false,error:'旧共通財布のWIN5券を保護中。移行が必要です'};
@@ -2784,7 +2775,7 @@ window.BakenWin5Wallet={
    .map(v=>Date.parse(String(v||'')));
   if(allRaceTimes.some(t=>!Number.isFinite(t))||allRaceTimes.some((t,i)=>i>0&&t<=allRaceTimes[i-1]))
    return {ok:false,error:'対象5レースの発走時刻を確認できません'};
-  if(Date.now()>=Math.min(firstAt-300000,Date.parse(BK_WIN5_LIVE_DATE+'T14:35:00+09:00')))return {ok:false,error:'WIN5の購入締切（14:35）を過ぎています'};
+  if(Date.now()>=firstAt-300000)return {ok:false,error:'WIN5の購入締切（最初の対象レース発走5分前）を過ぎています'};
   const points=normalized.reduce((n,leg)=>n*leg.numbers.length,1),stake=points*unit;
   if(!Number.isSafeInteger(stake)||points>5000||stake>1000000)return {ok:false,error:'点数・購入額が上限を超えています'};
   if(!Number.isSafeInteger(wallet.wallet)||wallet.wallet<0)return {ok:false,error:'WIN5専用残高が不正です'};
