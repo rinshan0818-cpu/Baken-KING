@@ -1,4 +1,4 @@
-// PWA network recovery v1.60b; preserve all app storage and user data.
+// PWA recovery v1.75b; retain origin storage, wallet, bets and friend data.
 // Baken-KING PWA refresh fix: network-first navigation and opt-in settlement-ready Web Push.
 // Only the service worker can display a push while the app is closed.
 const BK_GACHA_IMAGE_CACHE='baken-win5-gacha-images-v1';
@@ -19,9 +19,9 @@ self.addEventListener('activate',event=>event.waitUntil((async()=>{
    const url=new URL(page.url);
    const scope=new URL(self.registration.scope);
    if(url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))continue;
-   if(url.searchParams.has('bk-recovered-v160b'))continue;
+   if(url.searchParams.has('bk-recovered-v175b'))continue;
    const target=new URL('./index.html',scope);
-   target.searchParams.set('bk-recovered-v160b','1');
+   target.searchParams.set('bk-recovered-v175b','1');
    target.searchParams.set('t',String(Date.now()));
    await page.navigate(target.href);
   }catch(e){console.warn('PWA recovery deferred',e)}
@@ -36,10 +36,10 @@ self.addEventListener('fetch',event=>{
  if(isLocal&&(/\/(?:app-version\.json|index\.html|sw\.js)$/.test(url.pathname)||url.pathname===scope.pathname)){
   event.respondWith((async()=>{
    const target=new URL(event.request.url);
-   target.searchParams.set('bk-network-recovery','v160b');
+   target.searchParams.set('bk-network-recovery','v175b');
    target.searchParams.set('t',String(Date.now()));
    try{
-    const response=await fetch(new Request(target.href,{cache:'no-store',credentials:'same-origin',redirect:'follow'}));
+    const response=await fetch(new Request(target.href,{cache:'reload',credentials:'same-origin',redirect:'follow'}));
     if(response.ok)return response;
    }catch(e){}
    return fetch(event.request);
