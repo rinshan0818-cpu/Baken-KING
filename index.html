@@ -3511,8 +3511,19 @@ function bkSaveOfficialGoing(races){
   if(changed)localStorage.setItem(bkOfficialGoingKey,JSON.stringify(next));
  }catch(e){console.warn('Official going cache unavailable',e)}
 }
+// Verified historical race conditions recovered from the user's 2026-11-15 full backup.
+// Keep this independent of the rolling race-card cache; do not alter bet amounts or settlement.
+const bkHistoricalRaceConditions20261115={
+ '2026-11-15|福島|2':{surface:'芝',distance:1800,class:'未勝利',weightRule:'馬齢',restriction:['指定'],raceKind:'平地'},
+ '2026-11-15|京都|2':{surface:'芝',distance:1600,class:'未勝利',weightRule:'馬齢',restriction:['指定'],raceKind:'平地'},
+ '2026-11-15|京都|11':{surface:'芝',distance:2200,class:'GⅠ',weightRule:'定量',restriction:['牝馬限定','指定','国際'],raceKind:'平地'},
+ '2026-11-15|東京|12':{surface:'芝',distance:2000,class:'1勝クラス',weightRule:'定量',restriction:['混合','指定'],raceKind:'平地'},
+ '2026-11-15|京都|12':{surface:'芝',distance:1800,class:'3勝クラス',weightRule:'ハンデ',restriction:['混合','指定'],raceKind:'平地'}
+};
 function bkMeta(b,key){
  const existing=b&&b.raceMeta&&typeof b.raceMeta==='object'?b.raceMeta[key]:null;
+ const historical=bkHistoricalRaceConditions20261115[[b?.raceDate,b?.raceVenue,Number(b?.raceNumber)].join('|')];
+ if(historical&&Object.prototype.hasOwnProperty.call(historical,key))return historical[key];
  if(key==='going'){
   const historical=bkHistoricalGoing.get([b?.raceDate,b?.raceVenue,Number(b?.raceNumber)].join('|'));
   if(['良','稍重','重','不良'].includes(historical))return historical;
