@@ -2893,6 +2893,11 @@ function bkTicketPayout(b){const picks=bkTicketPicksFromSaved(b),unit=b.unitStak
 // retained only the general class. Match the full race identity, never just 11R.
 function bkOfficialRaceLabel(card){
  if(!card)return '';
+ // Verified 2026 Mile Championship: replace stale generic class-only card labels.
+ if(card.date==='2026-11-22'&&card.venue==='京都'&&Number(card.raceNumber)===11){
+  const name=String(card.raceName||'').trim();
+  if(!name||/^(?:3歳以上\s*)?オープン$/.test(name))return 'マイルチャンピオンシップ';
+ }
  if(card.date==='2026-11-01'&&card.venue==='東京'&&Number(card.raceNumber)===11)
   return '天皇賞（秋）';
  const name=String(card.raceName||'').trim();
