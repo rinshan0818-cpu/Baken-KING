@@ -131,7 +131,7 @@ function loadDraft(){
  try{
   const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');
   if(!draft||!schedule.some(item=>item.date===draft.date)||!Array.isArray(draft.picks)||draft.picks.length!==5)return;
-  selectedDate=draft.date;dateManuallyChosen=true;// Demo mode is controlled only from Settings; draft restoration must not override it.
+  if(draft.date!==selectedDate)return;// Demo mode is controlled only from Settings; draft restoration must not override it.
   picks=draft.picks.map(arr=>Array.isArray(arr)?[...new Set(arr.filter(n=>Number.isInteger(n)&&n>=1&&n<=18))].sort((a,b)=>a-b):[]);
   if(/^\d{1,7}$/.test(String(draft.unit))&&Number(draft.unit)>=100)unit.value=String(draft.unit);
  }catch{}
