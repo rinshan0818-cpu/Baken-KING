@@ -4794,7 +4794,13 @@ bkTicketRaceTitle=function(b){
   const obstacle=bkIsObstacleCard(entry,verified);
   const hero=document.querySelector('#autumnFixtureCard .bk-race-hero');
   if(hero){
-   const title=hero.querySelector('h2');if(title)title.textContent=entry.title||'出馬表';
+   const title=hero.querySelector('h2');if(title){
+    const base=String(entry.title||'出馬表').trim();
+    const officialGrade=bkNormalizeGrade(entry.raceConditions?.grade||entry.grade||'');
+    const verifiedGrade=entry.date==='2026-11-22'&&entry.venue==='京都'&&Number(entry.raceNumber)===11?'GⅠ':null;
+    const grade=officialGrade||verifiedGrade;
+    title.textContent=grade&&!/[(（]\\s*(?:J[・･]?G[ⅠⅡⅢ123]|G[ⅠⅡⅢ123]|L|リステッド)\\s*[)）]/i.test(base)?base+'（'+grade+'）':base;
+   }
    const eyebrow=hero.querySelector('.bk-race-eyebrow');if(eyebrow){eyebrow.textContent='';eyebrow.hidden=true}
    const meta=hero.querySelector('.bk-race-meta');if(meta){const course=entry.raceConditions?.obstacleCourse||verified.obstacleCourse;const track=obstacle?'障害':(entry.surface||entry.raceConditions?.surface||verified.surface||'');const distance=entry.distance||entry.raceConditions?.distanceMeters||verified.distanceMeters;meta.textContent=[(entry.startTime||'時刻未登録')+'発走',distance?(track+' '+distance+'m'+(track==='障害'&&course?'（'+course+'）':'')):(track||'コース未取得'),entry.horses.length+'頭'].join(' · ')}
    let obstacleTag=hero.querySelector('.bk-obstacle-tag');
