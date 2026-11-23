@@ -3503,7 +3503,7 @@ function bkSaveOfficialRestrictions(races){
   const next=previous&&typeof previous==='object'&&!Array.isArray(previous)?{...previous}:{};
   let changed=false;
   for(const race of races||[]){
-   if(!race||race.status!=='final'||!/^20\\d{2}-\\d{2}-\\d{2}$/.test(race.date||'')||
+   if(!race||race.status!=='final'||!/^20\d{2}-\d{2}-\d{2}$/.test(race.date||'')||
      !['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'].includes(race.venue)||
      !Number.isInteger(race.raceNumber)||race.raceNumber<1||race.raceNumber>12||
      !['牝馬限定','若手騎手','その他（一般）'].includes(race.restrictionCategory))continue;
