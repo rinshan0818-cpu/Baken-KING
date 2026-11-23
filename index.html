@@ -3496,6 +3496,23 @@ function bkKnownRaceGrade(b){
 const bkHistoricalGoingRows=[["2026-11-07","福島","稍重","良","稍重","稍重","良","良","良","稍重","稍重","稍重","稍重","稍重"],["2026-11-07","京都","良","良","良","良","良","良","良","良","良","良","良","良"],["2026-11-07","東京","稍重","稍重","良","良","稍重","稍重","良","良","稍重","良","良","良"],["2026-11-08","福島","稍重","稍重","稍重","稍重","稍重","稍重","稍重","稍重","稍重","稍重","稍重","稍重"],["2026-11-08","京都","良","良","良","良","良","良","良","良","良","良","良","良"],["2026-11-08","東京","良","良","良","良","良","良","良","良","良","良","良","良"],["2026-11-14","福島","良","良","良","良","良","良","良","良","良","良","良","良"],["2026-11-14","京都","良","良","良","良","良","良","良","良","良","良","良","良"],["2026-11-14","東京","良","良","良","良","良","良","良","良","良","良","良","良"],["2026-11-15","福島","良","良","良","稍重","稍重","稍重","稍重","稍重","稍重","稍重","稍重","重"],["2026-11-15","京都","稍重","稍重","稍重","不良","重","不良","重","不良","重","不良","重","重"],["2026-11-15","東京","良","良","良","良","良","良","良","良","良","良","良","良"]];
 const bkHistoricalGoing=new Map(bkHistoricalGoingRows.flatMap(([date,venue,...goings])=>
  goings.map((going,i)=>[[date,venue,i+1].join('|'),going])));
+const bkOfficialRestrictionKey='baken-official-race-restriction-v1';
+function bkSaveOfficialRestrictions(races){
+ try{
+  const previous=JSON.parse(localStorage.getItem(bkOfficialRestrictionKey)||'{}');
+  const next=previous&&typeof previous==='object'&&!Array.isArray(previous)?{...previous}:{};
+  let changed=false;
+  for(const race of races||[]){
+   if(!race||race.status!=='final'||!/^20\\d{2}-\\d{2}-\\d{2}$/.test(race.date||'')||
+     !['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'].includes(race.venue)||
+     !Number.isInteger(race.raceNumber)||race.raceNumber<1||race.raceNumber>12||
+     !['牝馬限定','若手騎手','その他（一般）'].includes(race.restrictionCategory))continue;
+   const key=[race.date,race.venue,race.raceNumber].join('|');
+   if(next[key]!==race.restrictionCategory){next[key]=race.restrictionCategory;changed=true}
+  }
+  if(changed)localStorage.setItem(bkOfficialRestrictionKey,JSON.stringify(next));
+ }catch(e){console.warn('Official restriction cache unavailable',e)}
+}
 const bkOfficialGoingKey='baken-official-race-going-v1';
 function bkSaveOfficialGoing(races){
  try{
@@ -3627,6 +3644,10 @@ function bkMeta(b,key){
 function bkDistanceBand(n){if(!Number.isFinite(n))return null;return n<=1400?'〜1400m':n<=1800?'1401〜1800m':n<=2400?'1801〜2400m':'2401m〜'}
 function bkDetailValue(b,key){if(key==='style'){const raw=b.betStyle||b.mode||b.betMode||null;return ({normal:'通常',box:'BOX',wheel:'流し',formation:'フォーメーション',通常:'通常',BOX:'BOX',流し:'流し',フォーメーション:'フォーメーション'})[raw]||null;}if(key==='restriction'){
  const verifiedKey=[b?.raceDate,b?.raceVenue,Number(b?.raceNumber)].join('|');
+ try{
+  const official=JSON.parse(localStorage.getItem(bkOfficialRestrictionKey)||'{}');
+  if(['牝馬限定','若手騎手','その他（一般）'].includes(official?.[verifiedKey]))return [official[verifiedKey]];
+ }catch{}
  const verified=bkVerifiedEntryCategory.get(verifiedKey);
  if(verified)return [verified];
  const raw=bkMeta(b,'restriction');
@@ -5065,7 +5086,10 @@ bkTicketRaceTitle=function(b){
  }
  async function registerVerifiedResults(payload,automatic=false){
   // Going is auxiliary analytics metadata; failures must never delay settlement.
-  if(payload?.schemaVersion===1&&Array.isArray(payload.races))bkSaveOfficialGoing(payload.races);
+  if(payload?.schemaVersion===1&&Array.isArray(payload.races)){
+   bkSaveOfficialGoing(payload.races);
+   bkSaveOfficialRestrictions(payload.races);
+  }
   {
    if(!automatic&&payload?.format==='BAKEN_KING_SPECIAL_RESULT')return registerSpecialManualResult(payload);
    if(automatic&&(!payload||!Array.isArray(payload.races)))return 0;
